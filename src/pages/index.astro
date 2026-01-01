@@ -1,0 +1,67 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout pageTitle="Home">
+  <section class="text-content">
+    <p>
+      I'm a network engineer, cybersecurity student, and more. 
+    </p>
+    <a href="/about" class="link">Read more about me!</a>
+  </section>
+
+  <section class="text-content">
+    <h2 class="h1">Latest Projects</h2>
+    <table class="productions">
+      <tbody><tr>
+        <td class="year">2023</td>
+        <td class="title">
+          <a href="/projects/project-1"><i>Project 1</i></a>
+          <span class="production-meta">
+            <span class="company">Company 1</span>, <span class="venue">Venue 1</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="year">2023</td>
+        <td class="title">
+          <a href="/projects/project-2"><i>Project 2</i></a>
+          <span class="production-meta">
+            <span class="company">Company 2</span>, <span class="venue">Venue 2</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="year">2023</td>
+        <td class="title">
+          <a href="/projects/project-3"><i>Project 3</i></a>
+          <span class="production-meta">
+            <span class="company">Company 3</span>, <span class="venue">Venue 3</span>
+          </span>
+        </td>
+      </tr>
+    </tbody></table>
+    <p><a href="/projects" class="link">View all projects</a></p>
+  </section>
+
+  <section class="text-content">
+    <h2 class="h1">Recent Blog Posts</h2>
+    <p>
+      I write about a variety of topics, including web development, design, and the intersection of art and technology. Here are a few of my latest posts:
+    </p>
+    <ul class="link-tree">
+      <li><a href="/blog/post-1">Blog Post 1</a></li>
+      <li><a href="/blog/post-2">Blog Post 2</a></li>
+      <li><a href="/blog/post-3">Blog Post 3</a></li>
+    </ul>
+    <p><a href="/blog" class.="link">Read more on my blog</a></p>
+  </section>
+
+  <section class="text-content">
+    <h2 class="h1">Speaking</h2>
+    <p>
+      I'm available for speaking engagements on topics related to web development, design, and creative technology. I've previously spoken at conferences and meetups on a range of subjects, from the latest front-end techniques to the importance of accessibility.
+    </p>
+    <p><a href="/speaking" class="link">Learn more about my speaking</a></p>
+  </section>
+</Layout>

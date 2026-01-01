@@ -1,0 +1,62 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout pageTitle="Contact">
+  <div class="text-content center-content">
+    <h1>Contact me</h1>
+    <p>Feel free to drop me an email or find me via the links below.</p>
+    <div id="link-tree-container">
+      <ul class="link-tree max">
+        <li><a href="mailto:srneas@gmail.com" class="link">Email</a></li>
+        <li>
+          <a
+            href="https://www.linkedin.com/in/solomon-neas/"
+            class="link"
+            target="_blank"
+            >LinkedIn</a
+          >
+        </li>
+        <li>
+          <a href="https://linktr.ee/solomonneas" class="link" target="_blank"
+            >Linktree</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .center-content {
+    width: 100%;
+    max-width: 30rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #link-tree-container {
+    width: 100%;
+    max-width: none;
+    font-size: 1rem;
+  }
+
+  #link-tree-container ul,
+  #link-tree-container li,
+  #link-tree-container a {
+    width: 100%;
+    max-width: none;
+  }
+
+  .link-tree {
+    list-style: none;
+    padding: 0;
+  }
+  .link-tree li {
+    margin: 0;
+  }
+
+  .link-tree li + li {
+    margin-top: 1rem;
+  }
+</style>

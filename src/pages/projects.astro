@@ -1,0 +1,93 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout pageTitle="Projects">
+  <section>
+    <h1>Projects</h1>
+    <table class="productions">
+      <tr>
+        <td class="year">2024</td>
+        <td class="title">
+          <a href="#"><i>Designing and Building an Open Source SOC</i></a>
+          <span class="production-meta">
+            <span class="company">Personal Project</span>, <span class="venue"
+              >In Progress</span
+            >
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="year">2024</td>
+        <td class="title">
+          <a href="#"><i>Linux+ VM Labs and Documentation</i></a>
+          <span class="production-meta">
+            <span class="company"
+              >Training Material for Linux+ V8 (XK0-006)</span
+            >, <span class="venue">In Progress</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="year">2024</td>
+        <td class="title">
+          <a href="#"><i>Learning Neovim</i></a>
+          <span class="production-meta">
+            <span class="company">Personal Development</span>, <span class="venue"
+              >Ongoing</span
+            >
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="year">2024</td>
+        <td class="title">
+          <a href="#"><i>Learning Go</i></a>
+          <span class="production-meta">
+            <span class="company">Personal Development</span>, <span class="venue"
+              >Ongoing</span
+            >
+          </span>
+        </td>
+      </tr>
+    </table>
+  </section>
+</Layout>
+
+<style>
+  section {
+    padding: 3.815rem 0 0.8rem;
+  }
+  h1 {
+    font-size: 1.563rem;
+    margin-top: 0;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 1.563rem;
+  }
+  .productions {
+    font-size: 0.8rem;
+    color: var(--text);
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .productions tr + tr {
+    border-top: 1px dotted var(--text);
+  }
+  .productions td {
+    padding: 0.4rem;
+    vertical-align: top;
+  }
+  .productions .year {
+    padding-right: clamp(1rem, 6vw, 3.815rem);
+    white-space: nowrap;
+  }
+  .productions .title a {
+    font-style: italic;
+  }
+  .production-meta {
+    display: block;
+    font-family: "IBM Plex Mono", "Courier New", Courier, monospace;
+    font-size: 0.8rem;
+  }
+</style>

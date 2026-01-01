@@ -1,0 +1,171 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout pageTitle="Resources">
+  <section class="text-content">
+    <h1>Resources</h1>
+    <p>
+      A curated list of resources covering a range of topics from software
+      development to network engineering and cybersecurity. Feel free to get in
+      touch if there’s something you want to see here!
+    </p>
+    <p>
+      <a href="https://ko-fi.com/solomonneas" class="link"
+        >Found this useful? Buy me a coffee!</a
+      >
+    </p>
+  </section>
+
+  <section>
+    <h2>GitHub</h2>
+    <table class="resources">
+      <tr>
+        <td class="cost">Free</td>
+        <td class="resource-title"
+          ><a href="https://github.com/sindresorhus/awesome" target="_blank"
+            >Awesome Lists</a
+          > <span class="resource-type-mobile">directory</span></td
+        >
+        <td class="resource-type">directory</td>
+      </tr>
+      <tr>
+        <td class="cost">Free</td>
+        <td class="resource-title"
+          ><a href="https://docs.github.com/en/get-started" target="_blank"
+            >GitHub Docs</a
+          > <span class="resource-type-mobile">documentation</span></td
+        >
+        <td class="resource-type">documentation</td>
+      </tr>
+      <tr>
+        <td class="cost">Free - Paid</td>
+        <td class="resource-title"
+          ><a href="https://www.gitkraken.com/" target="_blank">GitKraken</a>
+          <span class="resource-type-mobile">tool</span></td
+        >
+        <td class="resource-type">tool</td>
+      </tr>
+    </table>
+
+    <h2>Network Engineering</h2>
+    <table class="resources">
+      <tr>
+        <td class="cost">Varies</td>
+        <td class="resource-title"
+          ><a href="https://www.netacad.com/" target="_blank"
+            >Cisco Networking Academy</a
+          > <span class="resource-type-mobile">course</span></td
+        >
+        <td class="resource-type">course</td>
+      </tr>
+      <tr>
+        <td class="cost">Free</td>
+        <td class="resource-title"
+          ><a href="https://www.wireshark.org/" target="_blank">Wireshark</a>
+          <span class="resource-type-mobile">tool</span></td
+        >
+        <td class="resource-type">tool</td>
+      </tr>
+      <tr>
+        <td class="cost">Free</td>
+        <td class="resource-title"
+          ><a href="https://www.cloudflare.com/learning/" target="_blank"
+            >Cloudflare Learning Center</a
+          > <span class="resource-type-mobile">learning</span></td
+        >
+        <td class="resource-type">learning</td>
+      </tr>
+    </table>
+
+    <h2>Cybersecurity</h2>
+    <table class="resources">
+      <tr>
+        <td class="cost">Free</td>
+        <td class="resource-title"
+          ><a
+            href="https://owasp.org/www-project-cheat-sheet-series/"
+            target="_blank">OWASP Cheat Sheet Series</a
+          > <span class="resource-type-mobile">guide</span></td
+        >
+        <td class="resource-type">guide</td>
+      </tr>
+      <tr>
+        <td class="cost">Free - Paid</td>
+        <td class="resource-title"
+          ><a href="https://tryhackme.com/" target="_blank">TryHackMe</a>
+          <span class="resource-type-mobile">platform</span></td
+        >
+        <td class="resource-type">platform</td>
+      </tr>
+      <tr>
+        <td class="cost">Free</td>
+        <td class="resource-title"
+          ><a href="https://www.sans.org/cyber-security-resources/" target="_blank"
+            >SANS Resources</a
+          > <span class="resource-type-mobile">directory</span></td
+        >
+        <td class="resource-type">directory</td>
+      </tr>
+    </table>
+  </section>
+</Layout>
+
+<style>
+  table.resources {
+    font-size: 0.8rem;
+    color: #655a3d;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1.563rem;
+  }
+  .resources tr + tr {
+    border-top: 1px dotted #655a3d;
+  }
+  .resources td {
+    padding: 0.4rem;
+    vertical-align: top;
+  }
+  .resources .cost,
+  .resources .resource-title {
+    padding-right: 1rem;
+    padding-right: clamp(1rem, 6vw, 3.815rem);
+  }
+  .resources .cost {
+    white-space: nowrap;
+  }
+  .resources .resource-type {
+    display: none;
+  }
+  .resources .resource-type-mobile {
+    display: inline;
+    font-size: 0.64rem;
+    border-radius: 1rem;
+    border: 1px dotted #655a3d;
+    padding: 0 0.512rem;
+    white-space: nowrap;
+    text-decoration: none;
+    margin-left: 0.5rem;
+  }
+  .resources .title a {
+    font-style: italic;
+  }
+  section h2 {
+    font-weight: 400;
+    font-size: 1.25rem;
+    margin-top: 3.815rem;
+  }
+
+  @media screen and (min-width: 900px) {
+    .resources .resource-title {
+      white-space: nowrap;
+    }
+    .resources .resource-type-mobile {
+      display: none;
+    }
+    .resources .resource-type {
+      display: table-cell;
+      width: 100%;
+    }
+  }
+</style>
