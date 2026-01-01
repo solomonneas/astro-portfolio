@@ -1,0 +1,79 @@
+---
+import Layout from "./Layout.astro";
+const { frontmatter } = Astro.props;
+---
+
+<Layout pageTitle={frontmatter.title}>
+  <div class="page">
+    <div class="text-content">
+      <hgroup>
+        <h1>{frontmatter.title}</h1>
+        <p class="mono small">{frontmatter.description}</p>
+      </hgroup>
+      <div>
+        <slot />
+      </div>
+      <section class="production-images">
+        <img
+          alt={frontmatter.img_alt}
+          src={frontmatter.img}
+        />
+      </section>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .text-content {
+    line-height: 1.7;
+    grid-auto-rows: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .text-content > * {
+    grid-column: 1 / 2;
+    margin-top: 0;
+  }
+  .text-content > * + *,
+  .text-content > div > * + *,
+  .text-content > h1 + *,
+  section > h1 + * {
+    margin-top: 1.563rem;
+  }
+  .production-images,
+  .text-content > div > h2 {
+    margin-top: 1.953rem;
+  }
+
+  hgroup h1 {
+    margin: 0;
+  }
+
+  hgroup h1 + p {
+    margin-top: 0.4rem;
+  }
+
+  .production-images {
+    place-self: start;
+    padding: 0;
+    max-height: 100%;
+    margin-left: 0;
+  }
+  .production-images > img + img {
+    margin-top: 0.2rem;
+  }
+
+  @media screen and (min-width: 1300px) {
+    .text-content {
+      grid-template-columns: minmax(65ch, 1fr) minmax(10rem, auto);
+    }
+
+    .production-images {
+      grid-row: span 2;
+      grid-column: 2 / 3;
+      overflow: visible;
+      margin-left: clamp(4px, 6vw, 4rem);
+      margin-top: 1.953rem;
+    }
+  }
+</style>

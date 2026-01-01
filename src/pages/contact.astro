@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout pageTitle="Contact">
-  <div class="text-content center-content">
+  <div class="text-content">
     <h1>Contact me</h1>
     <p>Feel free to drop me an email or find me via the links below.</p>
     <div id="link-tree-container">
@@ -18,6 +18,9 @@ import Layout from "../layouts/Layout.astro";
           >
         </li>
         <li>
+          <a href="https://x.com/solomonneas" class="link" target="_blank">X</a>
+        </li>
+        <li>
           <a href="https://linktr.ee/solomonneas" class="link" target="_blank"
             >Linktree</a
           >
@@ -28,24 +31,9 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <style>
-  .center-content {
-    width: 100%;
-    max-width: 30rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
   #link-tree-container {
-    width: 100%;
-    max-width: none;
+    max-width: 20rem; /* Set a max-width for the container */
     font-size: 1rem;
-  }
-
-  #link-tree-container ul,
-  #link-tree-container li,
-  #link-tree-container a {
-    width: 100%;
-    max-width: none;
   }
 
   .link-tree {
@@ -59,4 +47,6 @@ import Layout from "../layouts/Layout.astro";
   .link-tree li + li {
     margin-top: 1rem;
   }
+
+  /* Let global styles handle the centering of text inside the link */
 </style>
