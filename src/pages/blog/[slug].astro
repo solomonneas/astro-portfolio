@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// This function is required for Astro to know which pages to generate
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<Layout title={entry.data.title}>
+  <div class="mb-8">
+    <h1>{entry.data.title}</h1>
+    <p>Published on: {entry.data.pubDate.toDateString()}</p>
+    <article class="prose lg:prose-xl">
+      <Content />
+    </article>
+  </div>
+</Layout>

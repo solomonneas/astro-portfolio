@@ -95,7 +95,7 @@ const pathname = Astro.url.pathname;
             <li><a href="/resources" class={pathname.startsWith("/resources") ? "current-link" : ""}>Resources</a></li>
             <li><a href="/blog" class={pathname.startsWith("/blog") ? "current-link" : ""}>Blog</a></li>
             <li><a href="/rss.xml" target="_blank">RSS</a></li>
-            <li><a href="/contact" class={pathname.startsWith("/contact") ? "current-link" : ""}>Contact</a></li>
+            <li><a href="/contact" class={pathname.startsWith("/contact") ? "current-kind" : ""}>Contact</a></li>
           </ul>
         </div>
       </nav>
@@ -103,6 +103,11 @@ const pathname = Astro.url.pathname;
         <slot />
       </main>
       <footer id="footer">
+        {pathname.startsWith("/blog/") && (
+          <div class="text-center" style="margin-bottom: 2rem;">
+            <a href="/blog" class="text-lg text-blue-500 hover:underline">Back to Blog</a>
+          </div>
+        )}
         <div id="kofi">
           <a href="https://ko-fi.com/solomonneas" class="kofi-button">
             <img
