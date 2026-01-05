@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favicon Selection</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 2rem; background: #fff2d1; color: #655a3d; }
+        .options { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
+        .option { text-align: center; border: 1px solid #655a3d; padding: 1rem; border-radius: 8px; background: white; }
+        .icon-container { width: 100px; height: 100px; margin: 0 auto 1rem; }
+        h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        code { background: #eee; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>Choose Your Favicon</h1>
+    <div class="options">
+        <div class="option">
+            <h2>Option 1: Serif</h2>
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
+                    <text x="50%" y="55%" font-family="'Lora', serif" font-weight="bold" font-size="7" fill="#655a3d" text-anchor="middle" dominant-baseline="middle">S</text>
+                    <style>svg{background: #fff2d1;}</style>
+                </svg>
+            </div>
+            <p>Matches "Solomon Neas"</p>
+        </div>
+
+        <div class="option">
+            <h2>Option 2: Mono</h2>
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
+                    <text x="50%" y="55%" font-family="'IBM Plex Mono', monospace" font-weight="bold" font-size="7" fill="#655a3d" text-anchor="middle" dominant-baseline="middle">S</text>
+                    <style>svg{background: #fff2d1;}</style>
+                </svg>
+            </div>
+            <p>Matches code elements</p>
+        </div>
+
+        <div class="option">
+            <h2>Option 3: Modern</h2>
+            <div class="icon-container">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                    <path fill="#655a3d" d="M16,2C8.268,2,2,8.268,2,16s6.268,14,14,14s14-6.268,14-14S23.732,2,16,2z M12,24c-1.105,0-2-0.895-2-2 s0.895-2,2-2h4c1.105,0,2-0.895,2-2s-0.895-2-2-2h-3.5C21,15.5,22,14.5,22,13c0-2.209-1.791-4-4-4h-2c-1.105,0-2,0.895-2,2 s0.895,2,2,2h2c1.105,0,2,0.895,2,2s-0.895,2-2,2h-4c-1.105,0-2,0.895-2,2s0.895,2,2,2h3.5C11,21.5,10,22.5,10,24c0,2.209,1.791,4,4,4 h2c1.105,0,2-0.895,2-2S17.105,24,16,24H12z"/>
+                    <rect x="0" y="0" width="32" height="32" fill="none"/>
+                </svg>
+            </div>
+             <p>Geometric Circle</p>
+        </div>
+        
+         <div class="option">
+            <h2>Option 4: Pixel</h2>
+            <div class="icon-container">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
+                    <path fill="#655a3d" d="M2 1h4v1H6v1h1v2H6v1H2V5h1V4h4V3H2V1z"/>
+                    <style>svg{background: #fff2d1;}</style>
+                </svg>
+            </div>
+             <p>8-bit style</p>
+        </div>
+    </div>
+</body>
+</html>
