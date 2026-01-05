@@ -14,10 +14,7 @@ const { frontmatter } = Astro.props;
         <slot />
       </div>
       <section class="production-images">
-        <img
-          alt={frontmatter.img_alt}
-          src={frontmatter.img}
-        />
+        <img alt={frontmatter.img_alt} src={frontmatter.img} />
       </section>
     </div>
   </div>
