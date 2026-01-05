@@ -11,7 +11,7 @@ const pathname = Astro.url.pathname;
     <title>Solomon Neas | {pageTitle}</title>
     <link rel="icon" type="image/svg+xml" href="/icon.svg" id="svg-icon" />
 
-    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/global.css" />
 
     <script>
       let darkmode = false;
@@ -30,7 +30,7 @@ const pathname = Astro.url.pathname;
  #filter { backdrop-filter:hue-rotate(${hueRotation}deg) invert(${a}%); }
  `;
 
-        const o = `data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 8\'%3E%3Cpath fill=\'%23655a3d\' d=\'M7.68.77A.77.77 0 0 0 6.91 0H.77A.77.77 0 0 0 0 .77V6.9c0 .43.34.77.77.77H6.9c.43 0 .77-.34.77-.77V.77Z\'/><path fill=\'%23fff2d1\' d=\'M1.44 6.72v-.27c.2-.01.35-.06.43-.15.07-.08.12-.2.12-.35l.02-.51V1.57l.02-.28-.59.03V.96h1.85v.27c-.2 0-.34.05-.42.14a.55.55 0 0 0-.13.36l-.02.51V3.6h.62l1.03-1.62a4.87 4.87 0 0 1 .58-.69 4.15 4.15 0 0 1-.5.02V.96h1.77v.27c-.23.02-.44.06-.62.12s-.35.16-.52.31c-.16.15-.34.38-.52.68l-.8 1.29c.15.09.28.2.38.32l.3.38.92 1.22c.2.28.38.48.51.6.13.14.26.22.36.25.11.03.22.05.34.05v.27h-1c-.06 0-.14-.04-.23-.11a19.93 19.93 0 0 1-.61-.7l-.99-1.33-.3-.39a1.53 1.53 0 0 0-.31-.28l-.4.01v1.82a19.9 19.9 0 0 1-.03.65l.6-.03v.36H1.43Z\'/><style>svg{filter:hue-rotate(${hueRotation}deg) invert(${a}%25);}</style></svg>`;
+        const o = `data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 8\'%3E%3Ctext x=\'50%25\' y=\'60%25\' font-family=\'serif\' font-weight=\'bold\' font-size=\'7\' fill=\'%23C5A028\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3ES%3C/text%3E%3Cstyle%3Esvg{filter:hue-rotate(${hueRotation}deg) invert(${a}%25);}%3C/style%3E%3C/svg%3E`;
         svgIcon.setAttribute("href", o);
         saveThemeToLocalStorage(inverted, hueRotation);
       }
@@ -55,7 +55,7 @@ const pathname = Astro.url.pathname;
         }
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById("color");
         btn.addEventListener("click", () => {
           darkmode = !darkmode;
@@ -72,7 +72,7 @@ const pathname = Astro.url.pathname;
           animationStyle.innerText = `* {
             transition-property:filter, backdrop-filter;
             transition-duration: 1s;
-          }`
+          }`;
         }, 1);
       });
     </script>
@@ -88,14 +88,54 @@ const pathname = Astro.url.pathname;
         </div>
         <div class="nav-links">
           <ul>
-            <li><a href="/" class={pathname === "/" ? "current-link" : ""}>Home</a></li>
-            <li><a href="/about" class={pathname.startsWith("/about") ? "current-link" : ""}>About</a></li>
-            <li><a href="/opportunities" class={pathname.startsWith("/opportunities") ? "current-link" : ""}>Opportunities</a></li>
-            <li><a href="/projects" class={pathname.startsWith("/projects") ? "current-link" : ""}>Projects</a></li>
-            <li><a href="/resources" class={pathname.startsWith("/resources") ? "current-link" : ""}>Resources</a></li>
-            <li><a href="/blog" class={pathname.startsWith("/blog") ? "current-link" : ""}>Blog</a></li>
+            <li>
+              <a href="/" class={pathname === "/" ? "current-link" : ""}>Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="/about"
+                class={pathname.startsWith("/about") ? "current-link" : ""}
+                >About</a
+              >
+            </li>
+            <li>
+              <a
+                href="/opportunities"
+                class={pathname.startsWith("/opportunities")
+                  ? "current-link"
+                  : ""}>Opportunities</a
+              >
+            </li>
+            <li>
+              <a
+                href="/projects"
+                class={pathname.startsWith("/projects") ? "current-link" : ""}
+                >Projects</a
+              >
+            </li>
+            <li>
+              <a
+                href="/resources"
+                class={pathname.startsWith("/resources") ? "current-link" : ""}
+                >Resources</a
+              >
+            </li>
+            <li>
+              <a
+                href="/blog"
+                class={pathname.startsWith("/blog") ? "current-link" : ""}
+                >Blog</a
+              >
+            </li>
             <li><a href="/rss.xml" target="_blank">RSS</a></li>
-            <li><a href="/contact" class={pathname.startsWith("/contact") ? "current-kind" : ""}>Contact</a></li>
+            <li>
+              <a
+                href="/contact"
+                class={pathname.startsWith("/contact") ? "current-kind" : ""}
+                >Contact</a
+              >
+            </li>
           </ul>
         </div>
       </nav>
@@ -103,25 +143,29 @@ const pathname = Astro.url.pathname;
         <slot />
       </main>
       <footer id="footer">
-        {pathname.startsWith("/blog/") && (
-          <div class="text-center" style="margin-bottom: 2rem;">
-            <a href="/blog" class="text-lg text-blue-500 hover:underline">Back to Blog</a>
-          </div>
-        )}
+        {
+          pathname.startsWith("/blog/") && (
+            <div class="text-center" style="margin-bottom: 2rem;">
+              <a href="/blog" class="text-lg text-blue-500 hover:underline">
+                Back to Blog
+              </a>
+            </div>
+          )
+        }
         <div id="kofi">
           <a href="https://ko-fi.com/solomonneas" class="kofi-button">
-            <img
-              src="/ko-fi.png"
-              alt=""
-              width="22px"
-              height="15px"
-            />
-             Buy me a coffee
+            <img src="/ko-fi.png" alt="" width="22px" height="15px" />
+            Buy me a coffee
           </a>
         </div>
         <div class="nav-links footer-links">
           <ul>
-            <li><a href="https://www.linkedin.com/in/solomon-neas/" target="_blank">LinkedIn</a></li>
+            <li>
+              <a
+                href="https://www.linkedin.com/in/solomon-neas/"
+                target="_blank">LinkedIn</a
+              >
+            </li>
             <li><a href="https://x.com/solomonneas" target="_blank">X</a></li>
             <li><a href="mailto:srneas@gmail.com">Email</a></li>
           </ul>

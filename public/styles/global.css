@@ -1,4 +1,3 @@
-
 @font-face {
     font-family: 'Lora';
     src: url('/fonts/Lora-Regular.woff2') format('woff2');
@@ -45,12 +44,14 @@ body {
     color: var(--text);
     font-family: 'Lora', serif;
     overscroll-behavior-y: none;
+    overflow-x: hidden;
 }
 
 .site-wrapper {
     padding: clamp(4px, 6vw, 4rem);
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 70rem;
+    margin: 0 auto;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -132,24 +133,30 @@ main {
     grid-auto-rows: auto;
 }
 
-.text-content > * {
+.text-content>* {
     grid-column: 1 / 2;
     margin-top: 0;
     margin-bottom: 0;
     max-width: 65ch;
 }
 
-.text-content > * + *, .text-content > div > * + *, .text-content > h1 + *, section > h1 + * {
+.text-content>*+*,
+.text-content>div>*+*,
+.text-content>h1+*,
+section>h1+* {
     margin-top: 1.563rem;
 }
 
-h1, .h1 {
+h1,
+.h1 {
     font-size: 1.563rem;
     margin-top: 0;
     font-weight: 400;
 }
 
-h2, .h2, .site-title {
+h2,
+.h2,
+.site-title {
     font-size: 1.25rem;
     font-weight: 400;
 }
@@ -203,24 +210,35 @@ footer {
 }
 
 @keyframes wiggle {
-    0%, 60%, 100% {
+
+    0%,
+    60%,
+    100% {
         transform: rotate(0) scale(1.0);
     }
+
     75% {
         transform: rotate(0) scale(1.12);
     }
+
     80% {
         transform: rotate(0) scale(1.1);
     }
-    84%, 92% {
+
+    84%,
+    92% {
         transform: rotate(-10deg) scale(1.1);
     }
-    88%, 96% {
+
+    88%,
+    96% {
         transform: rotate(10deg) scale(1.1);
     }
 }
 
-.button, .button:visited, a.kofi-button {
+.button,
+.button:visited,
+a.kofi-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -259,11 +277,12 @@ footer {
     font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
 }
 
-.productions tr + tr {
+.productions tr+tr {
     border-top: 1px dotted var(--text);
 }
 
-.productions td, .productions th {
+.productions td,
+.productions th {
     padding: .4rem;
     vertical-align: top;
 }
@@ -317,18 +336,19 @@ cite a {
     font-size: 1rem;
 }
 
-.testimonials blockquote + blockquote {
+.testimonials blockquote+blockquote {
     margin-top: 1.563rem;
 }
 
 @media screen and (min-width: 1300px) {
     .text-content {
-        grid-template-columns: minmax(65ch, 1fr) minmax(10rem, auto);
+        grid-template-columns: 65ch 1fr;
+        gap: clamp(2rem, 4vw, 4rem);
     }
 
-    .text-content > .testimonials {
+    .text-content>.testimonials {
         grid-column: 2 / 3;
-        margin-left: clamp(4px, 6vw, 4rem);
+        margin-left: 0;
     }
 
     .testimonials blockquote {
