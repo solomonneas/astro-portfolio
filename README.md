@@ -1,26 +1,33 @@
-# Solomon Neas - Personal Portfolio
+# Solomon Neas | Personal Portfolio
 
-This is the source code for the personal portfolio website of Solomon Neas, built with the [Astro](https://astro.build/) web framework.
+A minimalist, high-performance personal portfolio built with [Astro](https://astro.build/).
 
-## ✨ Features
+## 🛠️ Tech Stack
 
-*   **Astro-powered:** Fast, content-focused, and built with Astro's "Islands Architecture."
-*   **Dynamic Theming:** A unique, client-side theme switcher that allows users to randomize the color scheme of the site.
-*   **Fully Responsive:** Designed to work beautifully on all devices, from mobile phones to desktop computers.
-*   **SEO Optimized:** Built with SEO best practices in mind to ensure high visibility on search engines.
+- **Framework:** Astro 5.0
+- **Styling:** Tailwind CSS
+- **Interactivity:** Astro Islands
+- **Icons:** Custom Terminal Cursor SVG
 
-## 🚀 Project Structure
+## 🚀 Getting Started
 
-*   `src/pages/`: This is where all the pages for the site are located. Each `.astro` file in this directory becomes a page on the site.
-*   `src/layouts/`: This directory contains the main layout for the site, which includes the header, footer, and navigation.
-*   `src/components/`: This is where reusable components are stored.
-*   `public/`: This directory is for static assets that don't need to be processed by Astro, such as fonts, images, and `global.css`.
+```bash
+# Install dependencies
+npm install
 
-## 🧞 Commands
+# Start development server
+npm run dev
 
-| Command           | Action                                       |
-| :---------------- | :------------------------------------------- |
-| `npm install`     | Installs dependencies                        |
-| `npm run dev`     | Starts local dev server at `localhost:4321`  |
-| `npm run build`   | Build your production site to `./dist/`      |
-| `npm run preview` | Preview your build locally, before deploying |
+# Build for production
+npm run build
+```
+
+## � Key Directories
+
+- `src/pages/`: File-based routing for all site pages.
+- `src/layouts/`: Core page structure and dynamic theme logic.
+- `src/components/`: Reusable UI components.
+- `public/`: Static assets (fonts, custom icons).
+
+---
+Built with focus on speed and simplicity.
