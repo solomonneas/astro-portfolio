@@ -34,5 +34,5 @@ yarn-error.log*
 dist/
 
 # Blueprint
-# blueprint.md
+blueprint.md
 GEMINI.md
