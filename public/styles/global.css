@@ -184,7 +184,28 @@ footer {
 }
 
 .footer-links ul li {
-    margin: 1.91rem;
+    margin: clamp(0.5rem, 2vw, 1rem);
+}
+
+.footer-links a {
+    border-bottom: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    transition: transform 0.2s ease;
+}
+
+.footer-links a:hover {
+    transform: translateY(-3px);
+    background: transparent !important;
+    color: currentColor !important;
+}
+
+.social-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
 }
 
 #kofi {

@@ -104,3 +104,4 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   2. **Dependency Check:** If a `package.json` was modified, AI runs `npm install`.  
   3. **Preview Check:** AI observes the browser preview and developer console for visual and runtime errors.  
   4. **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
+.gitignore
