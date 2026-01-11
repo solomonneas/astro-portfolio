@@ -6,133 +6,424 @@ import Layout from "../layouts/Layout.astro";
   <section>
     <h1>Projects</h1>
     <table class="productions">
-      <tr>
-        <td class="year">2026 Jan</td>
-        <td class="title">
-          <a><i>HyperV to Proxmox Migration</i></a>
-          <span class="production-meta">
-            <span class="company">Polk State College</span>, <span class="venue">In Progress</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Dec</td>
-        <td class="title">
-          <a href="/projects/designing-and-building-an-open-source-soc/">
-            <i>Designing and Building an Open Source SOC</i>
-          </a>
-          <span class="production-meta">
-            <span class="company">Polk State College</span>, <span class="venue">In Progress</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Dec</td>
-        <td class="title">
-          <a href="/projects/learning-neovim/"><i>Learning Neovim</i></a>
-          <span class="production-meta">
-            <span class="company">Personal Development</span>, <span class="venue">Ongoing</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Dec</td>
-        <td class="title">
-          <a href="/projects/learning-astro/"><i>Learning Astro.js</i></a>
-          <span class="production-meta">
-            <span class="company">Personal Development</span>, <span class="venue">Ongoing</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Dec</td>
-        <td class="title">
-          <a><i>Ollama & Local LLMS</i></a>
-          <span class="production-meta">
-            <span class="company">Personal Project</span>, <span class="venue">Ongoing</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Nov</td>
-        <td class="title">
-          <a href="/projects/linux-vm-labs-and-documentation/"><i>Linux+ VM Labs and Documentation</i></a>
-          <span class="production-meta">
-            <span class="company">Training Material for Linux+ V8 (XK0-006)</span>, <span class="venue">Completed</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Nov</td>
-        <td class="title">
-          <a><i>Proxmox 9.1.2 Homelab</i></a>
-          <span class="production-meta">
-            <span class="company">Personal Project</span>, <span class="venue">Ongoing</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Oct</td>
-        <td class="title">
-          <a><i>APT 44 - Cyber Intelligence Report | LIS62709 Cyber Intelligence</i></a>
-          <span class="production-meta">
-            <span class="company">University of South Florida</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Oct</td>
-        <td class="title">
-          <a>
-            <i>
-              Securing U.S. Water and Wastewater Utilities: Cyber Risks, OT Exposure, and National Security
-              Implications" | LIS6107 Advanced Professional Communication for Analysists
-            </i>
-          </a>
-          <span class="production-meta">
-            <span class="company">University of South Florida</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Jul</td>
-        <td class="title">
-          <a><i>NDG Proxmox VE 8 - NETLAB+ Deployment Workshop</i></a>
-          <span class="production-meta">
-            <span class="company">Network Development Group</span>, <span class="venue">Completed</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Jul</td>
-        <td class="title">
-          <a><i>VMware ESXi to Proxmox Migration for NDG Netlabs+</i></a>
-          <span class="production-meta">
-            <span class="company">Migration of critical infrastructure for a popular online learning platform.</span>, <span
-              class="venue">
-              Completed
+      <thead>
+        <tr>
+          <th class="icon-header"></th>
+          <th class="year">Date</th>
+          <th class="title">Project</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Server Infrastructure</title><path
+                fill="currentColor"
+                d="M4,1V5H20V1H4M4,7V11H20V7H4M4,13V17H20V13H4M4,19V23H20V19H4Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2026 Jan
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Windows / Hyper-V</title><path
+                  fill="currentColor"
+                  d="M3,12V6.75L9,5.43V11.69M20,3V11.75L10,11.87V5.33M10,12.14L20,12.27V21L10,19.66M9,12.31V18.57L3,17.25V12">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Proxmox</title><path
+                  fill="currentColor"
+                  d="M12,15C7.58,15 4,16.79 4,19V21H20V19C20,16.79 16.42,15 12,15M8,9A4,4 0 0,0 12,13A4,4 0 0,0 16,9A4,4 0 0,0 12,5A4,4 0 0,0 8,9Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>HyperV to Proxmox Migration</i></a>
+            <span class="production-meta">
+              <span class="company">Polk State College</span>, <span class="venue">In Progress</span>
             </span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Jul</td>
-        <td class="title">
-          <a><i>Obsidian Personal Knowledge Management</i></a>
-          <span class="production-meta">
-            <span class="company">Personal Development</span>, <span class="venue">Ongoing</span>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="year">2025 Jun</td>
-        <td class="title">
-          <a><i>Classroom Hardware Upgrade & MECM Integration</i></a>
-          <span class="production-meta">
-            <span class="company">Polk State College</span>
-          </span>
-        </td>
-      </tr>
+            <span class="description">Migrating mission-critical virtualization hosts from Hyper-V to Proxmox VE.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Security / SOC</title><path
+                fill="currentColor"
+                d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C14.21,7 16,8.79 16,11C16,13.21 14.21,15 12,15C9.79,15 8,13.21 8,11C8,8.79 9.79,7 12,7M12,17C14.67,17 20,18.33 20,21V22H4V21C4,18.33 9.33,17 12,17Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Dec
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Linux</title><path
+                  fill="currentColor"
+                  d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Elasticsearch</title><path fill="currentColor" d="M12,12A10,10 0 1,0 22,22L12,12Z"></path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a href="/projects/designing-and-building-an-open-source-soc/">
+              <i>Designing and Building an Open Source SOC</i>
+            </a>
+            <span class="production-meta">
+              <span class="company">Polk State College</span>, <span class="venue">In Progress</span>
+            </span>
+            <span class="description">
+              Implementing a full-stack Security Operations Center using Wazuh, ELK, and Suricata.
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Development / Code</title><path
+                fill="currentColor"
+                d="M12,14.7L11,15.7L5.3,10L11,4.3L12,5.3L7.3,10L12,14.7M13,14.7L17.7,10L13,5.3L14,4.3L19.7,10L14,15.7L13,14.7Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Dec
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Lua</title><path
+                  fill="currentColor"
+                  d="M12,2C6.48,2 2,6.48 2,12S6.48,22 12,22 22,17.52 22,12 17.52,2 12,2C12,20C7.59,20 4,16.41 4,12S7.59,4 12,4 20,7.59 20,12 16.41,20 12,20M12,6C8.69,6 6,8.69 6,12S8.69,18 12,18 18,15.31 18,12 15.31,6 12,6Z">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Vim</title><path
+                  fill="currentColor"
+                  d="M12,2L2,22H22L12,2M12,6L19.53,19H4.47L12,6M11,10V14H13V10H11M11,16V18H13V16H11Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a href="/projects/learning-neovim/"><i>Learning Neovim</i></a>
+            <span class="production-meta">
+              <span class="company">Personal Development</span>, <span class="venue">Ongoing</span>
+            </span>
+            <span class="description">Mastering modal editing and building a custom Lua-based configuration.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Web Development</title><path
+                fill="currentColor"
+                d="M16.36,14C16.44,13.34 16.5,12.68 16.5,12C16.5,11.32 16.44,10.66 16.36,10H19.74C19.9,10.64 20,11.31 20,12C20,12.69 19.9,13.36 19.74,14M14.59,19.56C15.19,18.45 15.65,17.25 15.97,16H18.92C17.96,17.65 16.43,18.93 14.59,19.56M14.34,14H9.66C9.57,13.34 9.5,12.68 9.5,12C9.5,11.32 9.57,10.66 9.66,10H14.34C14.43,10.66 14.5,11.32 14.5,12C14.5,12.68 14.43,13.34 14.34,14M12,19.96C11.17,18.76 10.5,17.43 10.09,16H13.91C13.5,17.43 12.83,18.76 12,19.96M8,12C8,12.68 8.06,13.34 8.14,14H4.26C4.1,13.36 4,12.69 4,12C4,11.31 4.1,10.64 4.26,10H8.14C8.06,10.66 8,11.32 8,12M5.08,16H7.64C8.03,17.25 8.49,18.45 9.1,19.56C7.25,18.93 5.73,17.65 5.08,16M5.08,8C5.73,6.35 7.25,5.07 9.1,4.44C8.49,5.55 8.03,6.75 7.64,8H5.08M10.09,8C10.5,6.57 11.17,5.24 12,4.04C12.83,5.24 13.5,6.57 13.91,8H10.09M18.92,8H15.97C15.65,6.75 15.19,5.55 14.59,4.44C16.43,5.07 17.96,6.35 18.92,8Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Dec
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Astro</title><path
+                  fill="currentColor"
+                  d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>JavaScript</title><path
+                  fill="currentColor"
+                  d="M3,3H21V21H3V3M7.73,18.04C8.13,18.89 8.92,19.5 10.27,19.5C11.56,19.5 12.39,18.81 12.39,17.71C12.39,16.74 11.7,16.11 10.4,15.56L9.93,15.36C8.38,14.74 7.44,13.9 7.44,12.36C7.44,10.82 8.66,9.66 10.32,9.66C11.85,9.66 12.78,10.5 13.23,11.5L11.39,12.63C11.08,11.95 10.7,11.58 10.23,11.58C9.75,11.58 9.38,11.89 9.38,12.39C9.38,12.89 9.69,13.16 10.44,13.5L10.9,13.71C12.71,14.5 13.9,15.33 13.9,17.58C13.9,19.73 12.25,21 10.23,21C8.25,21 7.12,19.86 6.5,18.6L7.73,18.04M15.11,11V18.82C15.11,20.23 15.89,21 17.2,21C18.51,21 19.33,20.19 19.33,18.81V11H17.43V18.63C17.43,19.12 17.25,19.32 16.94,19.32C16.63,19.32 16.45,19.12 16.45,18.63V11H15.11Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a href="/projects/learning-astro/"><i>Learning Astro.js</i></a>
+            <span class="production-meta">
+              <span class="company">Personal Development</span>, <span class="venue">Ongoing</span>
+            </span>
+            <span class="description">Building performant, content-driven websites with the Astro framework.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>AI</title><path
+                fill="currentColor"
+                d="M19,15C19,13.9 18.1,13 17,13H7A2,2 0 0,0 5,15C5,16.1 5.9,17 7,17H17C18.1,17 19,16.1 19,15M17,15H7V15H17V15M17,11C18.1,11 19,10.1 19,9C19,7.9 18.1,7 17,7H7A2,2 0 0,0 5,9C5,10.1 5.9,11 7,11H17M7,9H17V9H7V9M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Dec
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Python</title><path
+                  fill="currentColor"
+                  d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M13,7H11V13H17V11H13V7Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>Ollama & Local LLMS</i></a>
+            <span class="production-meta">
+              <span class="company">Personal Project</span>
+            </span>
+            <span class="description">Self-hosting large language models for private and offline AI assistance.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Terminal</title><path
+                fill="currentColor"
+                d="M20,19V7H4V19H20M20,5A2,2 0 0,1 22,7V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V7A2,2 0 0,1 4,5H20M13,17V15H18V17H13M9.58,13L5.57,9L6.99,7.58L12.41,13L6.99,18.41L5.57,17L9.58,13Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Nov
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Linux</title><path
+                  fill="currentColor"
+                  d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>VMware</title><path
+                  fill="currentColor"
+                  d="M2,2H22V22H2V2M4,4V20H20V4H4M6,6H18V18H6V6M8,8H16V16H8V8">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a href="/projects/linux-vm-labs-and-documentation/"><i>Linux+ VM Labs and Documentation</i></a>
+            <span class="production-meta">
+              <span class="company">Training Material</span>, <span class="venue">Completed</span>
+            </span>
+            <span class="description">Developing comprehensive lab environments for CompTIA Linux+ certification.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Server Infrastructure</title><path
+                fill="currentColor"
+                d="M4,1V5H20V1H4M4,7V11H20V7H4M4,13V17H20V13H4M4,19V23H20V19H4Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Nov
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Proxmox</title><path
+                  fill="currentColor"
+                  d="M12,15C7.58,15 4,16.79 4,19V21H20V19C20,16.79 16.42,15 12,15M8,9A4,4 0 0,0 12,13A4,4 0 0,0 16,9A4,4 0 0,0 12,5A4,4 0 0,0 8,9Z">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Network</title><path
+                  fill="currentColor"
+                  d="M12,11A3,3 0 0,0 9,14A3,3 0 0,0 12,17A3,3 0 0,0 15,14A3,3 0 0,0 12,11M12,19A5,5 0 0,1 7,14A5,5 0 0,1 12,9A5,5 0 0,1 17,14A5,5 0 0,1 12,19M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>Proxmox 9.1.2 Homelab</i></a>
+            <span class="production-meta">
+              <span class="company">Personal Project</span>, <span class="venue">Ongoing</span>
+            </span>
+            <span class="description">Building a redundant homelab cluster for DevOps and security testing.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Security</title><path
+                fill="currentColor"
+                d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C14.21,7 16,8.79 16,11C16,13.21 14.21,15 12,15C9.79,15 8,13.21 8,11C8,8.79 9.79,7 12,7M12,17C14.67,17 20,18.33 20,21V22H4V21C4,18.33 9.33,17 12,17Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Oct
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Research</title><path
+                  fill="currentColor"
+                  d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M13,7H11V13H17V11H13V7Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>APT 44 - Cyber Intelligence Report</i></a>
+            <span class="production-meta">
+              <span class="company">University of South Florida</span>
+            </span>
+            <span class="description">Analyzing advanced persistent threats and state-sponsored cyber operations.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Security</title><path
+                fill="currentColor"
+                d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C14.21,7 16,8.79 16,11C16,13.21 14.21,15 12,15C9.79,15 8,13.21 8,11C8,8.79 9.79,7 12,7M12,17C14.67,17 20,18.33 20,21V22H4V21C4,18.33 9.33,17 12,17Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Oct
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Research</title><path
+                  fill="currentColor"
+                  d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>Securing U.S. Water and Wastewater Utilities</i></a>
+            <span class="production-meta">
+              <span class="company">University of South Florida</span>
+            </span>
+            <span class="description">Researching security vulnerabilities in national critical infrastructure.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Server Infrastructure</title><path
+                fill="currentColor"
+                d="M4,1V5H20V1H4M4,7V11H20V7H4M4,13V17H20V13H4M4,19V23H20V19H4Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Jul
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Proxmox</title><path
+                  fill="currentColor"
+                  d="M12,15C7.58,15 4,16.79 4,19V21H20V19C20,16.79 16.42,15 12,15M8,9A4,4 0 0,0 12,13A4,4 0 0,0 16,9A4,4 0 0,0 12,5A4,4 0 0,0 8,9Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>NDG Proxmox VE 8 - NETLAB+ Deployment Workshop</i></a>
+            <span class="production-meta">
+              <span class="company">Network Development Group</span>, <span class="venue">Completed</span>
+            </span>
+            <span class="description">Designing deployment workflows for Proxmox in academic environments.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Migration / Virtualization</title><path
+                fill="currentColor"
+                d="M4,1V5H20V1H4M4,7V11H20V7H4M4,13V17H20V13H4M4,19V23H20V19H4Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Jul
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>VMware</title><path
+                  fill="currentColor"
+                  d="M2,2H22V22H2V2M4,4V20H20V4H4M6,6H18V18H6V6M8,8H16V16H8V8">
+                </path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Proxmox</title><path
+                  fill="currentColor"
+                  d="M12,15C7.58,15 4,16.79 4,19V21H20V19C20,16.79 16.42,15 12,15M8,9A4,4 0 0,0 12,13A4,4 0 0,0 16,9A4,4 0 0,0 12,5A4,4 0 0,0 8,9Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>VMware ESXi to Proxmox Migration for NDG Netlabs+</i></a>
+            <span class="production-meta">
+              <span class="company">Migration for online platform.</span>, <span class="venue">Completed</span>
+            </span>
+            <span class="description">Executing a seamless infrastructure migration with zero downtime.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Notes</title><path
+                fill="currentColor"
+                d="M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Jul
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Markdown</title><path
+                  fill="currentColor"
+                  d="M2,3H22C23.11,3 24,3.9 24,5V19C24,20.11 23.11,21 22,21H2C0.9,21 0,20.11 0,19V5C0,3.9 0.9,3 2,3M12,18L15,14H13V9H11V14H9L12,18M5,18H8V16H5V18Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>Obsidian Personal Knowledge Management</i></a>
+            <span class="production-meta">
+              <span class="company">Personal Development</span>, <span class="venue">Ongoing</span>
+            </span>
+            <span class="description">
+              Building a second brain using interconnected markdown notes and zettelkasten.
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="project-icon">
+            <svg viewBox="0 0 24 24" class="inline-icon">
+              <title>Terminal</title><path
+                fill="currentColor"
+                d="M20,19V7H4V19H20M20,5A2,2 0 0,1 22,7V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V7A2,2 0 0,1 4,5H20M13,17V15H18V17H13M9.58,13L5.57,9L6.99,7.58L12.41,13L6.99,18.41L5.57,17L9.58,13Z">
+              </path>
+            </svg>
+          </td>
+          <td class="year">
+            2025 Jun
+            <div class="tech-stack">
+              <svg viewBox="0 0 24 24" class="stack-icon">
+                <title>Hardware</title><path
+                  fill="currentColor"
+                  d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z">
+                </path>
+              </svg>
+            </div>
+          </td>
+          <td class="title">
+            <a><i>Hardware Upgrade & MECM Integration</i></a>
+            <span class="production-meta">
+              <span class="company">Polk State College</span>
+            </span>
+            <span class="description">Optimizing campus hardware lifecycles and automated endpoint management.</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </section>
 </Layout>
@@ -154,23 +445,66 @@ import Layout from "../layouts/Layout.astro";
     border-collapse: collapse;
     width: 100%;
   }
+  .productions thead th {
+    text-align: left;
+    padding: 0.4rem;
+    border-bottom: 2px solid var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
   .productions tr + tr {
     border-top: 1px dotted var(--text);
   }
   .productions td {
-    padding: 0.4rem;
+    padding: 0.8rem 0.4rem;
     vertical-align: top;
   }
   .productions .year {
-    padding-right: clamp(1rem, 6vw, 3.815rem);
+    padding-right: 1.5rem;
     white-space: nowrap;
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .tech-stack {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+  .stack-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.6;
+  }
+  .productions .project-icon {
+    width: 32px;
+    padding-right: 1rem;
+  }
+  .inline-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    opacity: 0.8;
   }
   .productions .title a {
     font-style: italic;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.2rem;
   }
   .production-meta {
     display: block;
-    font-family: "IBM Plex Mono", "Courier New", Courier, monospace;
-    font-size: 0.8rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.4rem;
+  }
+  .description {
+    display: block;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    max-width: 60ch;
   }
 </style>
