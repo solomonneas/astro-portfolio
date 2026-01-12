@@ -1,0 +1,35 @@
+---
+interface Props {
+    status: "completed" | "ongoing" | "prepping";
+    class?: string;
+}
+
+const { status, class: className } = Astro.props;
+
+const statusClasses = {
+    completed: "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]",
+    ongoing: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)] animate-heartbeat",
+    prepping: "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.7)]",
+};
+---
+
+<div class:list={["inline-block w-2 h-2 rounded-full mb-[1px]", statusClasses[status], className]} aria-hidden="true">
+</div>
+
+<style>
+    @keyframes heartbeat {
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(0.9);
+        }
+    }
+
+    .animate-heartbeat {
+        animation: heartbeat 2.5s ease-in-out infinite;
+    }
+</style>
