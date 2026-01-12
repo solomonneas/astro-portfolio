@@ -216,7 +216,7 @@ footer {
 }
 
 .footer-links ul {
-    justify-content: flex-start;
+    justify-content: center;
     margin: -1.91rem;
 }
 
@@ -415,4 +415,3 @@ cite a {
         margin-right: auto;
     }
 }
-
