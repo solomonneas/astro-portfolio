@@ -1,6 +1,12 @@
 ---
 const { pageTitle } = Astro.props;
 const pathname = Astro.url.pathname;
+
+const isIndex = pathname === "/";
+const isBlogPost = pathname.match(/^\/blog\/.+/);
+const isProjectPage = pathname.match(/^\/projects\/.+/);
+const showHomeLink = !isIndex && !isBlogPost && !isProjectPage;
+
 import "../styles/global.css";
 ---
 
@@ -81,6 +87,59 @@ import "../styles/global.css";
         }, 1);
       });
     </script>
+
+    <style>
+      .back-link,
+      .home-link {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.8rem;
+        color: var(--text);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        border: 1px solid transparent;
+      }
+
+      .back-link:hover,
+      .home-link:hover {
+        background: rgba(0, 0, 0, 0.05);
+        border-color: var(--text);
+        color: var(--text);
+        transform: translateY(-1px);
+      }
+
+      .home-link .mono::after {
+        content: "█";
+        animation: blink 1s step-end infinite;
+        color: var(--text);
+        opacity: 0.7;
+        margin-left: 5px;
+      }
+
+      .mono {
+        font-family: "IBM Plex Mono", monospace;
+      }
+
+      @keyframes blink {
+        from,
+        to {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+
+    <style is:global>
+      .back-link,
+      .home-link {
+        font-family: "IBM Plex Mono", monospace !important;
+      }
+    </style>
   </head>
   <body>
     <div id="filter"></div>
@@ -129,8 +188,33 @@ import "../styles/global.css";
         {
           pathname.startsWith("/blog/") && (
             <div class="text-center" style="margin-bottom: 2rem;">
-              <a href="/blog" class="text-lg text-blue-500 hover:underline">
-                Back to Blog
+              <a href="/blog" class="back-link">
+                ← Back
+              </a>
+            </div>
+          )
+        }
+        {
+          showHomeLink && (
+            <div class="text-center" style="margin-bottom: 2rem;">
+              <a href="/" class="home-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="vertical-align: middle; margin-right: 8px;">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span class="mono">
+                  root@<span style="font-weight: 700;">solomon.neas</span>:{pathname}: $ cd ~
+                </span>
               </a>
             </div>
           )
