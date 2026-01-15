@@ -6,6 +6,7 @@ const { frontmatter } = Astro.props;
 <Layout pageTitle={frontmatter.title}>
   <div class="page">
     <div class="text-content">
+      <a href="/projects" class="back-link">← Back</a>
       <hgroup>
         <h1>{frontmatter.title}</h1>
         <p class="mono small">{frontmatter.description}</p>
