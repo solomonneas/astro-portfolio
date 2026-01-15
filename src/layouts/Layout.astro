@@ -88,8 +88,9 @@ import "../styles/global.css";
       <a href="#main-content" id="skip-link">Skip to content</a>
       <nav>
         <div class="title-container">
-          <div class="site-title"><span class="user-host">root@solomon.neas:~#</span></div>
-          <button id="color" class="shell-button">./random_theme.sh</button>
+          <button id="color" class="shell-button site-title">
+            root@<span class="user-host">solomon.neas</span>:~# ./random_theme.sh
+          </button>
         </div>
         <div class="nav-links">
           <ul>
@@ -100,9 +101,10 @@ import "../styles/global.css";
               <a href="/about" class={pathname.startsWith("/about") ? "current-link" : ""}>About</a>
             </li>
             <li>
-              <a href="/opportunities" class={pathname.startsWith("/opportunities") ? "current-link" : ""}>
-                Opportunities
-              </a>
+              <a href="/experience" class={pathname.startsWith("/experience") ? "current-link" : ""}>Experience</a>
+            </li>
+            <li>
+              <a href="/hire" class={pathname.startsWith("/hire") ? "current-link" : ""}>Hire</a>
             </li>
             <li>
               <a href="/projects" class={pathname.startsWith("/projects") ? "current-link" : ""}>Projects</a>
