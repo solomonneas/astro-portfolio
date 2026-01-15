@@ -4,28 +4,101 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout pageTitle="Home">
   <section class="text-content">
-    <p>I'm a network engineer, cybersecurity student, and more.</p>
     <p>
-      <a href="/about" class="link">Read more about me!</a>
+      I'm a father, network & systems administrator and engineer, cybersecurity & intelligence analyst graduate student,
+      AI enthusiast, educator, webdev, and more.
     </p>
+    <p>
+      <a href="/about" class="link">$ cd About</a>
+    </p>
+  </section>
+
+  <section class="text-content">
+    <h2 class="h1">Current Roles</h2>
+    <table class="productions">
+      <tbody>
+        <tr>
+          <td class="year">2023-PRESENT</td>
+          <td class="title">
+            <strong>NETWORK & SYSTEMS ADMINISTRATOR <br />[Laboratory Assistant]</strong>
+            <span class="production-meta">
+              <span class="company">Polk State College</span>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="year">2025-PRESENT</td>
+          <td class="title">
+            <strong>WEB DEVELOPER & OWNER</strong>
+            <span class="production-meta">
+              <span class="company">solomonneas.dev</span>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="h2" style="margin-top: 2rem;">Education</h2>
+    <table class="productions">
+      <tbody>
+        <tr>
+          <td class="year">2025-PRESENT</td>
+          <td class="title">
+            <strong>M.S. Cybersecurity Intelligence & Information Security</strong>
+            <span class="production-meta">
+              <span class="company">University of South Florida</span>
+            </span>
+            <div style="margin-top: 0.5rem; color: var(--text); font-size: 0.8rem;">
+              <p style="margin-bottom: 0.25rem;">Current Semester:</p>
+              <ul style="list-style: none; padding-left: 0; margin: 0;">
+                <li>LIS&nbsp;5802 - Information Analytics</li>
+                <li>LIS&nbsp;6670 - Advanced Cyber Intelligence</li>
+                <li>LIS&nbsp;6700 - Information Strategy and Decision-Making</li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="year">2025</td>
+          <td class="title">
+            <strong>B.A.S. Supervision & Management : Business Information Technology</strong>
+            <span class="production-meta">
+              <span class="company">Polk State College</span>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="year">2022</td>
+          <td class="title">
+            <strong>A.S. Network Systems Engineering Technology: Infrastructure</strong>
+            <span class="production-meta">
+              <span class="company">Polk State College</span>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p><a href="/experience" class="link">$ cd Experience</a></p>
   </section>
   <section class="text-content">
     <h2 class="h1">Latest Projects</h2>
     <table class="productions">
       <tbody>
         <tr>
-          <td class="year">2024</td>
+          <td class="year">2026</td>
           <td class="title">
-            <a href="/projects/project-1"><i>Open Source SOC for NSET Cybersecurity Students</i></a>
+            <a href="/projects/designing-and-building-an-open-source-soc">
+              <i>Designing and Building an Open Source SOC</i>
+            </a>
             <span class="production-meta">
               <span class="company">PSC</span>, <span class="venue">Network Systems Engineering Technology</span>
             </span>
           </td>
         </tr>
         <tr>
-          <td class="year">2024</td>
+          <td class="year">2025</td>
           <td class="title">
-            <a href="/projects/project-2">
+            <a href="/projects/linux-vm-labs-and-documentation">
               <i>Linux VM Labs, Coursework, & Documentation for Linux+ V8 (XK0-006) Exam Objectives</i>
             </a>
             <span class="production-meta">
@@ -34,18 +107,20 @@ import Layout from "../layouts/Layout.astro";
           </td>
         </tr>
         <tr>
-          <td class="year">2024</td>
+          <td class="year">2025</td>
           <td class="title">
-            <a href="/projects/project-3"><i>Proxmox 9.1.2 Homelab</i></a>
+            <a href="/projects/proxmox-homelab"><i>Proxmox 9.1.2 Homelab</i></a>
             <span class="production-meta">
               <span class="company">Home</span>, <span class="venue">Homelab</span>
             </span>
           </td>
         </tr>
         <tr>
-          <td class="year">2024</td>
+          <td class="year">2025</td>
           <td class="title">
-            <a href="/projects/project-3"><i>VMware ESXi to Proxmox 8 Migration for NDG Netlabs+</i></a>
+            <a href="/projects/vmware-to-proxmox-migration">
+              <i>VMware ESXi to Proxmox 8 Migration for NDG Netlabs+</i>
+            </a>
             <span class="production-meta">
               <span class="company">PSC</span>, <span class="venue">Network Systems Engineering Technology</span>
             </span>
@@ -53,20 +128,31 @@ import Layout from "../layouts/Layout.astro";
         </tr>
       </tbody>
     </table>
-    <p><a href="/projects" class="link">View all projects</a></p>
+    <p><a href="/projects" class="link">$ cd Projects</a></p>
   </section>
 
   <section class="text-content">
     <h2 class="h1">Recent Blog Posts</h2>
     <p>
-      I write about a variety of topics, including web development, design, and the intersection of art and technology.
-      Here are a few of my latest posts:
+      I write about a variety of topics, including network and systems engineering, cybersecurity, higher education,
+      instuctional design, and more. Here are a few of my latest posts:
     </p>
     <ul class="link-tree">
       <li><a href="/blog/post-1">Blog Post 1</a></li>
       <li><a href="/blog/post-2">Blog Post 2</a></li>
       <li><a href="/blog/post-3">Blog Post 3</a></li>
     </ul>
-    <p><a href="/blog" class="link">Read more on my blog</a></p>
+    <p><a href="/blog" class="link">$ cd Blog</a></p>
+  </section>
+
+  <section class="text-content">
+    <h2 class="h1">Seeking Opportunities</h2>
+    <p>I am actively seeking new opportunities in education and technology:</p>
+    <ul class="opportunities-list">
+      <li><strong>Adjunct Faculty:</strong> Remote or in-person in the New Port Richey, FL area</li>
+      <li><strong>Instructional Design:</strong> Part-time, remote opportunities</li>
+      <li><strong>Contracting:</strong> Infrastructure and software development projects</li>
+    </ul>
+    <p><a href="/hire" class="link">$ cd Hire</a></p>
   </section>
 </Layout>

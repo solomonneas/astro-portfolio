@@ -211,7 +211,7 @@ section>h1+* {
 }
 
 section+section {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
 
 h1,
@@ -259,12 +259,48 @@ h2,
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: .8rem;
+    padding: .8rem 1rem;
     width: 100%;
     max-width: 35rem;
-    border: 1px dotted var(--text);
+    border: 1px solid var(--text);
     border-radius: 4px;
     font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.link-tree li a:hover {
+    background: var(--text);
+    color: var(--background);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.link-tree {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0;
+}
+
+.link-tree li {
+    margin-bottom: 0.5rem;
+}
+
+.opportunities-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0;
+    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+}
+
+.opportunities-list li {
+    padding: 0.4rem 0;
+    border-bottom: 1px dotted var(--text);
+}
+
+.opportunities-list li:last-child {
+    border-bottom: none;
 }
 
 footer {
@@ -364,6 +400,13 @@ a.kofi-button {
     padding: clamp(.3rem, .4vw, .512rem) clamp(.512rem, .5vw, .8rem);
     border-radius: 4px;
     color: var(--background);
+    transition: all 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
 }
 
 .shell-button {
@@ -386,7 +429,7 @@ a.kofi-button {
 }
 
 .shell-button::after {
-    content: "_";
+    content: "█";
     animation: blink 1s step-end infinite;
     color: var(--text);
     opacity: 0.7;

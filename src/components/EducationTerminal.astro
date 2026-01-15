@@ -1,0 +1,53 @@
+---
+// src/components/EducationTerminal.astro
+---
+
+<div class="font-mono max-w-3xl mx-auto py-8 bg-zinc-950 p-8 rounded-xl shadow-2xl border border-zinc-900 my-8">
+    <h2 class="text-2xl text-emerald-400 mb-6 tracking-tight">
+        <span class="text-zinc-500">$</span> sudo tree education/
+    </h2>
+
+    <pre
+        class="education-tree font-mono text-base ml-2 text-zinc-300"><span class="tree-line">.</span>
+<span class="tree-line">├── </span><span class="degree-title">Master of Science in Cybersecurity Intelligence & Information Security</span>
+<span class="tree-line">│   ├── </span>University of South Florida (Current)
+<span class="tree-line">│   └── </span>Cybersecurity & Intelligence Analytics • Data Analytics
+<span class="tree-line">├── </span><span class="degree-title">Bachelor of Applied Science in Supervision & Management</span>
+<span class="tree-line">│   ├── </span>Polk State College (2025)
+<span class="tree-line">│   └── </span>Business Information Technology • Database Implementation & Management 
+<span class="tree-line">├── </span><span class="degree-title">Associate in Science in Network Systems Engineering Technology</span>
+<span class="tree-line">│   ├── </span>Polk State College (2022)
+<span class="tree-line">│   └── </span>Specialization in Network Infrastructure & Systems Engineering
+<span class="tree-line">├── </span><span class="degree-title">Collegiate High School</span>
+<span class="tree-line">│   ├── </span>Polk Community College (2005-2007)
+<span class="tree-line">│   └── </span>IT Program focus on Cisco Networking and Systems Administration
+<span class="tree-line">├── </span><span class="degree-title">Harrison School for the Visual and Performing Arts</span>
+<span class="tree-line">│   ├── </span>Lakeland, FL (2003-2005)
+<span class="tree-line">│   └── </span>Visual Arts Program
+<span class="tree-line">└── </span><span class="degree-title">Rochelle School of the Arts</span>
+<span class="tree-line">    ├── </span>Lakeland, FL
+<span class="tree-line">    └── </span>Orchestra (Cello) and Visual Arts</pre>
+</div>
+
+<style>
+    .education-tree {
+        white-space: pre;
+        line-height: 1.8;
+        overflow-x: auto;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .education-tree::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+    }
+
+    .tree-line {
+        color: rgba(107, 114, 128, 0.7); /* Muted gray for tree lines */
+    }
+
+    .degree-title {
+        color: #34d399 !important; /* Emerald-400 to match ExperienceTimeline */
+        font-weight: 900; /* Extra bold */
+    }
+</style>

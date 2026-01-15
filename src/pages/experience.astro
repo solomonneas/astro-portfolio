@@ -1,0 +1,78 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ExperienceTimeline from "../components/ExperienceTimeline.astro";
+import EducationTerminal from "../components/EducationTerminal.astro";
+
+const experienceData = [
+    {
+        date: "2023-PRESENT",
+        role: "NETWORK & SYSTEMS ADMINISTRATOR [Laboratory Assistant]",
+        company: "POLK STATE COLLEGE",
+        status: "ongoing",
+        description: [
+            "Key member of the Network Engineering team, responsible for maintaining and optimizing large-scale campus networks.",
+            "Lead initiatives in data center management, including server rack installation, cabling, and power management.",
+            "Administer and troubleshoot VoIP systems, ensuring high availability and voice quality for campus communications.",
+            "Manage and maintain UPS systems to ensure uninterrupted power supply for critical network infrastructure.",
+            "Collaborate with cross-functional teams to deploy and support AV technology in classrooms and conference rooms.",
+        ],
+    },
+    {
+        date: "2021-2023",
+        role: "IT SUPPORT TECHNICIAN",
+        company: "POLK STATE COLLEGE",
+        status: "past",
+        description: [
+            "Provided Tier 1 and Tier 2 technical support to faculty, staff, and students, resolving hardware and software issues.",
+            "Deployed and imaged workstations using SCCM, ensuring consistent configurations across the organization.",
+            "Managed active directory user accounts and permissions, maintaining security and access controls.",
+        ],
+    },
+    {
+        date: "2001-2007",
+        role: "OWNER, WEB DEVELOPER, & PROJECT MANAGER",
+        company: "NEAS WEB PRODUCTIONS",
+        status: "past",
+        description: [
+            "Freelance web design business delivering customized digital solutions for personal and small business clients.",
+            "Transitioned outdated, frame-based layouts to modern, PHP-driven structures for improved content management.",
+            "Designed and developed user-friendly websites with a focus on usability, branding, and visual appeal.",
+            "Guided clients through domain migrations from platforms like GeoCities and Angelfire to custom .com hosting.",
+        ],
+    },
+    {
+        date: "2004-2021",
+        role: "EXECUTIVE CHEF & CULINARY PROFESSIONAL",
+        company: "VARIOUS ESTABLISHMENTS",
+        status: "past",
+        description: [
+            "Led high-performing culinary teams in fast-paced environments, ensuring operational excellence and quality control.",
+            "Managed budgets, inventory, and supply chains to optimize food costs and minimize waste.",
+            "Developed creative menus and culinary concepts, driving customer engagement and satisfaction.",
+        ],
+    },
+];
+---
+
+<Layout pageTitle="Experience">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-center" style="margin-bottom: 3rem;">
+            <a
+                href="https://drive.google.com/file/d/1O9_WXA0WdIa-oM3HKlxCfOfcRN1p76-L/view"
+                class="font-mono text-emerald-400 bg-zinc-900/50 px-6 py-3 rounded-lg border border-zinc-800 hover:border-emerald-500/50 transition-all duration-300 group"
+                target="_blank">
+                <span class="text-zinc-500">$</span> curl -O <span class="group-hover:underline">
+                    https://solomonneas.dev/resume.pdf
+                </span>
+            </a>
+        </div>
+
+        <EducationTerminal />
+
+        <ExperienceTimeline experiences={experienceData} />
+    </div>
+</Layout>
+
+<style>
+    /* The styles for the old education tree are removed as it's replaced by EducationTerminal */
+</style>
