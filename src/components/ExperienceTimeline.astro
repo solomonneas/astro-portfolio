@@ -60,9 +60,10 @@ const {
                     </div>
 
                     <div class="ml-12 pl-4 border-l border-zinc-800 group-hover:border-emerald-500/50 transition-colors duration-300 w-full">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                             <h3 class="text-lg text-zinc-100 font-bold tracking-tight">
-                                {job.role} <span class="text-emerald-400">@ {job.company}</span>
+                                <div>{job.role}</div>
+                                <div class="text-emerald-400 mt-1">@ {job.company}</div>
                             </h3>
                             <span class="text-sm text-zinc-500 mt-1 sm:mt-0 uppercase tracking-widest">
                                 [{job.date}]
