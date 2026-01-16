@@ -1,0 +1,38 @@
+---
+// src/components/CertificationsTerminal.astro
+---
+
+<div class="font-mono max-w-3xl mx-auto py-8 bg-zinc-950 p-8 rounded-xl shadow-2xl border border-zinc-900 my-8">
+    <h2 class="text-2xl text-emerald-400 mb-6 tracking-tight">
+        <span class="text-zinc-500">$</span> sudo tree certifications/
+    </h2>
+
+    <pre
+        class="education-tree font-mono text-base ml-2 text-zinc-300"><span class="tree-line">.</span>
+<span class="tree-line">└── </span><span class="degree-title">A+ Good-For-Life</span>
+<span class="tree-line">    ├── </span>CompTIA (Issued May 2006)
+<span class="tree-line">    └── </span>Credential ID COMP001004827739</pre>
+</div>
+
+<style>
+    .education-tree {
+        white-space: pre;
+        line-height: 1.8;
+        overflow-x: auto;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .education-tree::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+    }
+
+    .tree-line {
+        color: rgba(107, 114, 128, 0.7); /* Muted gray for tree lines */
+    }
+
+    .degree-title {
+        color: #34d399 !important; /* Emerald-400 to match ExperienceTimeline */
+        font-weight: 900; /* Extra bold */
+    }
+</style>
