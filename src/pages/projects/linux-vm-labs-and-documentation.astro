@@ -2,13 +2,37 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-  title: "Linux+ VM Labs and Documentation",
-  description: "Training Material for Linux+ V8 (XK0-006), In Progress",
-  img: "/images/placeholder.png",
-  img_alt: "A placeholder image.",
+  title: "Linux VM Labs and Documentation",
+  status: "Completed",
+  statusType: "completed",
+  origin: "Training Material",
+  date: "2025.11",
+  techStack: ["Linux", "Fedora", "Ubuntu", "Rocky Linux", "Proxmox", "VirtualBox"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-  <p>This project is currently in progress. More details to come.</p>
+  <h2>// Overview</h2>
+  <p>
+    Developed comprehensive lab environments for CompTIA Linux+ certification preparation. These hands-on labs provide
+    students with practical experience in Linux system administration.
+  </p>
+
+  <h2>// Technical Implementation</h2>
+  <p>Created a series of virtual machine templates and lab exercises:</p>
+  <ul>
+    <li>Pre-configured VMs for Fedora, Ubuntu, and Rocky Linux</li>
+    <li>Step-by-step lab guides covering exam objectives</li>
+    <li>Automated deployment scripts for lab environments</li>
+    <li>Troubleshooting scenarios based on real-world issues</li>
+  </ul>
+
+  <h2>// Deliverables</h2>
+  <p>
+    Complete lab manual with 20+ hands-on exercises covering user management, file systems, networking, security, and
+    scripting.
+  </p>
+
+  <h2>// Status</h2>
+  <p>Labs completed and deployed for student use. Documentation available for instructors.</p>
 </ProjectLayout>

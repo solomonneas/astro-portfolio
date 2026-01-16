@@ -3,15 +3,38 @@ import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
     title: "HyperV to Proxmox Migration",
-    description: "Polk State College, In Progress",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    status: "In Progress",
+    statusType: "ongoing",
+    origin: "Polk State College",
+    date: "2026.01",
+    techStack: ["Windows Server", "Hyper-V", "Proxmox VE", "Linux", "PowerShell"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Migrating mission-critical virtualization hosts from Hyper-V to Proxmox VE. This project is currently in
-        progress. More details to come.
+        Leading a critical infrastructure migration project to transition the college's virtualization platform from
+        Microsoft Hyper-V to Proxmox VE. This initiative aims to reduce licensing costs while improving flexibility and
+        performance for academic lab environments.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <p>The migration involves careful planning and execution across multiple phases:</p>
+    <ul>
+        <li>Inventory and assessment of existing Hyper-V virtual machines and configurations</li>
+        <li>Setting up Proxmox VE cluster with high availability</li>
+        <li>Converting VHDX disk images to QCOW2 format</li>
+        <li>Migrating network configurations and VLAN assignments</li>
+        <li>Testing and validation in parallel environment before cutover</li>
+    </ul>
+
+    <h2>// Challenges</h2>
+    <p>
+        Key challenges include maintaining uptime during migration, ensuring compatibility with existing Active
+        Directory integration, and retraining staff on the new platform.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Currently in the planning and assessment phase. Target completion: Q2 2026.</p>
 </ProjectLayout>

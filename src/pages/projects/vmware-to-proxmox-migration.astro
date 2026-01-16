@@ -2,16 +2,37 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "VMware ESXi to Proxmox Migration for NDG Netlabs+",
-    description: "Migration for online platform., Completed",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    title: "VMware to Proxmox Migration",
+    status: "Completed",
+    statusType: "completed",
+    origin: "Client Migration Project",
+    date: "2025.07",
+    techStack: ["VMware ESXi", "Proxmox VE", "Linux", "PowerShell", "Bash"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Executing a seamless infrastructure migration with zero downtime. This project is completed. More details to
-        come.
+        Executed a seamless infrastructure migration from VMware ESXi to Proxmox VE with zero downtime for an online
+        platform. This project demonstrated the viability of open-source virtualization for production workloads.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <ul>
+        <li>Assessment and inventory of existing VMware environment</li>
+        <li>Parallel Proxmox cluster deployment</li>
+        <li>Disk conversion from VMDK to QCOW2 format</li>
+        <li>Live migration using shared storage</li>
+        <li>Network cutover with minimal interruption</li>
+    </ul>
+
+    <h2>// Results</h2>
+    <p>
+        Successfully migrated 25+ virtual machines with less than 5 minutes total downtime. Annual licensing costs
+        reduced by over 80%.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Migration completed. Client environment running stable on Proxmox VE.</p>
 </ProjectLayout>

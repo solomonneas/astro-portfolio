@@ -2,16 +2,38 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "Learning Astro.js",
-    description: "Personal Development, Ongoing",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    title: "solomonneas.dev",
+    status: "In Progress",
+    statusType: "ongoing",
+    origin: "Personal Development",
+    date: "2025.12",
+    techStack: ["Astro", "JavaScript", "HTML", "CSS", "Vercel", "GitHub"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Building performant, content-driven websites with the Astro framework. This project is currently in progress.
-        More details to come.
+        Building a performant, content-driven portfolio website using the Astro framework. This site serves as both a
+        professional portfolio and a learning playground for modern web development.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <p>The site is built with a focus on performance and developer experience:</p>
+    <ul>
+        <li>Astro's static site generation for fast page loads</li>
+        <li>Content collections for blog posts and project pages</li>
+        <li>Custom terminal-inspired design system</li>
+        <li>Dynamic theme switching with CSS variables</li>
+        <li>Continuous deployment via Vercel and GitHub</li>
+    </ul>
+
+    <h2>// Design Philosophy</h2>
+    <p>
+        The "Industrial Terminal / NOC Dashboard" aesthetic balances professional presentation with technical
+        credibility. The design appeals to both recruiters and fellow developers.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Core site complete. Continuously adding content and refining the design based on feedback.</p>
 </ProjectLayout>

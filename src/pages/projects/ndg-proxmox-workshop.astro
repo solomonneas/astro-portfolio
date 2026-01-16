@@ -3,15 +3,35 @@ import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
     title: "NDG Proxmox VE 8 - NETLAB+ Deployment Workshop",
-    description: "Network Development Group, Completed",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    status: "Completed",
+    statusType: "completed",
+    origin: "Network Development Group",
+    date: "2025.07",
+    techStack: ["Proxmox VE", "NETLAB+", "Linux", "Academic IT"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Designing deployment workflows for Proxmox in academic environments. This project is completed. More details to
-        come.
+        Designed deployment workflows for Proxmox VE in academic environments using the NETLAB+ platform. This workshop
+        helped educational institutions migrate their virtualization infrastructure.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <ul>
+        <li>Created step-by-step deployment guides for Proxmox VE 8</li>
+        <li>Integration procedures with NETLAB+ pod management</li>
+        <li>Network configuration for multi-tenant lab environments</li>
+        <li>Best practices for resource allocation and scheduling</li>
+    </ul>
+
+    <h2>// Deliverables</h2>
+    <p>
+        Complete workshop materials including documentation, configuration templates, and troubleshooting guides for
+        academic IT staff.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Workshop completed and materials published for NDG partners.</p>
 </ProjectLayout>

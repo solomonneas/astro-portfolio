@@ -3,12 +3,37 @@ import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
   title: "Learning Neovim",
-  description: "Personal Development, Ongoing",
-  img: "/images/placeholder.png",
-  img_alt: "A placeholder image.",
+  status: "In Progress",
+  statusType: "ongoing",
+  origin: "Personal Development",
+  date: "2025.12",
+  techStack: ["Neovim", "Lua", "LazyVim", "LSP", "Treesitter"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-  <p>This project is currently in progress. More details to come.</p>
+  <h2>// Overview</h2>
+  <p>
+    Mastering modal editing and building a custom Lua-based Neovim configuration. The goal is to create an efficient,
+    keyboard-driven development environment that enhances productivity across all programming languages.
+  </p>
+
+  <h2>// Technical Implementation</h2>
+  <p>Started with LazyVim as a base configuration and progressively customizing:</p>
+  <ul>
+    <li>Learning Vim motions and modal editing paradigms</li>
+    <li>Configuring LSP servers for multiple languages</li>
+    <li>Setting up Treesitter for syntax highlighting</li>
+    <li>Building custom keymaps for workflow optimization</li>
+    <li>Integrating with terminal multiplexers (tmux)</li>
+  </ul>
+
+  <h2>// Why Neovim</h2>
+  <p>
+    The ability to work entirely from the terminal, combined with the extensibility of Lua plugins, makes Neovim ideal
+    for remote server administration and development in constrained environments.
+  </p>
+
+  <h2>// Status</h2>
+  <p>Comfortable with basic motions. Currently learning advanced text objects and building muscle memory.</p>
 </ProjectLayout>

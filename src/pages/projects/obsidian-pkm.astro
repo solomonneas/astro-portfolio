@@ -3,15 +3,36 @@ import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
     title: "Obsidian Personal Knowledge Management",
-    description: "Personal Development, Completed",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    status: "In Progress",
+    statusType: "ongoing",
+    origin: "Personal Development",
+    date: "2025.07",
+    techStack: ["Obsidian", "Markdown", "Zettelkasten", "Git"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Implementing a comprehensive personal knowledge management system using Obsidian and Markdown. This project is
-        completed. More details to come.
+        Building a "second brain" using interconnected markdown notes and zettelkasten methodology. This knowledge
+        management system helps organize learning, capture ideas, and connect concepts across domains.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <ul>
+        <li>Obsidian vault with custom folder structure</li>
+        <li>Zettelkasten-style atomic notes with linking</li>
+        <li>Daily notes for journaling and task tracking</li>
+        <li>Git-based backup and version control</li>
+        <li>Templates for different note types</li>
+    </ul>
+
+    <h2>// Benefits</h2>
+    <p>
+        The interconnected nature of the vault surfaces connections between ideas that wouldn't be apparent in
+        traditional note-taking systems.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Active daily use. Continuously refining workflow and adding content.</p>
 </ProjectLayout>

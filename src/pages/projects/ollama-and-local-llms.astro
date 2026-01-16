@@ -2,16 +2,37 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "Ollama & Local LLMS",
-    description: "Personal Project, Ongoing",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    title: "Ollama and Local LLMs",
+    status: "In Progress",
+    statusType: "ongoing",
+    origin: "Personal Project",
+    date: "2025.12",
+    techStack: ["Ollama", "Python", "ComfyUI", "Stable Diffusion", "LLaMA", "Docker"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Self-hosting large language models for private and offline AI assistance. This project is currently in progress.
-        More details to come.
+        Self-hosting large language models for private and offline AI assistance. This project explores running AI
+        models locally to maintain privacy and work without internet dependency.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <p>Setting up a local AI stack with multiple capabilities:</p>
+    <ul>
+        <li>Ollama for running LLMs like LLaMA and Mistral locally</li>
+        <li>ComfyUI for Stable Diffusion image generation workflows</li>
+        <li>Python scripts for automation and integration</li>
+        <li>API endpoints for integration with other tools</li>
+    </ul>
+
+    <h2>// Use Cases</h2>
+    <p>
+        Local LLMs provide code assistance, documentation generation, and research support without sending sensitive
+        information to cloud services.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Ollama running with multiple models. Exploring fine-tuning for specific use cases.</p>
 </ProjectLayout>
