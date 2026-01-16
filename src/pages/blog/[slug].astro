@@ -13,15 +13,144 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+
+// Format date
+function formatDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 ---
 
-<Layout title={entry.data.title}>
-  <div class="mb-8">
-    <a href="/blog" class="back-link">← Back</a>
-    <h1>{entry.data.title}</h1>
-    <p>Published on: {entry.data.pubDate.toDateString()}</p>
-    <article class="prose lg:prose-xl">
+<Layout pageTitle={entry.data.title}>
+  <article class="blog-post">
+    <header class="post-header">
+      <h1 class="post-title">{entry.data.title}</h1>
+      <p class="post-meta">
+        <span class="meta-label">[+] Published:</span>
+        <span class="meta-value">{formatDate(entry.data.pubDate)}</span>
+      </p>
+      {
+        entry.data.tags && (
+          <div class="post-tags">
+            {entry.data.tags.map((tag) => (
+              <span class="tag">[{tag}]</span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <div class="post-content">
       <Content />
-    </article>
-  </div>
+    </div>
+
+    <footer class="post-footer">
+      <a href="/blog" class="back-link"><span class="prompt">$</span> cd ~/blog/</a>
+    </footer>
+  </article>
 </Layout>
+
+<style>
+  .blog-post {
+    padding: 2rem 0;
+  }
+
+  .post-header {
+    margin-bottom: 2rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    color: currentColor;
+    text-decoration: none;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+    transition: opacity 0.2s ease;
+  }
+
+  .back-link:hover {
+    opacity: 1;
+  }
+
+  .prompt {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .post-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+    line-height: 1.3;
+  }
+
+  .post-meta {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin: 0.5rem 0;
+  }
+
+  .meta-label {
+    color: #10b981;
+    font-weight: 500;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+
+  .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    padding: 0.1rem 0.3rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 2px;
+  }
+
+  .post-content {
+    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+    padding-top: 2rem;
+  }
+
+  .post-content :global(h2),
+  .post-content :global(h3),
+  .post-content :global(h4) {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-content :global(p) {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+
+  .post-content :global(pre) {
+    font-family: "IBM Plex Mono", monospace;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .post-content :global(code) {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9em;
+  }
+
+  .post-footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+  }
+</style>

@@ -2,16 +2,37 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "Proxmox 9.1.2 Homelab",
-    description: "Personal Project, Ongoing",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    title: "Proxmox Homelab",
+    status: "In Progress",
+    statusType: "ongoing",
+    origin: "Personal Project",
+    date: "2025.11",
+    techStack: ["Proxmox VE", "Ceph", "Linux", "Networking", "ZFS"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Building a redundant homelab cluster for DevOps and security testing. This project is currently in progress.
-        More details to come.
+        Building a redundant homelab cluster for DevOps experimentation, security testing, and self-hosted services. The
+        lab serves as a sandbox for learning and prototyping.
     </p>
+
+    <h2>// Technical Implementation</h2>
+    <p>Multi-node Proxmox cluster with enterprise features:</p>
+    <ul>
+        <li>Three-node Proxmox VE cluster with HA</li>
+        <li>Ceph distributed storage for VM replication</li>
+        <li>VLAN segmentation for network isolation</li>
+        <li>ZFS for local backup storage</li>
+        <li>Automated backups to off-site storage</li>
+    </ul>
+
+    <h2>// Services Hosted</h2>
+    <p>
+        Running various self-hosted services including Pi-hole, Gitea, monitoring stack, and development environments.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Core infrastructure operational. Continuously adding services and optimizing configurations.</p>
 </ProjectLayout>

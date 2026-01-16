@@ -2,16 +2,37 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "Securing U.S. Water and Wastewater Utilities",
-    description: "University of South Florida, Completed",
-    img: "/images/placeholder.png",
-    img_alt: "A placeholder image.",
+    title: "Securing US Water and Wastewater Utilities",
+    status: "Completed",
+    statusType: "completed",
+    origin: "University of South Florida",
+    date: "2025.10",
+    techStack: ["ICS Security", "SCADA", "Critical Infrastructure", "Research"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
+    <h2>// Overview</h2>
     <p>
-        Researching security vulnerabilities in national critical infrastructure. This project is completed. More
-        details to come.
+        Researching security vulnerabilities in national critical infrastructure, specifically water and wastewater
+        treatment facilities. This project examined the unique challenges of securing operational technology
+        environments.
     </p>
+
+    <h2>// Research Focus</h2>
+    <ul>
+        <li>Analysis of recent cyberattacks on water utilities</li>
+        <li>Common vulnerabilities in SCADA and ICS systems</li>
+        <li>Regulatory frameworks (AWIA, NIST CSF)</li>
+        <li>Best practices for small utility security programs</li>
+    </ul>
+
+    <h2>// Key Findings</h2>
+    <p>
+        Many small utilities lack dedicated security staff and rely on outdated systems. The research proposed
+        practical, low-cost security improvements for resource-constrained organizations.
+    </p>
+
+    <h2>// Status</h2>
+    <p>Research paper completed and submitted.</p>
 </ProjectLayout>

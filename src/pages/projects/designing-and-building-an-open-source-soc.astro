@@ -3,12 +3,38 @@ import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
   title: "Designing and Building an Open Source SOC",
-  description: "Personal Project, In Progress",
-  img: "/images/placeholder.png",
-  img_alt: "A placeholder image.",
+  status: "In Progress",
+  statusType: "ongoing",
+  origin: "Polk State College",
+  date: "2025.12",
+  techStack: ["Wazuh", "TheHive", "Cortex", "MISP", "Zeek", "Suricata", "Elasticsearch", "Docker", "Proxmox", "Ubuntu"],
 };
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-  <p>This project is currently in progress. More details to come.</p>
+  <h2>// Overview</h2>
+  <p>
+    Building a full-stack Security Operations Center using entirely open-source tools. This project provides hands-on
+    experience with enterprise security monitoring while creating a functional threat detection and response platform
+    for the college network.
+  </p>
+
+  <h2>// Technical Implementation</h2>
+  <p>The SOC architecture integrates multiple open-source security tools:</p>
+  <ul>
+    <li><strong>Wazuh:</strong> Host-based intrusion detection and log analysis</li>
+    <li><strong>Zeek & Suricata:</strong> Network traffic analysis and IDS/IPS</li>
+    <li><strong>TheHive & Cortex:</strong> Incident response and automated analysis</li>
+    <li><strong>MISP:</strong> Threat intelligence sharing platform</li>
+    <li><strong>Elasticsearch:</strong> Centralized log storage and search</li>
+  </ul>
+
+  <h2>// Architecture</h2>
+  <p>
+    All components are containerized using Docker and deployed on Proxmox VE for easy management and scalability. The
+    system ingests logs from Windows and Linux endpoints, network devices, and cloud services.
+  </p>
+
+  <h2>// Status</h2>
+  <p>Core infrastructure deployed. Currently integrating threat intelligence feeds and building detection rules.</p>
 </ProjectLayout>
