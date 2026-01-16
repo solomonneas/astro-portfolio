@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import ExperienceTimeline from "../components/ExperienceTimeline.astro";
 import EducationTerminal from "../components/EducationTerminal.astro";
+import CertificationsTerminal from "../components/CertificationsTerminal.astro";
 
 const experienceData = [
     {
@@ -65,7 +66,7 @@ const experienceData = [
         ],
     },
     {
-        date: "2004-2021",
+        date: "2004-2022",
         role: "EXECUTIVE CHEF & CULINARY PROFESSIONAL",
         company: "VARIOUS ESTABLISHMENTS",
         status: "past",
@@ -92,6 +93,8 @@ const experienceData = [
         </div>
 
         <EducationTerminal />
+
+        <CertificationsTerminal />
 
         <ExperienceTimeline experiences={experienceData} />
     </div>
