@@ -1,0 +1,873 @@
+---
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+
+const frontmatter = {
+  title: "APT44 Intelligence Assessment",
+  status: "Published",
+  statusType: "completed",
+  origin: "Cyber Intelligence Course",
+  date: "2025.10",
+  techStack: ["Threat Intelligence", "MITRE ATT&CK", "Malware Analysis", "OSINT"],
+};
+
+// Threat actor profile
+const threatProfile = {
+  name: "APT44 / Sandworm",
+  attribution: "GRU Unit 74455",
+  sponsor: "Russian Federation",
+  type: "State-Sponsored APT",
+  severity: "Critical",
+  active: "2014 - Present",
+};
+
+// Front personas
+const frontPersonas = [
+  { name: "CARR", fullName: "Cyber Army of Russia Reborn", confidence: "High" },
+  { name: "XakNet Team", fullName: "XakNet Team", confidence: "Moderate" },
+  { name: "Solntsepek", fullName: "Solntsepek", confidence: "Moderate" },
+];
+
+// Target sectors
+const targetSectors = [
+  { sector: "Government", regions: ["Ukraine", "NATO", "Global"], priority: "high" },
+  { sector: "Defense", regions: ["Ukraine", "Europe", "US"], priority: "high" },
+  { sector: "Energy/CIKR", regions: ["Ukraine", "Europe", "US"], priority: "high" },
+  { sector: "Telecommunications", regions: ["Ukraine", "Global"], priority: "high" },
+  { sector: "Media", regions: ["Global"], priority: "medium" },
+  { sector: "Civil Society", regions: ["Global"], priority: "medium" },
+];
+
+// TTP Phases
+const ttpPhases = [
+  {
+    phase: 1,
+    name: "Living on the Edge",
+    category: "Initial Access",
+    color: "#3b82f6",
+    ttps: ["Edge Infrastructure Exploitation", "Phishing & Credential Harvesting", "Supply Chain Compromise", "Vulnerability Exploitation"]
+  },
+  {
+    phase: 2,
+    name: "Living off the Land",
+    category: "Recon & Lateral Movement",
+    color: "#22c55e",
+    ttps: ["LOTL Techniques", "GPO Abuse", "Scheduled Tasks", "Credential Dumping"]
+  },
+  {
+    phase: 3,
+    name: "Going for the GPO",
+    category: "Persistence & Privilege Escalation",
+    color: "#eab308",
+    ttps: ["Custom Backdoors", "C2 Frameworks", "Web Shells", "Tunnelers"]
+  },
+  {
+    phase: 4,
+    name: "Disrupt and Deny",
+    category: "Attack & Sabotage",
+    color: "#f97316",
+    ttps: ["Wiper Malware", "ICS/OT Disruption", "Operational Coordination", "Mobile Espionage"]
+  },
+  {
+    phase: 5,
+    name: "Telegraphing Success",
+    category: "Influence Operations",
+    color: "#ef4444",
+    ttps: ["Hack-and-Leak", "HMI Manipulation Claims", "Narrative Amplification", "DDoS Campaigns"]
+  },
+];
+
+// Notable malware families
+const malwareFamilies = [
+  { name: "CADDYWIPER", type: "Wiper", id: "S0693", severity: "critical" },
+  { name: "INDUSTROYER", type: "ICS Framework", id: "S0604", severity: "critical" },
+  { name: "NotPetya", type: "Wiper/Pseudo-Ransomware", id: "S0368", severity: "critical" },
+  { name: "NEARMISS", type: "MBR Wiper", id: "S0697", severity: "critical" },
+  { name: "AcidRain", type: "Wiper", id: "S1125", severity: "critical" },
+  { name: "CYCLOPS BLINK", type: "Framework", id: "S0649", severity: "high" },
+  { name: "BLACKENERGY", type: "Backdoor", id: "S0089", severity: "high" },
+  { name: "Cobalt Strike", type: "Framework", id: "S0154", severity: "high" },
+];
+
+// Notable attacks timeline
+const notableAttacks = [
+  { year: "2015", event: "Ukraine Power Grid Attack", target: "Prykarpattyaoblenergo", impact: "230,000 without power" },
+  { year: "2016", event: "Ukraine Power Grid Attack II", target: "Ukrenergo", impact: "Industroyer deployment" },
+  { year: "2017", event: "NotPetya", target: "Global", impact: "$10B+ damages worldwide" },
+  { year: "2018", event: "Olympic Destroyer", target: "Pyeongchang Olympics", impact: "IT systems disrupted" },
+  { year: "2022", event: "Viasat Attack", target: "KA-SAT", impact: "AcidRain wiper, EU outages" },
+  { year: "2023", event: "Kyivstar Attack", target: "Ukraine Telecom", impact: "24M subscribers affected" },
+];
+---
+
+<ProjectLayout frontmatter={frontmatter}>
+  <h2>// Executive Summary</h2>
+  <p>
+    Advanced Persistent Threat 44 (APT44), also known as Sandworm, is a highly active and operationally
+    mature Russian state-sponsored threat actor formally attributed to Unit 74455 of the GRU. It functions
+    as a versatile instrument for the Kremlin, conducting a full spectrum of espionage, attack, and influence
+    operations to support Russia's national interests, aid military efforts, and undermine democratic processes
+    globally. While Ukraine has been the primary focus of its most destructive attacks over the past decade,
+    APT44 maintains a global mandate targeting government, defense, and energy sectors worldwide.
+  </p>
+
+  <!-- Threat Profile Card -->
+  <div class="threat-profile">
+    <div class="profile-header">
+      <div class="profile-badge critical">
+        <span class="badge-icon">⚠</span>
+        <span class="badge-text">CRITICAL THREAT</span>
+      </div>
+      <div class="profile-title">
+        <h3>{threatProfile.name}</h3>
+        <span class="profile-subtitle">{threatProfile.attribution}</span>
+      </div>
+    </div>
+    <div class="profile-grid">
+      <div class="profile-item">
+        <span class="item-label">Sponsor</span>
+        <span class="item-value">{threatProfile.sponsor}</span>
+      </div>
+      <div class="profile-item">
+        <span class="item-label">Type</span>
+        <span class="item-value">{threatProfile.type}</span>
+      </div>
+      <div class="profile-item">
+        <span class="item-label">Active Since</span>
+        <span class="item-value">{threatProfile.active}</span>
+      </div>
+      <div class="profile-item">
+        <span class="item-label">Severity</span>
+        <span class="item-value severity-critical">Critical</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Front Personas -->
+  <h2>// Front Personas & Affiliates</h2>
+  <p>
+    APT44 utilizes various front personas embedded within the pro-Russian Telegram ecosystem to amplify
+    its influence operations and publicly claim disruptive acts for psychological impact:
+  </p>
+  <div class="personas-grid">
+    {frontPersonas.map((persona) => (
+      <div class="persona-card">
+        <div class="persona-icon">👤</div>
+        <div class="persona-info">
+          <span class="persona-name">{persona.name}</span>
+          <span class="persona-full">{persona.fullName}</span>
+          <span class={`persona-confidence ${persona.confidence.toLowerCase()}`}>
+            {persona.confidence} Confidence Attribution
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Targets -->
+  <h2>// Target Profile</h2>
+  <p>
+    APT44 maintains a broad, global targeting mandate. Ukraine remains the primary focus due to Russia's
+    geopolitical goals, but operations extend to North America, Europe, the Middle East, Central Asia,
+    and Latin America.
+  </p>
+  <div class="targets-grid">
+    {targetSectors.map((t) => (
+      <div class={`target-card priority-${t.priority}`}>
+        <div class="target-header">
+          <span class="target-sector">{t.sector}</span>
+          <span class={`target-priority ${t.priority}`}>{t.priority.toUpperCase()}</span>
+        </div>
+        <div class="target-regions">
+          {t.regions.map((region) => (
+            <span class="region-tag">{region}</span>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Notable Attacks Timeline -->
+  <h2>// Notable Operations Timeline</h2>
+  <p>
+    APT44 has been responsible for some of the most destructive cyber attacks in history, particularly
+    targeting critical infrastructure:
+  </p>
+  <div class="attacks-timeline">
+    {notableAttacks.map((attack, i) => (
+      <div class="attack-event" style={`--delay: ${i * 0.1}s`}>
+        <div class="event-year">{attack.year}</div>
+        <div class="event-connector">
+          <div class="connector-dot"></div>
+          <div class="connector-line"></div>
+        </div>
+        <div class="event-details">
+          <span class="event-name">{attack.event}</span>
+          <span class="event-target">Target: {attack.target}</span>
+          <span class="event-impact">{attack.impact}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- TTPs -->
+  <h2>// Tactics, Techniques & Procedures</h2>
+  <p>
+    APT44 follows a highly flexible playbook designed to bypass best-practice defenses, emphasizing
+    scalability and minimizing forensic evidence. Their methodology adheres to five key phases:
+  </p>
+  <div class="ttp-phases">
+    {ttpPhases.map((phase) => (
+      <div class="ttp-phase" style={`--phase-color: ${phase.color}`}>
+        <div class="phase-header">
+          <span class="phase-number">{phase.phase}</span>
+          <div class="phase-info">
+            <span class="phase-name">{phase.name}</span>
+            <span class="phase-category">{phase.category}</span>
+          </div>
+        </div>
+        <div class="phase-ttps">
+          {phase.ttps.map((ttp) => (
+            <span class="ttp-tag">{ttp}</span>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Malware Arsenal -->
+  <h2>// Malware Arsenal</h2>
+  <p>
+    APT44 utilizes a diverse and adaptive arsenal emphasizing a "low-equity" approach, frequently
+    prioritizing open-source or commodity tools over proprietary custom implants. For destructive
+    operations, they deploy a wide range of wiper malware:
+  </p>
+  <div class="malware-grid">
+    {malwareFamilies.map((malware) => (
+      <div class={`malware-card severity-${malware.severity}`}>
+        <div class="malware-header">
+          <span class="malware-name">{malware.name}</span>
+          <span class="malware-id">{malware.id}</span>
+        </div>
+        <div class="malware-type">{malware.type}</div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Assessment -->
+  <h2>// Intelligence Assessment</h2>
+  <div class="assessment-block">
+    <p>
+      <strong>APT44/Sandworm</strong> is a Russian GRU state-sponsored group conducting a full spectrum
+      of cyber espionage, destructive attacks, and influence operations. Active for the past decade,
+      APT44's primary focus is Ukraine, but it maintains a global mandate targeting government, defense,
+      and critical infrastructure in North America and Europe.
+    </p>
+    <p>
+      The group is expected to continue operations to support the Kremlin's geopolitical objectives,
+      provide tactical advantage for the Russian military, and undermine democratic processes worldwide.
+      They typically gain access by exploiting edge infrastructure and using phishing, then move laterally
+      using Living-off-the-Land techniques before deploying destructive wipers like CADDYWIPER and NotPetya.
+    </p>
+    <div class="assessment-recommendation">
+      <span class="rec-label">Recommended Mitigations:</span>
+      <ul>
+        <li>Patch edge infrastructure (routers, VPN appliances) immediately</li>
+        <li>Segment IT and OT networks with strict access controls</li>
+        <li>Deploy EDR solutions capable of detecting LOTL-based TTPs</li>
+        <li>Monitor for GPO abuse and scheduled task anomalies</li>
+        <li>Implement robust backup strategies isolated from production networks</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PDF Viewer -->
+  <h2>// Full Report Document</h2>
+  <p>
+    The complete intelligence assessment report with detailed technical analysis, full malware catalog,
+    and comprehensive source citations:
+  </p>
+  <div class="pdf-viewer-container">
+    <div class="pdf-header">
+      <div class="pdf-info">
+        <span class="pdf-icon">📄</span>
+        <div class="pdf-details">
+          <span class="pdf-title">APT44 Intelligence Assessment Report</span>
+          <span class="pdf-meta">Solomon Neas | October 2025 | 24 pages</span>
+        </div>
+      </div>
+      <a href="/APT44.pdf" target="_blank" rel="noopener noreferrer" class="pdf-download">
+        <span>Open Full PDF</span>
+        <span class="download-icon">↗</span>
+      </a>
+    </div>
+    <div class="pdf-embed-wrapper">
+      <iframe
+        src="/APT44.pdf#view=FitH"
+        class="pdf-embed"
+        title="APT44 Intelligence Assessment Report"
+      ></iframe>
+    </div>
+    <div class="pdf-fallback">
+      <p>If the PDF doesn't load, <a href="/APT44.pdf" target="_blank" rel="noopener noreferrer">click here to download</a>.</p>
+    </div>
+  </div>
+</ProjectLayout>
+
+<style>
+  /* Threat Profile */
+  .threat-profile {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 4px solid #ef4444;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .profile-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .profile-badge.critical {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+    border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-badge {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .profile-title h3 {
+    margin: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.25rem;
+  }
+
+  .profile-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .profile-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .item-label {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .item-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .severity-critical {
+    color: #ef4444;
+    font-weight: 700;
+  }
+
+  /* Front Personas */
+  .personas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .persona-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .persona-icon {
+    font-size: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .persona-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .persona-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .persona-full {
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .persona-confidence {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    width: fit-content;
+  }
+
+  .persona-confidence.high {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+  }
+
+  .persona-confidence.moderate {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    color: #f59e0b;
+  }
+
+  /* Targets */
+  .targets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .target-card {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .target-card.priority-high {
+    border-left: 3px solid #ef4444;
+  }
+
+  .target-card.priority-medium {
+    border-left: 3px solid #f59e0b;
+  }
+
+  .target-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .target-sector {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .target-priority {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .target-priority.high {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+  }
+
+  .target-priority.medium {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    color: #f59e0b;
+  }
+
+  .target-regions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .region-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 3px;
+    opacity: 0.8;
+  }
+
+  /* Attacks Timeline */
+  .attacks-timeline {
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+  }
+
+  .attack-event {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .event-year {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ef4444;
+    min-width: 50px;
+  }
+
+  .event-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.3rem;
+  }
+
+  .connector-dot {
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .connector-line {
+    width: 2px;
+    flex: 1;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    min-height: 30px;
+  }
+
+  .attack-event:last-child .connector-line {
+    display: none;
+  }
+
+  .event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-bottom: 1rem;
+  }
+
+  .event-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .event-target {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .event-impact {
+    font-size: 0.75rem;
+    color: #f59e0b;
+  }
+
+  /* TTP Phases */
+  .ttp-phases {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .ttp-phase {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 4px solid var(--phase-color);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .phase-number {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--phase-color);
+    color: white;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .phase-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .phase-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .phase-category {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .phase-ttps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-left: 2.75rem;
+  }
+
+  .ttp-tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, var(--phase-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--phase-color) 25%, transparent);
+    border-radius: 3px;
+  }
+
+  /* Malware Grid */
+  .malware-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .malware-card {
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .malware-card.severity-critical {
+    border-top: 3px solid #ef4444;
+  }
+
+  .malware-card.severity-high {
+    border-top: 3px solid #f59e0b;
+  }
+
+  .malware-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .malware-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .malware-id {
+    font-size: 0.65rem;
+    opacity: 0.5;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .malware-type {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  /* Assessment */
+  .assessment-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .assessment-block p {
+    margin-bottom: 1rem;
+  }
+
+  .assessment-block p:last-of-type {
+    margin-bottom: 1.5rem;
+  }
+
+  .assessment-recommendation {
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 20%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .rec-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #10b981;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .assessment-recommendation ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .assessment-recommendation li {
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+    opacity: 0.9;
+  }
+
+  /* PDF Viewer */
+  .pdf-viewer-container {
+    margin: 1.5rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .pdf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .pdf-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .pdf-icon {
+    font-size: 1.5rem;
+  }
+
+  .pdf-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .pdf-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .pdf-meta {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .pdf-download {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--text);
+    color: var(--background);
+    border-radius: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .pdf-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .download-icon {
+    font-size: 1rem;
+  }
+
+  .pdf-embed-wrapper {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    background: #1a1a1a;
+  }
+
+  .pdf-embed {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .pdf-fallback {
+    padding: 0.75rem 1.25rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    font-size: 0.75rem;
+    text-align: center;
+    opacity: 0.7;
+  }
+
+  .pdf-fallback p {
+    margin: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .pdf-embed-wrapper {
+      height: 400px;
+    }
+
+    .phase-ttps {
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+
+    .attacks-timeline {
+      padding-left: 0;
+    }
+  }
+</style>
