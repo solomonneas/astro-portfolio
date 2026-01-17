@@ -1,74 +1,423 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import StatusLight from "../components/StatusLight.astro";
 ---
 
 <Layout pageTitle="About Me">
-  <div class="container mx-auto px-4 py-8">
-    <div class="max-w-3xl mx-auto">
-      <h1 class="text-center mb-12">About Me</h1>
-      <p class="text-lg text-center mb-12">
-        A passionate and driven individual with a rich and diverse background. My journey has taken me from the world of
-        culinary arts to the ever-evolving field of technology, where I've found my true calling.
-      </p>
+  <section class="about-terminal">
+    <header class="terminal-header">
+      <div class="header-left">
+        <StatusLight status="completed" />
+        <span class="status-text">AUTHENTICATED</span>
+      </div>
+      <h1>$ whoami</h1>
+    </header>
 
-      <div class="space-y-12">
-        <div class="mb-12">
-          <h2 class="mb-6">Early Influences & Tech Beginnings</h2>
-          <p class="text-lg mb-6">
-            I grew up in Lakeland, FL, in a large family with nine siblings. My father, a chemical engineer and software
-            developer, instilled in me an early appreciation for technology. I understood the importance of C and C++
-            before middle school and quickly became the household's go-to IT support, becoming proficient with DOS by
-            elementary school.
-          </p>
-          <p class="text-lg mb-4">
-            This early exposure sparked a passion for web development, leading me to start a business during the
-            GeoCities and Angelfire era. I designed custom websites, migrated legacy layouts to PHP, and helped clients
-            transition to custom domains. I also ran a business fixing and building computers, further deepening my
-            technical skills.
-          </p>
+    <div class="terminal-body">
+      <!-- User Profile Output -->
+      <div class="profile-output">
+        <div class="output-line">
+          <span class="label">&gt;&gt; USER:</span>
+          <span class="value name">Solomon Neas</span>
         </div>
-
-        <div class="mb-12">
-          <h2 class="mb-6">A Different Path: The Culinary World</h2>
-          <p class="text-lg mb-6">
-            For 17 years, I embarked on a culinary career, working as a cook and chef. This experience, while seemingly
-            different, taught me invaluable lessons in creativity, precision, and working under pressure.
-          </p>
+        <div class="output-line">
+          <span class="label">&gt;&gt; ROLE:</span>
+          <span class="value">Network & Systems Administrator | Cybersecurity Graduate Student</span>
         </div>
-        <div>
-          <h2 class="mb-6">Returning to My Roots</h2>
-          <p class="text-lg mb-6">
-            In 2021, I decided to return to my original passion and pursue a career in technology. This led me to enroll
-            at Polk State College and, now, the University of South Florida, where I am dedicated to expanding my
-            knowledge and skills in the cybersecurity landscape.
-          </p>
+        <div class="output-line">
+          <span class="label">&gt;&gt; ORIGIN:</span>
+          <span class="value">Lakeland, FL</span>
+        </div>
+        <div class="output-line">
+          <span class="label">&gt;&gt; STATUS:</span>
+          <span class="value highlight">Building secure systems, one subnet at a time</span>
         </div>
       </div>
+
+      <!-- Summary -->
+      <div class="summary-block">
+        <p>
+          From DOS commands in elementary school to designing enterprise SOC architectures—my path to technology
+          wasn't a straight line, but every detour added depth to how I approach problems today.
+        </p>
+      </div>
+
+      <!-- Timeline Sections -->
+      <div class="history-section">
+        <h2 class="section-header">## /var/log/history.log</h2>
+        <p class="section-comment">// A non-linear path to infrastructure & security</p>
+
+        <!-- Chapter 1 -->
+        <article class="history-entry">
+          <div class="entry-header">
+            <span class="entry-date">[~1995-2005]</span>
+            <span class="entry-divider">|</span>
+            <span class="entry-title">EARLY_TECH_INIT</span>
+          </div>
+          <div class="entry-body">
+            <p>
+              Grew up one of ten kids in a household where technology was second nature. My father—a chemical
+              engineer and software developer—had me understanding the significance of C and C++ before middle school.
+              I became the family's de facto IT department, troubleshooting DOS while other kids were still
+              figuring out Windows 95.
+            </p>
+            <p>
+              That foundation led to my first ventures: a web design business during the GeoCities and Angelfire era,
+              building custom sites, migrating layouts to PHP, and helping clients claim their corner of the early web.
+              I also ran a side operation building and repairing PCs—learning hardware from the ground up.
+            </p>
+            <div class="tech-tags">
+              <span class="tag">[DOS]</span>
+              <span class="tag">[HTML]</span>
+              <span class="tag">[PHP]</span>
+              <span class="tag">[Hardware]</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Chapter 2 -->
+        <article class="history-entry">
+          <div class="entry-header">
+            <span class="entry-date">[2005-2021]</span>
+            <span class="entry-divider">|</span>
+            <span class="entry-title">CULINARY_DETOUR</span>
+          </div>
+          <div class="entry-body">
+            <p>
+              Life took an unexpected fork. For 17 years, I worked as a cook and chef—a career that seems worlds
+              apart from network engineering. But kitchens and server rooms share more than you'd think: both
+              demand precision under pressure, systematic thinking, and the ability to troubleshoot on the fly
+              when everything's on fire (sometimes literally).
+            </p>
+            <p>
+              Managing kitchen operations taught me workflow optimization, resource allocation, and leading
+              teams through high-stakes situations. Skills that translate directly to incident response and
+              infrastructure management.
+            </p>
+            <div class="tech-tags">
+              <span class="tag">[Leadership]</span>
+              <span class="tag">[Operations]</span>
+              <span class="tag">[Crisis Management]</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Chapter 3 -->
+        <article class="history-entry current">
+          <div class="entry-header">
+            <span class="entry-date">[2021-PRESENT]</span>
+            <span class="entry-divider">|</span>
+            <span class="entry-title">RETURN_TO_ROOT</span>
+            <StatusLight status="ongoing" />
+          </div>
+          <div class="entry-body">
+            <p>
+              In 2021, I made the decision to return to my original calling. Enrolled at Polk State College
+              for Network Systems Engineering, then continued to a B.A.S. in Business Information Technology.
+              Now pursuing an M.S. in Cybersecurity Intelligence at the University of South Florida.
+            </p>
+            <p>
+              Currently working as a Network & Systems Administrator at Polk State, where I design lab environments,
+              manage virtualization infrastructure, and mentor the next generation of IT professionals. The goal:
+              bridge the gap between hands-on engineering and strategic security analysis.
+            </p>
+            <div class="tech-tags">
+              <span class="tag">[Proxmox]</span>
+              <span class="tag">[Linux]</span>
+              <span class="tag">[Windows Server]</span>
+              <span class="tag">[Security]</span>
+              <span class="tag">[Networking]</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Navigation -->
+      <div class="nav-section">
+        <p class="nav-comment">// Continue exploring</p>
+        <div class="nav-links">
+          <a href="/experience" class="nav-link">$ cd /experience</a>
+          <a href="/projects" class="nav-link">$ cd /projects</a>
+          <a href="/hire" class="nav-link">$ cd /hire</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="terminal-footer">
+        <span class="cursor-blink">█</span> EOF
+      </div>
     </div>
-  </div>
-  <style>
-    .education-container {
-      margin-top: 4rem;
+  </section>
+</Layout>
+
+<style>
+  .about-terminal {
+    font-family: "IBM Plex Mono", monospace;
+    max-width: 52rem;
+    margin: 0 auto;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .terminal-header h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .terminal-body {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+  }
+
+  /* Profile Output */
+  .profile-output {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+  }
+
+  .output-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .output-line .label {
+    color: #10b981;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+
+  .output-line .value {
+    opacity: 0.85;
+  }
+
+  .output-line .value.name {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .output-line .value.highlight {
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* Summary */
+  .summary-block {
+    margin-bottom: 2.5rem;
+  }
+
+  .summary-block p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin: 0;
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+
+  /* History Section */
+  .history-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    opacity: 0.9;
+  }
+
+  .section-comment {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 1.5rem 0;
+    font-style: italic;
+  }
+
+  /* History Entry */
+  .history-entry {
+    padding: 1.25rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .history-entry:hover {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .history-entry.current {
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+  }
+
+  .entry-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .entry-date {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .entry-divider {
+    opacity: 0.4;
+  }
+
+  .entry-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .entry-body p {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin: 0 0 1rem 0;
+    opacity: 0.8;
+    max-width: 60ch;
+  }
+
+  .entry-body p:last-of-type {
+    margin-bottom: 1rem;
+  }
+
+  /* Tech Tags */
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 2px;
+    opacity: 0.7;
+  }
+
+  /* Navigation */
+  .nav-section {
+    margin-bottom: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .nav-comment {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
+    font-style: italic;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    background: color-mix(in srgb, #10b981 5%, transparent);
+  }
+
+  /* Footer */
+  .terminal-footer {
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .terminal-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
     }
 
-    .education-tree {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 4px;
-      color: var(--text);
-      font-family: "IBM Plex Mono", Courier, monospace;
-      border: 1px solid rgba(128, 128, 128, 0.2);
-      padding: 1.5rem;
-      white-space: pre-wrap;
-      line-height: 1.6;
+    .output-line {
+      flex-direction: column;
+      gap: 0.25rem;
     }
 
-    .tree-line {
-      color: rgba(107, 114, 128, 0.7); /* Muted gray for tree lines */
+    .output-line .label {
+      min-width: auto;
     }
 
-    .degree-title {
-      color: #3b82f6 !important; /* Brighter blue-500 for degree titles */
-      font-weight: 900; /* Extra bold */
+    .entry-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
     }
-  </style></Layout
->
+
+    .nav-links {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>

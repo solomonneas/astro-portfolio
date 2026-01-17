@@ -1,86 +1,224 @@
 ---
 // src/components/ExperienceTimeline.astro
+import StatusLight from "./StatusLight.astro";
 
-// Example data prop - you'd pass this in from your main page or content collection
 interface Props {
-    experiences?: Array<{
-        date: string;
-        role: string;
-        company: string;
-        status: string;
-        description: string[];
-    }>;
+  experiences?: Array<{
+    date: string;
+    role: string;
+    company: string;
+    status: string;
+    description: string[];
+  }>;
 }
 
-const {
-    experiences = [
-        {
-            date: "2024-PRESENT",
-            role: "NETWORK OPERATIONS LEAD",
-            company: "POLK STATE COLLEGE",
-            status: "ongoing", // 'ongoing' or 'past'
-            description: [
-                "Lead network architecture design and implementation for multi-campus infrastructure.",
-                "Manage security protocols and firewall configurations (Palo Alto, Fortinet).",
-                "Mentor junior sysadmins and oversee Proxmox virtual environment.",
-            ],
-        },
-        {
-            date: "2022-2024",
-            role: "SYSTEMS ADMINISTRATOR",
-            company: "PREVIOUS CORP",
-            status: "past",
-            description: [
-                "Automated server provisioning using Ansible and Bash scripts.",
-                "Maintained 99.99% uptime for critical Linux-based services.",
-            ],
-        },
-    ],
-} = Astro.props;
+const { experiences = [] } = Astro.props;
 ---
 
-<div class="font-mono max-w-3xl mx-auto py-8 bg-zinc-950 p-8 rounded-xl shadow-2xl border border-zinc-900 my-8">
-    <h2 class="text-2xl text-emerald-400 mb-8 tracking-tight">
-        <span class="text-zinc-500">$</span> tail -f /var/log/experience
-    </h2>
+<div class="terminal-section">
+  <h2 class="section-header">$ tail -f /var/log/experience.log</h2>
+  <p class="section-meta">[+] Displaying {experiences.length} entries</p>
 
-    <div
-        class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-700 before:to-transparent before:content-['']">
-        {
-            experiences.map((job, index) => (
-                <div class="relative flex items-start group is-active">
-                    <div class={`absolute left-0 h-10 w-10 flex items-center justify-center`}>
-                        <div
-                            class={`h-3 w-3 rounded-full shadow-lg ${
-                                job.status === "ongoing"
-                                    ? "bg-emerald-500 animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.8)]"
-                                    : "bg-zinc-600 group-hover:bg-emerald-500 transition-colors duration-300"
-                            }`}
-                        />
-                    </div>
+  <div class="timeline">
+    {experiences.map((job, index) => (
+      <article class="timeline-entry">
+        <div class="entry-indicator">
+          <StatusLight status={job.status === "ongoing" ? "ongoing" : "completed"} />
+        </div>
 
-                    <div class="ml-12 pl-4 border-l border-zinc-800 group-hover:border-emerald-500/50 transition-colors duration-300 w-full">
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                            <h3 class="text-lg text-zinc-100 font-bold tracking-tight">
-                                <div>{job.role}</div>
-                                <div class="text-emerald-400 mt-1">@ {job.company}</div>
-                            </h3>
-                            <span class="text-sm text-zinc-500 mt-1 sm:mt-0 uppercase tracking-widest">
-                                [{job.date}]
-                            </span>
-                        </div>
+        <div class="entry-content">
+          <header class="entry-header">
+            <div class="header-main">
+              <span class="entry-date">[{job.date}]</span>
+              <span class="entry-divider">|</span>
+              <span class="entry-status">{job.status === "ongoing" ? "ACTIVE" : "COMPLETED"}</span>
+            </div>
+          </header>
 
-                        <ul class="mt-4 space-y-2 text-zinc-300">
-                            {job.description.map((item) => (
-                                <li class="flex items-start">
-                                    <span class="text-emerald-500 mr-2">→</span>
-                                    <span>{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            ))
-        }
-    </div>
+          <div class="entry-body">
+            <div class="entry-field">
+              <span class="field-label">&gt;&gt; ROLE:</span>
+              <span class="field-value role">{job.role}</span>
+            </div>
+            <div class="entry-field">
+              <span class="field-label">&gt;&gt; ORG:</span>
+              <span class="field-value org">{job.company}</span>
+            </div>
+            <div class="entry-field description-field">
+              <span class="field-label">&gt;&gt; LOG:</span>
+              <ul class="description-list">
+                {job.description.map((item) => (
+                  <li>
+                    <span class="list-marker">[+]</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
 </div>
+
+<style>
+  .terminal-section {
+    font-family: "IBM Plex Mono", monospace;
+    padding: 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+  }
+
+  .section-header {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #10b981;
+  }
+
+  .section-meta {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .timeline-entry {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .timeline-entry:hover {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .entry-indicator {
+    flex-shrink: 0;
+    padding-top: 0.2rem;
+  }
+
+  .entry-content {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .entry-header {
+    margin-bottom: 1rem;
+  }
+
+  .header-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+  }
+
+  .entry-date {
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .entry-divider {
+    opacity: 0.3;
+  }
+
+  .entry-status {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  .entry-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .entry-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .field-label {
+    color: #10b981;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: 60px;
+  }
+
+  .field-value {
+    opacity: 0.8;
+  }
+
+  .field-value.role {
+    font-weight: 600;
+    opacity: 0.95;
+  }
+
+  .field-value.org {
+    opacity: 0.7;
+  }
+
+  .description-field {
+    align-items: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .description-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .description-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    opacity: 0.75;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .list-marker {
+    color: #10b981;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .timeline-entry {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .entry-field {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .field-label {
+      min-width: auto;
+    }
+  }
+</style>

@@ -2,38 +2,1494 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "solomonneas.dev",
-    status: "In Progress",
-    statusType: "ongoing",
-    origin: "Personal Development",
-    date: "2025.12",
-    techStack: ["Astro", "JavaScript", "HTML", "CSS", "Vercel", "GitHub"],
+  title: "solomonneas.dev",
+  status: "In Progress",
+  statusType: "ongoing",
+  origin: "Personal Development",
+  date: "2025.12",
+  techStack: ["Astro", "Tailwind CSS", "Vite", "Node.js", "Vercel", "GitHub"],
 };
+
+const components = [
+  { name: "Astro 5.x", category: "Framework", role: "Static site generation, routing, content collections", color: "#ff5d01" },
+  { name: "Tailwind CSS 4.x", category: "Styling", role: "Utility-first CSS framework via Vite plugin", color: "#06b6d4" },
+  { name: "Vite", category: "Build Tool", role: "Dev server, HMR, asset bundling", color: "#646cff" },
+  { name: "Content Collections", category: "CMS", role: "Type-safe content with Zod schema validation", color: "#10b981" },
+  { name: "Vercel", category: "Hosting", role: "CI/CD, edge deployment, automatic HTTPS", color: "#000000" },
+  { name: "GitHub", category: "Source Control", role: "Version control, deployment triggers", color: "#6e5494" },
+];
+
+const pages = [
+  { path: "/", name: "index.astro", desc: "Home / README terminal" },
+  { path: "/about", name: "about.astro", desc: "Profile & history" },
+  { path: "/experience", name: "experience.astro", desc: "Career timeline" },
+  { path: "/projects", name: "projects.astro", desc: "Project log entries" },
+  { path: "/blog", name: "blog.astro", desc: "Blog index" },
+  { path: "/blog/[slug]", name: "[...slug].astro", desc: "Dynamic blog posts" },
+  { path: "/hire", name: "hire.astro", desc: "Services & contact" },
+  { path: "/contact", name: "contact.astro", desc: "Contact methods" },
+  { path: "/rss.xml", name: "rss.xml.js", desc: "RSS feed endpoint" },
+];
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-    <h2>// Overview</h2>
-    <p>
-        Building a performant, content-driven portfolio website using the Astro framework. This site serves as both a
-        professional portfolio and a learning playground for modern web development.
-    </p>
+  <h2>// Overview</h2>
+  <p>
+    A performant, content-driven portfolio website built with modern web technologies. This project serves as both a
+    professional portfolio and a learning playground for the Astro framework, showcasing a custom "Industrial Terminal /
+    NOC Dashboard" design system.
+  </p>
 
-    <h2>// Technical Implementation</h2>
-    <p>The site is built with a focus on performance and developer experience:</p>
-    <ul>
-        <li>Astro's static site generation for fast page loads</li>
-        <li>Content collections for blog posts and project pages</li>
-        <li>Custom terminal-inspired design system</li>
-        <li>Dynamic theme switching with CSS variables</li>
-        <li>Continuous deployment via Vercel and GitHub</li>
+  <!-- GitHub Repo Link -->
+  <div class="github-callout">
+    <div class="github-content">
+      <div class="github-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+      </div>
+      <div class="github-text">
+        <span class="github-label">Open Source</span>
+        <p class="github-desc">This project is open source! Check out the code, fork it, or give it a star if you find it useful.</p>
+      </div>
+    </div>
+    <div class="github-actions">
+      <a href="https://github.com/solomonneas/astro-portfolio" target="_blank" class="github-link repo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+        <span>View Repository</span>
+      </a>
+      <a href="https://github.com/solomonneas/astro-portfolio/stargazers" target="_blank" class="github-link star">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+        </svg>
+        <span>Star on GitHub</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- High-Level Architecture -->
+  <h2>// High-Level Architecture</h2>
+  <div class="architecture-diagram">
+    <div class="arch-layer source">
+      <span class="layer-label">SOURCE</span>
+      <div class="arch-boxes">
+        <div class="arch-box">
+          <span class="box-icon">📁</span>
+          <span class="box-title">src/</span>
+          <span class="box-desc">Pages, Layouts, Components</span>
+        </div>
+        <div class="arch-box">
+          <span class="box-icon">📝</span>
+          <span class="box-title">content/</span>
+          <span class="box-desc">Blog Posts (MDX)</span>
+        </div>
+        <div class="arch-box">
+          <span class="box-icon">🎨</span>
+          <span class="box-title">styles/</span>
+          <span class="box-desc">Global CSS + Tailwind</span>
+        </div>
+        <div class="arch-box">
+          <span class="box-icon">🔤</span>
+          <span class="box-title">public/</span>
+          <span class="box-desc">Fonts, Favicon, Assets</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector">
+      <div class="connector-line">
+        <div class="connector-particle"></div>
+      </div>
+      <span class="connector-label">astro build</span>
+    </div>
+
+    <div class="arch-layer build">
+      <span class="layer-label">BUILD PIPELINE</span>
+      <div class="build-process">
+        <div class="process-node vite">
+          <div class="node-pulse"></div>
+          <span class="node-label">Vite</span>
+          <span class="node-role">Bundler</span>
+        </div>
+        <div class="process-arrow">→</div>
+        <div class="process-node astro">
+          <div class="node-pulse"></div>
+          <span class="node-label">Astro</span>
+          <span class="node-role">SSG</span>
+        </div>
+        <div class="process-arrow">→</div>
+        <div class="process-node tailwind">
+          <div class="node-pulse"></div>
+          <span class="node-label">Tailwind</span>
+          <span class="node-role">CSS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector">
+      <div class="connector-line">
+        <div class="connector-particle"></div>
+      </div>
+      <span class="connector-label">git push → deploy</span>
+    </div>
+
+    <div class="arch-layer deploy">
+      <span class="layer-label">DEPLOYMENT</span>
+      <div class="deploy-stack">
+        <div class="deploy-node github">
+          <span class="node-icon">⚙️</span>
+          <span>GitHub</span>
+        </div>
+        <div class="deploy-arrow">
+          <div class="arrow-line"><div class="arrow-particle"></div></div>
+        </div>
+        <div class="deploy-node vercel">
+          <span class="node-icon">▲</span>
+          <span>Vercel</span>
+        </div>
+        <div class="deploy-arrow">
+          <div class="arrow-line"><div class="arrow-particle"></div></div>
+        </div>
+        <div class="deploy-node cdn">
+          <span class="node-icon">🌐</span>
+          <span>Edge CDN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-divider">
+      <span class="divider-line"></span>
+      <span class="divider-text">solomonneas.dev</span>
+      <span class="divider-line"></span>
+    </div>
+
+    <div class="arch-layer users">
+      <span class="layer-label">USERS</span>
+      <div class="user-grid">
+        <div class="user-item"><span>🖥️ Desktop</span></div>
+        <div class="user-item"><span>📱 Mobile</span></div>
+        <div class="user-item"><span>📰 RSS Readers</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Component Inventory -->
+  <h2>// Tech Stack Inventory</h2>
+  <p class="section-intro">The site leverages modern web technologies for optimal developer experience and performance:</p>
+
+  <div class="component-grid">
+    {components.map((comp, i) => (
+      <div class="component-card" style={`--accent: ${comp.color}; --delay: ${i * 0.1}s`}>
+        <div class="card-header">
+          <span class="card-indicator"></span>
+          <span class="card-name">{comp.name}</span>
+          <span class="card-category">{comp.category}</span>
+        </div>
+        <div class="card-body">
+          <span class="card-role">{comp.role}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Project Structure -->
+  <h2>// Project Structure</h2>
+  <div class="structure-diagram">
+    <div class="tree-container">
+      <div class="tree-header">
+        <span class="tree-prompt">$</span> tree src/ -L 2
+      </div>
+      <div class="tree-content">
+        <div class="tree-line root">
+          <span class="tree-branch">📦</span>
+          <span class="tree-name">src/</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-branch">├── 📁</span>
+          <span class="tree-name">components/</span>
+          <span class="tree-desc"># Reusable UI components</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">StatusLight.astro</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">EducationTerminal.astro</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">CertificationsTerminal.astro</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   └──</span>
+          <span class="tree-file">ExperienceTimeline.astro</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-branch">├── 📁</span>
+          <span class="tree-name">content/</span>
+          <span class="tree-desc"># Content collections</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">config.ts</span>
+          <span class="tree-desc"># Zod schemas</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   └── 📁</span>
+          <span class="tree-name">blog/</span>
+          <span class="tree-desc"># Markdown posts</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-branch">├── 📁</span>
+          <span class="tree-name">layouts/</span>
+          <span class="tree-desc"># Page templates</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">Layout.astro</span>
+          <span class="tree-desc"># Main layout</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   └──</span>
+          <span class="tree-file">ProjectLayout.astro</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-branch">├── 📁</span>
+          <span class="tree-name">pages/</span>
+          <span class="tree-desc"># File-based routing</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">index.astro</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├──</span>
+          <span class="tree-file">about.astro</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   ├── 📁</span>
+          <span class="tree-name">blog/</span>
+        </div>
+        <div class="tree-line sub">
+          <span class="tree-branch">│   └── 📁</span>
+          <span class="tree-name">projects/</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-branch">└── 📁</span>
+          <span class="tree-name">styles/</span>
+        </div>
+        <div class="tree-line sub last">
+          <span class="tree-branch">    └──</span>
+          <span class="tree-file">global.css</span>
+          <span class="tree-desc"># Tailwind + custom</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Route Map -->
+  <h2>// Route Map</h2>
+  <p class="section-intro">File-based routing generates the following endpoints:</p>
+
+  <div class="route-table">
+    <div class="route-header">
+      <span class="route-col path">PATH</span>
+      <span class="route-col file">FILE</span>
+      <span class="route-col desc">DESCRIPTION</span>
+    </div>
+    {pages.map((page, i) => (
+      <div class="route-row" style={`--delay: ${i * 0.05}s`}>
+        <span class="route-col path">
+          <span class="route-prompt">GET</span>
+          {page.path}
+        </span>
+        <span class="route-col file">{page.name}</span>
+        <span class="route-col desc">{page.desc}</span>
+      </div>
+    ))}
+  </div>
+
+  <!-- Build Pipeline -->
+  <h2>// Build Pipeline</h2>
+  <div class="pipeline-section">
+    <h3 class="pipeline-title">
+      <span class="pipeline-num">01</span>
+      Development Flow
+    </h3>
+    <p class="pipeline-desc">Local development with hot module replacement</p>
+
+    <div class="pipeline-flow">
+      <div class="pipeline-step" style="--step: 1">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <span class="step-title">npm run dev</span>
+          <span class="step-desc">Starts Vite dev server on localhost:4321</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 2">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <span class="step-title">File Watch</span>
+          <span class="step-desc">Vite monitors src/ for changes</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 3">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <span class="step-title">HMR Update</span>
+          <span class="step-desc">Instant browser refresh on save</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipeline-section">
+    <h3 class="pipeline-title">
+      <span class="pipeline-num">02</span>
+      Production Build
+    </h3>
+    <p class="pipeline-desc">Static site generation for deployment</p>
+
+    <div class="pipeline-flow">
+      <div class="pipeline-step" style="--step: 1">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <span class="step-title">npm run build</span>
+          <span class="step-desc">Triggers Astro build command</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 2">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <span class="step-title">Content Process</span>
+          <span class="step-desc">Validate collections, parse MDX</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 3">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <span class="step-title">SSG Render</span>
+          <span class="step-desc">Generate static HTML for each route</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 4">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <span class="step-title">CSS Optimize</span>
+          <span class="step-desc">Tailwind purge, minification</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 5">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <span class="step-title">Output</span>
+          <span class="step-desc">Static files in dist/ ready to deploy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design System -->
+  <h2>// Design System Deep Dive</h2>
+
+  <div class="deep-dive">
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #10b981">🎨</span>
+        Theme Engine
+      </h3>
+      <p>Dynamic color theming with CSS filters and localStorage persistence.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Core Mechanism</h4>
+          <ul>
+            <li><code>hue-rotate()</code> — shifts entire color palette</li>
+            <li><code>invert()</code> — toggles light/dark mode</li>
+            <li>Full-page filter via <code>#filter</code> overlay</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Persistence</h4>
+          <ul>
+            <li>Theme saved to localStorage</li>
+            <li>Applied on page load before paint</li>
+            <li>Random hue on each theme toggle</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Implementation</h4>
+          <ul>
+            <li>Inline &lt;script&gt; in Layout.astro</li>
+            <li>CSS transitions for smooth changes</li>
+            <li>Favicon dynamically recolored via SVG</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #06b6d4">🔤</span>
+        Typography System
+      </h3>
+      <p>Self-hosted fonts for performance and consistent rendering.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Font Stack</h4>
+          <ul>
+            <li><strong>IBM Plex Mono</strong> — Code, terminals, UI</li>
+            <li><strong>IBM Plex Sans</strong> — Body text</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Loading Strategy</h4>
+          <ul>
+            <li>WOFF2 format for compression</li>
+            <li>@font-face in global.css</li>
+            <li>Served from /public/fonts/</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #f59e0b">📟</span>
+        Terminal Aesthetic
+      </h3>
+      <p>The "NOC Dashboard" visual language throughout the site.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Visual Elements</h4>
+          <ul>
+            <li>Terminal headers with status indicators</li>
+            <li>Monospace typography throughout</li>
+            <li>Dotted borders and subtle backgrounds</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Color Patterns</h4>
+          <ul>
+            <li><code>color-mix()</code> for theme-aware colors</li>
+            <li>Emerald green (#10b981) accents</li>
+            <li>Low-opacity backgrounds (2-5%)</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Interactive States</h4>
+          <ul>
+            <li>StatusLight pulsing animations</li>
+            <li>Hover transforms and glows</li>
+            <li>CLI-style navigation ($ cd /path)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #8b5cf6">📚</span>
+        Content Collections
+      </h3>
+      <p>Type-safe content management with Zod validation.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Blog Schema</h4>
+          <ul>
+            <li><code>title: z.string()</code></li>
+            <li><code>pubDate: z.date()</code></li>
+            <li><code>tags: z.array(z.string())</code></li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Benefits</h4>
+          <ul>
+            <li>Build-time validation catches errors</li>
+            <li>TypeScript types auto-generated</li>
+            <li>IDE autocomplete for frontmatter</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config Notes -->
+  <h2>// Key Configuration</h2>
+
+  <div class="config-grid">
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">⚙️</span>
+        <span class="config-title">astro.config.mjs</span>
+      </div>
+      <p>Defines site URL and Vite plugins. Tailwind integrated via <code>@tailwindcss/vite</code> plugin for Tailwind v4 support.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">🎨</span>
+        <span class="config-title">global.css</span>
+      </div>
+      <p>Imports Tailwind via <code>@import "tailwindcss"</code>, defines @font-face rules, CSS variables, and base styles.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">📦</span>
+        <span class="config-title">package.json</span>
+      </div>
+      <p>Minimal dependencies: <code>astro</code>, <code>tailwindcss</code>, <code>@tailwindcss/vite</code>, <code>@astrojs/rss</code>.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">📝</span>
+        <span class="config-title">content/config.ts</span>
+      </div>
+      <p>Defines content collections using <code>defineCollection()</code> and Zod schemas for type-safe content.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">▲</span>
+        <span class="config-title">Vercel</span>
+      </div>
+      <p>Zero-config deployment. Auto-detects Astro, runs build, deploys to edge CDN on every push to main.</p>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <h2>// Current Status</h2>
+  <div class="status-block">
+    <div class="status-indicator active">
+      <div class="status-pulse"></div>
+      <span>Site live and actively developed</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">✓</span> Astro 5.x framework configured</li>
+      <li><span class="check">✓</span> Tailwind CSS 4.x integrated</li>
+      <li><span class="check">✓</span> Terminal design system implemented</li>
+      <li><span class="check">✓</span> Dynamic theme engine working</li>
+      <li><span class="check">✓</span> Content collections for blog</li>
+      <li><span class="check">✓</span> Vercel CI/CD pipeline active</li>
+      <li><span class="check">✓</span> RSS feed generation</li>
+      <li><span class="pending">○</span> Additional blog content</li>
+      <li><span class="pending">○</span> SEO optimization (meta tags, OG images)</li>
+      <li><span class="pending">○</span> Analytics integration</li>
     </ul>
-
-    <h2>// Design Philosophy</h2>
-    <p>
-        The "Industrial Terminal / NOC Dashboard" aesthetic balances professional presentation with technical
-        credibility. The design appeals to both recruiters and fellow developers.
-    </p>
-
-    <h2>// Status</h2>
-    <p>Core site complete. Continuously adding content and refining the design based on feedback.</p>
+  </div>
 </ProjectLayout>
+
+<style>
+  /* Section Intro */
+  .section-intro {
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+  }
+
+  /* GitHub Callout */
+  .github-callout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid #6e5494;
+    border-radius: 6px;
+  }
+
+  .github-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .github-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: color-mix(in srgb, #6e5494 15%, transparent);
+    border-radius: 6px;
+    color: #6e5494;
+  }
+
+  .github-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .github-text {
+    flex: 1;
+  }
+
+  .github-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6e5494;
+  }
+
+  .github-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0.25rem 0 0 0;
+    line-height: 1.5;
+  }
+
+  .github-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .github-link.repo {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    color: currentColor;
+  }
+
+  .github-link.repo:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  .github-link.star {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+    color: #f59e0b;
+  }
+
+  .github-link.star:hover {
+    background: color-mix(in srgb, #f59e0b 25%, transparent);
+    border-color: #f59e0b;
+  }
+
+  .github-link svg {
+    flex-shrink: 0;
+  }
+
+  /* Architecture Diagram */
+  .architecture-diagram {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .arch-layer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .layer-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    text-transform: uppercase;
+  }
+
+  .arch-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .arch-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem 1.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    min-width: 120px;
+  }
+
+  .box-icon {
+    font-size: 1.25rem;
+  }
+
+  .box-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .box-desc {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    text-align: center;
+  }
+
+  .arch-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .connector-line {
+    width: 2px;
+    height: 40px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .connector-particle {
+    position: absolute;
+    width: 2px;
+    height: 12px;
+    background: #10b981;
+    animation: flowDown 1.5s ease-in-out infinite;
+  }
+
+  @keyframes flowDown {
+    0% { top: -12px; }
+    100% { top: 40px; }
+  }
+
+  .connector-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: #10b981;
+  }
+
+  .build-process {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .process-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem 1.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+  }
+
+  .process-node.vite { border-color: color-mix(in srgb, #646cff 40%, transparent); }
+  .process-node.astro { border-color: color-mix(in srgb, #ff5d01 40%, transparent); }
+  .process-node.tailwind { border-color: color-mix(in srgb, #06b6d4 40%, transparent); }
+
+  .node-pulse {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .node-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .node-role {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .process-arrow {
+    font-size: 1.25rem;
+    opacity: 0.4;
+    color: #10b981;
+  }
+
+  .deploy-stack {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .deploy-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .node-icon {
+    font-size: 1rem;
+  }
+
+  .deploy-arrow {
+    display: flex;
+    align-items: center;
+  }
+
+  .arrow-line {
+    width: 30px;
+    height: 2px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arrow-particle {
+    position: absolute;
+    width: 8px;
+    height: 2px;
+    background: #10b981;
+    animation: flowRight 1.5s ease-in-out infinite;
+  }
+
+  @keyframes flowRight {
+    0% { left: -8px; }
+    100% { left: 30px; }
+  }
+
+  .arch-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, color-mix(in srgb, currentColor 20%, transparent), transparent);
+  }
+
+  .divider-text {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .user-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .user-item {
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  /* Component Grid */
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .component-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .card-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .card-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .card-category {
+    margin-left: auto;
+    font-size: 0.65rem;
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .card-body {
+    padding: 0.75rem 1rem;
+  }
+
+  .card-role {
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+
+  /* Project Structure */
+  .structure-diagram {
+    margin: 1.5rem 0;
+  }
+
+  .tree-container {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .tree-header {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+  }
+
+  .tree-prompt {
+    color: #10b981;
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .tree-content {
+    padding: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .tree-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+  }
+
+  .tree-line.root {
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-line.sub {
+    padding-left: 0.5rem;
+    opacity: 0.8;
+  }
+
+  .tree-branch {
+    opacity: 0.4;
+    white-space: pre;
+  }
+
+  .tree-name {
+    color: #10b981;
+    font-weight: 500;
+  }
+
+  .tree-file {
+    opacity: 0.9;
+  }
+
+  .tree-desc {
+    opacity: 0.5;
+    font-style: italic;
+    margin-left: auto;
+  }
+
+  /* Route Table */
+  .route-table {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .route-header {
+    display: flex;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  .route-row {
+    display: flex;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px dotted color-mix(in srgb, currentColor 10%, transparent);
+    font-size: 0.75rem;
+    animation: fadeSlideIn 0.3s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  .route-row:last-child {
+    border-bottom: none;
+  }
+
+  .route-row:hover {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
+  .route-col {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .route-col.path {
+    flex: 2;
+  }
+
+  .route-col.file {
+    flex: 2;
+    opacity: 0.7;
+  }
+
+  .route-col.desc {
+    flex: 3;
+    opacity: 0.5;
+  }
+
+  .route-prompt {
+    font-size: 0.6rem;
+    color: #10b981;
+    font-weight: 600;
+    padding: 0.1rem 0.3rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border-radius: 2px;
+  }
+
+  /* Pipeline Section */
+  .pipeline-section {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .pipeline-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: currentColor;
+  }
+
+  .pipeline-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 1px solid #10b981;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    color: #10b981;
+  }
+
+  .pipeline-desc {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    font-style: italic;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .pipeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    flex: 1;
+    min-width: 140px;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: calc(var(--step) * 0.1s);
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .step-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .step-desc {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  .pipeline-connector {
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem;
+    height: 60px;
+  }
+
+  .connector-pulse {
+    width: 20px;
+    height: 2px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    position: relative;
+  }
+
+  .connector-pulse::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 2px;
+    background: #10b981;
+    animation: connectorFlow 1s ease-in-out infinite;
+  }
+
+  @keyframes connectorFlow {
+    0% { left: 0; }
+    100% { left: 14px; }
+  }
+
+  /* Deep Dive */
+  .deep-dive {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .dive-section {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .dive-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: currentColor;
+  }
+
+  .dive-icon {
+    font-size: 1.25rem;
+    color: var(--color);
+  }
+
+  .dive-section > p {
+    opacity: 0.8;
+    margin: 0 0 1rem 0;
+  }
+
+  .dive-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .detail-block h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .detail-block ul {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .detail-block li {
+    margin-bottom: 0.35rem;
+    opacity: 0.8;
+  }
+
+  .detail-block code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  /* Config Grid */
+  .config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .config-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .config-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .config-icon {
+    font-size: 1.25rem;
+    opacity: 0.7;
+  }
+
+  .config-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .config-card p {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .config-card code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  /* Status Block */
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  .pending {
+    color: #f59e0b;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .architecture-diagram,
+    .pipeline-section {
+      padding: 1rem;
+    }
+
+    .arch-boxes {
+      flex-direction: column;
+    }
+
+    .build-process {
+      flex-direction: column;
+    }
+
+    .process-arrow {
+      transform: rotate(90deg);
+    }
+
+    .deploy-stack {
+      flex-direction: column;
+    }
+
+    .deploy-arrow {
+      transform: rotate(90deg);
+    }
+
+    .pipeline-flow {
+      flex-direction: column;
+    }
+
+    .pipeline-connector {
+      height: auto;
+      padding: 0.5rem 0;
+      transform: rotate(90deg);
+    }
+
+    .dive-details {
+      grid-template-columns: 1fr;
+    }
+
+    .route-header,
+    .route-row {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .route-col {
+      width: 100%;
+    }
+
+    .route-col.desc {
+      margin-top: 0.25rem;
+    }
+  }
+</style>

@@ -4,13 +4,24 @@ import StatusLight from "../components/StatusLight.astro";
 ---
 
 <Layout pageTitle="Hire">
-  <section class="text-content">
-    <h1>Hire Me</h1>
-    <p>Enterprise-grade solutions delivered with precision. Select a service module below.</p>
-    <p class="work-auth-note"><strong>Note:</strong> US Citizen - No visa sponsorship required.</p>
-  </section>
+  <section class="hire-terminal">
+    <header class="terminal-header">
+      <div class="header-left">
+        <StatusLight status="ongoing" />
+        <span class="status-text">AVAILABLE</span>
+      </div>
+      <h1>$ ./services.sh --list</h1>
+    </header>
 
-  <section class="services-grid">
+    <div class="terminal-body">
+      <!-- Intro -->
+      <div class="intro-block">
+        <p class="intro-text">Enterprise-grade solutions delivered with precision. Select a service module below.</p>
+        <p class="work-auth"><span class="badge">[US CITIZEN]</span> No visa sponsorship required.</p>
+      </div>
+
+      <!-- Services Grid -->
+      <div class="services-grid">
     <!-- Service Module 1: Infrastructure & Cybersecurity -->
     <div class="service-card">
       <div class="card-header">
@@ -105,107 +116,197 @@ import StatusLight from "../components/StatusLight.astro";
         <a href="https://ko-fi.com/solomonneas" target="_blank" class="cta-button">[ Execute: Start_Project ]</a>
       </div>
     </div>
-  </section>
+      </div>
 
-  <!-- Testimonials Section -->
-  <section class="testimonials-section">
-    <h2 class="testimonials-header">$ cat ~/testimonials.txt</h2>
-    <div class="testimonials-grid">
-      <!-- Testimonial 1 -->
-      <div
-        class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 font-mono text-sm relative group hover:border-emerald-500/30 transition-colors flex flex-col h-full">
-        <div class="flex items-center gap-2 mb-4 border-b border-zinc-800 pb-2">
-          <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/50"></div>
-          <span class="ml-2 text-xs text-zinc-100">review_01.txt</span>
-        </div>
-        <div class="text-zinc-200 mb-4 flex-grow">
-          <span class="text-emerald-500">$</span> cat review_01.txt<br /><br />
-          "You have been a vital part of our department. Can 't wait to see what 2026 has to offer!"
-        </div>
-        <div class="text-xs text-zinc-100 border-t border-zinc-800 pt-3 flex flex-col items-end gap-1 mt-auto w-full">
-          <span class="font-semibold">-- John Stewart</span>
-          <span class="text-zinc-400 text-right">Program Director, Polk State College</span>
+      <!-- Testimonials Section -->
+      <div class="testimonials-section">
+        <h2 class="section-header">$ cat ~/testimonials.txt</h2>
+        <p class="section-meta">[+] Loading client feedback...</p>
+
+        <div class="testimonials-grid">
+          <!-- Testimonial 1 -->
+          <div class="testimonial-card">
+            <div class="card-titlebar">
+              <div class="titlebar-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="filename">review_01.txt</span>
+            </div>
+            <div class="card-content">
+              <p class="command"><span class="prompt">$</span> cat review_01.txt</p>
+              <p class="quote">"You have been a vital part of our department. Can't wait to see what 2026 has to offer!"</p>
+            </div>
+            <div class="card-attribution">
+              <span class="author">-- John Stewart</span>
+              <span class="role">Program Director, Polk State College</span>
+            </div>
+          </div>
+
+          <!-- Testimonial 2 -->
+          <div class="testimonial-card">
+            <div class="card-titlebar">
+              <div class="titlebar-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="filename">review_02.txt</span>
+            </div>
+            <div class="card-content">
+              <p class="command"><span class="prompt">$</span> cat review_02.txt</p>
+              <p class="quote">"I can't recommend Solomon enough. He's a baller, shot caller."</p>
+            </div>
+            <div class="card-attribution">
+              <span class="author">-- Joseph Smith</span>
+              <span class="role">Some Dude</span>
+            </div>
+          </div>
+
+          <!-- Testimonial 3 -->
+          <div class="testimonial-card">
+            <div class="card-titlebar">
+              <div class="titlebar-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="filename">review_03.txt</span>
+            </div>
+            <div class="card-content">
+              <p class="command"><span class="prompt">$</span> cat review_03.txt</p>
+              <p class="quote">"He's a mean one, Mr. Grinch."</p>
+            </div>
+            <div class="card-attribution">
+              <span class="author">-- Every Who</span>
+              <span class="role">Whoville</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Testimonial 2 -->
-      <div
-        class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 font-mono text-sm relative group hover:border-emerald-500/30 transition-colors flex flex-col h-full">
-        <div class="flex items-center gap-2 mb-4 border-b border-zinc-800 pb-2">
-          <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/50"></div>
-          <span class="ml-2 text-xs text-zinc-100">review_02.txt</span>
-        </div>
-        <div class="text-zinc-200 mb-4 flex-grow">
-          <span class="text-emerald-500">$</span> cat review_02.txt<br />
-          "I can't recommend Solomon enough. He's a baller, shot caller."
-        </div>
-        <div class="text-xs text-zinc-100 border-t border-zinc-800 pt-3 flex flex-col items-end gap-1 mt-auto w-full">
-          <span class="font-semibold whitespace-nowrap">-- Joseph Smith</span>
-          <span class="text-zinc-400 text-right">Some Dude</span>
+      <!-- Navigation -->
+      <div class="nav-section">
+        <p class="nav-comment">// Continue exploring</p>
+        <div class="nav-links">
+          <a href="/projects" class="nav-link">$ cd /projects</a>
+          <a href="/experience" class="nav-link">$ cd /experience</a>
+          <a href="/contact" class="nav-link">$ cd /contact</a>
         </div>
       </div>
 
-      <!-- Testimonial 3 -->
-      <div
-        class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 font-mono text-sm relative group hover:border-emerald-500/30 transition-colors flex flex-col h-full">
-        <div class="flex items-center gap-2 mb-4 border-b border-zinc-800 pb-2">
-          <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/50"></div>
-          <span class="ml-2 text-xs text-zinc-100">review_03.txt</span>
-        </div>
-        <div class="text-zinc-200 mb-4 flex-grow">
-          <span class="text-emerald-500">$</span> cat review_03.txt<br />
-          "He's a mean one, Mr. Grinch."
-        </div>
-        <div class="text-xs text-zinc-100 border-t border-zinc-800 pt-3 flex flex-col items-end gap-1 mt-auto w-full">
-          <span class="font-semibold">-- Every Who</span>
-          <span class="text-zinc-400 text-right">Whoville</span>
-        </div>
+      <!-- Footer -->
+      <div class="terminal-footer">
+        <span class="cursor-blink">█</span> EOF
       </div>
     </div>
   </section>
 </Layout>
 
 <style>
+  /* Terminal Wrapper */
+  .hire-terminal {
+    font-family: "IBM Plex Mono", monospace;
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .terminal-header .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .terminal-header h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .terminal-body {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+  }
+
+  /* Intro Block */
+  .intro-block {
+    margin-bottom: 2rem;
+  }
+
+  .intro-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.6;
+  }
+
+  .work-auth {
+    font-size: 0.8rem;
+    margin: 0;
+    opacity: 0.7;
+  }
+
+  .work-auth .badge {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  /* Services Grid */
   .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
   }
 
   .service-card {
     font-family: "IBM Plex Mono", monospace;
-    background: rgba(24, 24, 27, 0.6);
-    border: 1px solid rgba(63, 63, 70, 0.8);
+    background: color-mix(in srgb, currentColor 4%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
     border-radius: 6px;
     display: flex;
     flex-direction: column;
-    transition:
-      border-color 0.3s ease,
-      box-shadow 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .service-card:hover {
-    border-color: rgba(52, 211, 153, 0.4);
-    box-shadow: 0 0 20px rgba(52, 211, 153, 0.1);
+    border-color: color-mix(in srgb, #10b981 40%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, #10b981 10%, transparent);
   }
 
-  .card-header {
+  .service-card .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(63, 63, 70, 0.8);
-    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: color-mix(in srgb, currentColor 3%, transparent);
   }
 
-  .header-left {
+  .service-card .header-left {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -213,14 +314,14 @@ import StatusLight from "../components/StatusLight.astro";
 
   .module-id {
     font-size: 0.7rem;
-    color: rgba(161, 161, 170, 0.9);
+    opacity: 0.6;
     letter-spacing: 0.05em;
   }
 
   .status-label {
     font-size: 0.65rem;
-    color: #34d399;
-    background: rgba(52, 211, 153, 0.1);
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 10%, transparent);
     padding: 0.2rem 0.5rem;
     border-radius: 2px;
     letter-spacing: 0.1em;
@@ -231,13 +332,8 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   @keyframes pulse-bg {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
   .card-body {
@@ -248,21 +344,21 @@ import StatusLight from "../components/StatusLight.astro";
   .service-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #34d399;
+    color: #10b981;
     margin: 0 0 0.75rem 0;
     line-height: 1.4;
   }
 
   .service-desc {
     font-size: 0.8rem;
-    color: rgba(228, 228, 231, 0.85);
+    opacity: 0.75;
     margin-bottom: 1rem;
     line-height: 1.6;
   }
 
   .tech-specs h3 {
     font-size: 0.7rem;
-    color: rgba(161, 161, 170, 0.7);
+    opacity: 0.5;
     margin: 0 0 0.5rem 0;
     font-weight: 400;
   }
@@ -275,7 +371,7 @@ import StatusLight from "../components/StatusLight.astro";
 
   .tech-specs li {
     font-size: 0.75rem;
-    color: rgba(212, 212, 216, 0.9);
+    opacity: 0.8;
     padding: 0.25rem 0;
     display: flex;
     align-items: flex-start;
@@ -283,7 +379,7 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   .tech-specs .prefix {
-    color: #34d399;
+    color: #10b981;
     font-weight: 600;
     flex-shrink: 0;
   }
@@ -292,19 +388,20 @@ import StatusLight from "../components/StatusLight.astro";
     display: inline-block;
     margin-top: 1rem;
     font-size: 0.7rem;
-    color: rgba(161, 161, 170, 0.8);
+    opacity: 0.5;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
   }
 
   .case-study-link:hover {
-    color: #34d399;
+    opacity: 1;
+    color: #10b981;
   }
 
   .card-footer {
     padding: 1rem;
-    border-top: 1px solid rgba(63, 63, 70, 0.8);
-    background: rgba(0, 0, 0, 0.15);
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: color-mix(in srgb, currentColor 2%, transparent);
   }
 
   .cta-button {
@@ -312,9 +409,9 @@ import StatusLight from "../components/StatusLight.astro";
     text-align: center;
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.75rem;
-    color: #34d399;
-    background: rgba(52, 211, 153, 0.1);
-    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
     padding: 0.6rem 1rem;
     border-radius: 3px;
     text-decoration: none;
@@ -323,39 +420,189 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   .cta-button:hover {
-    background: rgba(52, 211, 153, 0.2);
-    border-color: #34d399;
-    box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-color: #10b981;
+    box-shadow: 0 0 10px color-mix(in srgb, #10b981 25%, transparent);
   }
 
   /* Testimonials Section */
   .testimonials-section {
-    margin-top: 4rem;
+    margin-bottom: 2rem;
   }
 
-  .testimonials-header {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 1.25rem;
+  .section-header {
+    font-size: 1rem;
     font-weight: 600;
-    color: currentColor;
-    margin: 0 0 2rem 0;
-    opacity: 0.9;
+    color: #10b981;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .section-meta {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 1.25rem 0;
   }
 
   .testimonials-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
   }
 
-  /* Light theme compatibility */
-  :global(body) .service-card {
-    background: rgba(24, 24, 27, 0.6);
+  .testimonial-card {
+    background: color-mix(in srgb, currentColor 4%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
   }
 
-  @media (prefers-color-scheme: light) {
-    .service-card {
-      background: rgba(39, 39, 42, 0.95);
+  .testimonial-card:hover {
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+  }
+
+  .card-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
+  .titlebar-dots {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+
+  .dot.red { background: #ef4444; }
+  .dot.yellow { background: #eab308; }
+  .dot.green { background: #10b981; }
+
+  .filename {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-left: 0.5rem;
+  }
+
+  .card-content {
+    padding: 1rem;
+    flex-grow: 1;
+  }
+
+  .card-content .command {
+    font-size: 0.75rem;
+    margin: 0 0 0.75rem 0;
+    opacity: 0.6;
+  }
+
+  .card-content .prompt {
+    color: #10b981;
+  }
+
+  .card-content .quote {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  .card-attribution {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+  }
+
+  .card-attribution .author {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .card-attribution .role {
+    font-size: 0.7rem;
+    opacity: 0.5;
+  }
+
+  /* Navigation */
+  .nav-section {
+    padding-top: 1.5rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .nav-comment {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
+    font-style: italic;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    background: color-mix(in srgb, #10b981 5%, transparent);
+  }
+
+  /* Footer */
+  .terminal-footer {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .terminal-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .services-grid,
+    .testimonials-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-links {
+      flex-direction: column;
+      gap: 0.5rem;
     }
   }
 </style>

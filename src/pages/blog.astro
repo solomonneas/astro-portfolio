@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import StatusLight from "../components/StatusLight.astro";
 
 const allPosts = await getCollection("blog");
 // Sort posts by date, newest first
@@ -16,56 +17,108 @@ function formatDate(date: Date) {
 ---
 
 <Layout pageTitle="Blog">
-  <section class="blog-log">
-    <header class="log-header">
-      <h1>$ ls ~/blog/</h1>
-      <p class="log-meta">[+] {allPosts.length} entries found</p>
+  <section class="blog-terminal">
+    <header class="terminal-header">
+      <div class="header-left">
+        <StatusLight status="completed" />
+        <span class="status-text">INDEXED</span>
+      </div>
+      <h1>$ ls -la ~/blog/</h1>
     </header>
 
-    <div class="blog-entries">
-      {
-        allPosts.map((post) => (
-          <a href={`/blog/${post.slug}`} class="blog-entry">
-            <span class="entry-date">[{formatDate(post.data.pubDate)}]</span>
-            <span class="entry-title">{post.data.title}</span>
-            {post.data.tags && (
-              <span class="entry-tags">
-                {post.data.tags.map((tag) => (
-                  <span class="tag">[{tag}]</span>
-                ))}
-              </span>
-            )}
-          </a>
-        ))
-      }
-    </div>
+    <div class="terminal-body">
+      <p class="log-meta">[+] {allPosts.length} entries found</p>
 
-    <footer class="log-footer">
-      <span class="cursor-blink">█</span> EOF
-    </footer>
+      <div class="blog-entries">
+        {
+          allPosts.map((post) => (
+            <a href={`/blog/${post.slug}`} class="blog-entry">
+              <span class="entry-date">[{formatDate(post.data.pubDate)}]</span>
+              <span class="entry-title">{post.data.title}</span>
+              {post.data.tags && (
+                <span class="entry-tags">
+                  {post.data.tags.map((tag) => (
+                    <span class="tag">[{tag}]</span>
+                  ))}
+                </span>
+              )}
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- Navigation -->
+      <div class="nav-section">
+        <p class="nav-comment">// Continue exploring</p>
+        <div class="nav-links">
+          <a href="/projects" class="nav-link">$ cd /projects</a>
+          <a href="/about" class="nav-link">$ cd /about</a>
+          <a href="/contact" class="nav-link">$ cd /contact</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="terminal-footer">
+        <span class="cursor-blink">█</span> EOF
+      </div>
+    </div>
   </section>
 </Layout>
 
 <style>
-  .blog-log {
+  /* Terminal Wrapper */
+  .blog-terminal {
     font-family: "IBM Plex Mono", monospace;
-    padding: 2rem 0;
+    max-width: 52rem;
+    margin: 0 auto;
   }
 
-  .log-header h1 {
-    font-size: 1.25rem;
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-text {
+    font-size: 0.7rem;
     font-weight: 600;
-    color: currentColor;
-    margin: 0 0 0.5rem 0;
-    opacity: 0.9;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .terminal-header h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .terminal-body {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    background: color-mix(in srgb, currentColor 2%, transparent);
   }
 
   .log-meta {
     font-size: 0.75rem;
-    opacity: 0.6;
-    margin: 0 0 2rem 0;
+    opacity: 0.5;
+    margin: 0 0 1.5rem 0;
   }
 
+  /* Blog Entries */
   .blog-entries {
     display: flex;
     flex-direction: column;
@@ -100,7 +153,7 @@ function formatDate(date: Date) {
   }
 
   .entry-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 400;
     flex-grow: 1;
   }
@@ -120,8 +173,47 @@ function formatDate(date: Date) {
     border-radius: 2px;
   }
 
-  .log-footer {
+  /* Navigation */
+  .nav-section {
     margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .nav-comment {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
+    font-style: italic;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    background: color-mix(in srgb, #10b981 5%, transparent);
+  }
+
+  /* Footer */
+  .terminal-footer {
+    margin-top: 1.5rem;
     font-size: 0.8rem;
     opacity: 0.5;
   }
@@ -131,16 +223,18 @@ function formatDate(date: Date) {
   }
 
   @keyframes blink {
-    from,
-    to {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
   }
 
+  /* Responsive */
   @media (max-width: 640px) {
+    .terminal-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
     .blog-entry {
       flex-direction: column;
       gap: 0.25rem;
@@ -148,6 +242,12 @@ function formatDate(date: Date) {
 
     .entry-tags {
       margin-top: 0.25rem;
+      margin-left: 0;
+    }
+
+    .nav-links {
+      flex-direction: column;
+      gap: 0.5rem;
     }
   }
 </style>
