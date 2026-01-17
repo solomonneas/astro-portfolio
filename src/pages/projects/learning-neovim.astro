@@ -7,8 +7,57 @@ const frontmatter = {
   statusType: "ongoing",
   origin: "Personal Development",
   date: "2025.12",
-  techStack: ["Neovim", "Lua", "LazyVim", "LSP", "Treesitter"],
+  techStack: ["Neovim", "Lua", "NvChad", "LSP", "Treesitter"],
 };
+
+// Keyboard lighting scheme for learning vim motions
+const keyGroups = [
+  {
+    keys: ["H", "J", "K", "L", "%", "*"],
+    color: "#ef4444",
+    colorName: "Red",
+    purpose: "Movement",
+    description: "Navigate text. HJKL for directions, % for matching brackets, * to search word under cursor.",
+  },
+  {
+    keys: ["I", "A", "O", "R"],
+    color: "#22c55e",
+    colorName: "Green",
+    purpose: "Insert/Action",
+    description: "Enter \"typing\" mode. Green means go; start inserting text.",
+  },
+  {
+    keys: ["D", "Y", "P", "C", "&"],
+    color: "#eab308",
+    colorName: "Yellow",
+    purpose: "Verbs",
+    description: "Delete, Yank (copy), Put (paste), Change, & (repeat substitution). The action words.",
+  },
+  {
+    keys: ["W", "B", "E", "0", "$"],
+    color: "#3b82f6",
+    colorName: "Blue",
+    purpose: "Nouns/Objects",
+    description: "Word, Back, End-of-word, Start/End of line. What you act on.",
+  },
+  {
+    keys: ["Esc", "Caps→Esc", "Ctrl"],
+    color: "#06b6d4",
+    colorName: "Cyan",
+    purpose: "Panic Keys",
+    description: "Strobe effect. Caps Lock remapped to Esc (no hand stretching). Ctrl for combos.",
+    strobe: true,
+  },
+];
+
+// Vim grammar examples
+const grammarExamples = [
+  { command: "dw", meaning: "Delete Word", verb: "d", noun: "w" },
+  { command: "ci\"", meaning: "Change Inside quotes", verb: "c", noun: "i\"" },
+  { command: "yy", meaning: "Yank (copy) line", verb: "y", noun: "y" },
+  { command: "d$", meaning: "Delete to end of line", verb: "d", noun: "$" },
+  { command: "ct)", meaning: "Change To )", verb: "c", noun: "t)" },
+];
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
@@ -18,22 +67,829 @@ const frontmatter = {
     keyboard-driven development environment that enhances productivity across all programming languages.
   </p>
 
-  <h2>// Technical Implementation</h2>
-  <p>Started with LazyVim as a base configuration and progressively customizing:</p>
-  <ul>
-    <li>Learning Vim motions and modal editing paradigms</li>
-    <li>Configuring LSP servers for multiple languages</li>
-    <li>Setting up Treesitter for syntax highlighting</li>
-    <li>Building custom keymaps for workflow optimization</li>
-    <li>Integrating with terminal multiplexers (tmux)</li>
-  </ul>
+  <!-- The Spark -->
+  <h2>// The Spark</h2>
+  <p>
+    Watching programmers on YouTube use Neovim effectively was mesmerizing. Fuzzy finding files with Telescope,
+    harpooning between buffers, zipping around codebases; deleting, replacing, and refactoring at lightning speed.
+    It looked like magic. The efficiency gap between watching them work and my own workflow felt enormous.
+  </p>
+  <p>
+    Learning has been difficult. Modal editing is a complete paradigm shift, and building muscle memory takes time.
+    But once things start clicking, editing simple files becomes genuinely fun. Going back to nano and scrolling
+    through a config file or YAML feels painfully slow now. There's no going back.
+  </p>
 
+  <!-- Keyboard Learning System -->
+  <h2>// Keyboard Learning System</h2>
+  <p class="section-intro">
+    Despite typing without looking since childhood, my hands still get confused with vim motions (especially
+    remembering where all the funky characters live: <code># $ % ^ & *</code>). So I built a color-coded
+    lighting scheme on my keyboard to reinforce the vim "grammar" while learning:
+  </p>
+
+  <div class="keyboard-diagram">
+    <!-- Visual Keyboard -->
+    <div class="keyboard-visual">
+      <div class="keyboard-row">
+        <div class="key small panic">Esc</div>
+        <div class="key">1</div>
+        <div class="key">2</div>
+        <div class="key">3</div>
+        <div class="key noun">4<span class="shift-char">$</span></div>
+        <div class="key move">5<span class="shift-char">%</span></div>
+        <div class="key">6</div>
+        <div class="key verb">7<span class="shift-char">&</span></div>
+        <div class="key move">8<span class="shift-char">*</span></div>
+        <div class="key">9</div>
+        <div class="key noun">0</div>
+        <div class="key">-</div>
+        <div class="key">=</div>
+        <div class="key wide">Bksp</div>
+      </div>
+      <div class="keyboard-row">
+        <div class="key medium">Tab</div>
+        <div class="key">Q</div>
+        <div class="key noun">W</div>
+        <div class="key noun">E</div>
+        <div class="key insert">R</div>
+        <div class="key">T</div>
+        <div class="key verb">Y</div>
+        <div class="key">U</div>
+        <div class="key insert">I</div>
+        <div class="key insert">O</div>
+        <div class="key verb">P</div>
+        <div class="key">[</div>
+        <div class="key">]</div>
+        <div class="key medium">\</div>
+      </div>
+      <div class="keyboard-row">
+        <div class="key medium panic" title="Mapped to Esc">Caps</div>
+        <div class="key insert">A</div>
+        <div class="key">S</div>
+        <div class="key verb">D</div>
+        <div class="key">F</div>
+        <div class="key">G</div>
+        <div class="key move">H</div>
+        <div class="key move">J</div>
+        <div class="key move">K</div>
+        <div class="key move">L</div>
+        <div class="key">;</div>
+        <div class="key">'</div>
+        <div class="key wide">Enter</div>
+      </div>
+      <div class="keyboard-row">
+        <div class="key extra-wide">Shift</div>
+        <div class="key">Z</div>
+        <div class="key">X</div>
+        <div class="key verb">C</div>
+        <div class="key">V</div>
+        <div class="key noun">B</div>
+        <div class="key">N</div>
+        <div class="key">M</div>
+        <div class="key">,</div>
+        <div class="key">.</div>
+        <div class="key">/</div>
+        <div class="key extra-wide">Shift</div>
+      </div>
+      <div class="keyboard-row">
+        <div class="key small panic">Ctrl</div>
+        <div class="key small">Fn</div>
+        <div class="key small">Win</div>
+        <div class="key small">Alt</div>
+        <div class="key spacebar"></div>
+        <div class="key small">Alt</div>
+        <div class="key small">Win</div>
+        <div class="key small">Menu</div>
+        <div class="key small panic">Ctrl</div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="keyboard-legend">
+      {keyGroups.map((group) => (
+        <div class="legend-item" style={`--key-color: ${group.color}`}>
+          <div class={`legend-color ${group.strobe ? 'strobe' : ''}`}></div>
+          <div class="legend-info">
+            <span class="legend-keys">
+              {group.keys.map((key, i) => (
+                <>
+                  <kbd>{key}</kbd>
+                  {i < group.keys.length - 1 && " "}
+                </>
+              ))}
+            </span>
+            <span class="legend-purpose">{group.purpose}</span>
+            <span class="legend-desc">{group.description}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Vim Grammar -->
+  <h2>// The Vim Grammar</h2>
+  <p class="section-intro">
+    The breakthrough was understanding that vim commands follow a grammar: <strong>Verb + Noun</strong>.
+    Once you internalize this, you stop memorizing commands and start composing them:
+  </p>
+
+  <div class="grammar-container">
+    <div class="grammar-formula">
+      <span class="formula-part verb">Verb</span>
+      <span class="formula-operator">+</span>
+      <span class="formula-part noun">Noun</span>
+      <span class="formula-operator">=</span>
+      <span class="formula-part action">Action</span>
+    </div>
+
+    <div class="grammar-examples">
+      {grammarExamples.map((ex) => (
+        <div class="example-row">
+          <code class="example-cmd">{ex.command}</code>
+          <div class="example-breakdown">
+            <span class="verb-tag">{ex.verb}</span>
+            <span class="noun-tag">{ex.noun}</span>
+          </div>
+          <span class="example-meaning">{ex.meaning}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Motions & Multipliers -->
+  <h2>// Motions & Multipliers</h2>
+  <p class="section-intro">
+    Beyond basic movement, vim has powerful motions for jumping around files and multiplying actions:
+  </p>
+
+  <div class="motions-grid">
+    <div class="motion-card">
+      <div class="motion-header">
+        <code class="motion-cmd">gg</code>
+        <span class="motion-name">Go to Top</span>
+      </div>
+      <p>Jump to the first line of the file. Start of everything.</p>
+    </div>
+
+    <div class="motion-card">
+      <div class="motion-header">
+        <code class="motion-cmd">G</code>
+        <span class="motion-name">Go to Bottom</span>
+      </div>
+      <p>Jump to the last line of the file. End of the road.</p>
+    </div>
+
+    <div class="motion-card">
+      <div class="motion-header">
+        <code class="motion-cmd">/pattern</code>
+        <span class="motion-name">Search Forward</span>
+      </div>
+      <p>Search for text. Press <kbd>n</kbd> for next, <kbd>N</kbd> for previous.</p>
+    </div>
+
+    <div class="motion-card">
+      <div class="motion-header">
+        <code class="motion-cmd">?pattern</code>
+        <span class="motion-name">Search Backward</span>
+      </div>
+      <p>Search backwards through the file. Same <kbd>n</kbd>/<kbd>N</kbd> navigation.</p>
+    </div>
+
+    <div class="motion-card">
+      <div class="motion-header">
+        <code class="motion-cmd">:42</code>
+        <span class="motion-name">Go to Line</span>
+      </div>
+      <p>Jump directly to line 42. Or <code>42G</code> in normal mode.</p>
+    </div>
+
+    <div class="motion-card">
+      <div class="motion-header">
+        <code class="motion-cmd">5j</code>
+        <span class="motion-name">Number + Motion</span>
+      </div>
+      <p>Move 5 lines down. Prefix any motion with a count: <code>10w</code>, <code>3dd</code>, <code>2yy</code>.</p>
+    </div>
+  </div>
+
+  <div class="multiplier-example">
+    <span class="mult-label">The Multiplier Pattern:</span>
+    <div class="mult-formula">
+      <span class="mult-part count">Count</span>
+      <span class="mult-op">+</span>
+      <span class="mult-part verb">Verb</span>
+      <span class="mult-op">+</span>
+      <span class="mult-part noun">Noun</span>
+      <span class="mult-op">=</span>
+      <span class="mult-result">3dw → Delete 3 words</span>
+    </div>
+  </div>
+
+  <!-- Tools & Plugins -->
+  <h2>// Essential Plugins</h2>
+  <div class="plugin-grid">
+    <div class="plugin-card">
+      <div class="plugin-header">
+        <span class="plugin-icon">🔭</span>
+        <span class="plugin-name">Telescope</span>
+      </div>
+      <p>Fuzzy finder for files, grep, buffers. The gateway to navigating any codebase instantly.</p>
+    </div>
+
+    <div class="plugin-card">
+      <div class="plugin-header">
+        <span class="plugin-icon">🪝</span>
+        <span class="plugin-name">Harpoon</span>
+      </div>
+      <p>Mark and jump between frequently used files. No more hunting through buffer lists.</p>
+    </div>
+
+    <div class="plugin-card">
+      <div class="plugin-header">
+        <span class="plugin-icon">🌳</span>
+        <span class="plugin-name">Treesitter</span>
+      </div>
+      <p>Syntax-aware highlighting and text objects. Select functions, classes, and blocks intelligently.</p>
+    </div>
+
+    <div class="plugin-card">
+      <div class="plugin-header">
+        <span class="plugin-icon">⚡</span>
+        <span class="plugin-name">LSP</span>
+      </div>
+      <p>Language Server Protocol integration. IDE-level autocomplete, diagnostics, and go-to-definition.</p>
+    </div>
+  </div>
+
+  <!-- Configuration Journey -->
+  <h2>// Configuration Journey</h2>
+  <p>
+    Learning Neovim also means learning Lua [the language that powers modern Neovim configs]. Before this,
+    my only Lua exposure was tinkering with World of Warcraft addon mods nearly 20 years ago. Started with
+    <a href="https://github.com/nvim-lua/kickstart.nvim">kickstart.nvim</a> to understand the fundamentals, but
+    gravitating toward <a href="https://nvchad.com/">NvChad</a> for its polish and sensible defaults. The goal is
+    to eventually build a fully custom configuration once I understand what each piece does.
+  </p>
+
+  <!-- Vim Everywhere -->
+  <h2>// Vim Motions Everywhere</h2>
+  <p>
+    Even though I still reach for VSCode often (especially for complex debugging or collaboration), I've installed
+    vim motion extensions in every editor I use. The muscle memory transfers. Once you learn to navigate with
+    <code>hjkl</code>, reach for <code>ciw</code> to change a word, or <code>dd</code> to delete a line, doing it
+    any other way feels inefficient. The motions are editor-agnostic; the habit sticks.
+  </p>
+
+  <!-- Why Neovim -->
   <h2>// Why Neovim</h2>
   <p>
     The ability to work entirely from the terminal, combined with the extensibility of Lua plugins, makes Neovim ideal
-    for remote server administration and development in constrained environments.
+    for remote server administration and development in constrained environments. SSH into a box and have your full
+    editing environment available immediately.
   </p>
 
-  <h2>// Status</h2>
-  <p>Comfortable with basic motions. Currently learning advanced text objects and building muscle memory.</p>
+  <!-- Status -->
+  <h2>// Current Status</h2>
+  <div class="status-block">
+    <div class="status-indicator ongoing">
+      <div class="status-pulse"></div>
+      <span>Building muscle memory daily</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">✓</span> Basic motions (hjkl, w, b, e, 0, $)</li>
+      <li><span class="check">✓</span> Insert modes (i, a, o, I, A, O)</li>
+      <li><span class="check">✓</span> Verb + Noun grammar internalized</li>
+      <li><span class="check">✓</span> Vim motions in all editors (VSCode, etc.)</li>
+      <li><span class="check">✓</span> Telescope fuzzy finding</li>
+      <li><span class="pending">○</span> Learning Lua basics</li>
+      <li><span class="pending">○</span> NvChad configuration</li>
+      <li><span class="pending">○</span> Advanced text objects</li>
+      <li><span class="pending">○</span> Macros and registers</li>
+      <li><span class="pending">○</span> Fully custom configuration</li>
+    </ul>
+  </div>
 </ProjectLayout>
+
+<style>
+  /* Section Intro */
+  .section-intro {
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Keyboard Diagram */
+  .keyboard-diagram {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  /* Visual Keyboard */
+  .keyboard-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+  }
+
+  .keyboard-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  .key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .key.small { min-width: 32px; font-size: 0.6rem; }
+  .key.medium { min-width: 54px; }
+  .key.wide { min-width: 72px; }
+  .key.extra-wide { min-width: 90px; }
+  .key.spacebar { min-width: 200px; }
+
+  .shift-char {
+    font-size: 0.5rem;
+    opacity: 0.7;
+    margin-left: 2px;
+    vertical-align: super;
+  }
+
+  /* Key colors */
+  .key.move {
+    background: color-mix(in srgb, #ef4444 20%, transparent);
+    border-color: color-mix(in srgb, #ef4444 40%, transparent);
+    color: #ef4444;
+    box-shadow: 0 0 8px color-mix(in srgb, #ef4444 30%, transparent);
+  }
+
+  .key.insert {
+    background: color-mix(in srgb, #22c55e 20%, transparent);
+    border-color: color-mix(in srgb, #22c55e 40%, transparent);
+    color: #22c55e;
+    box-shadow: 0 0 8px color-mix(in srgb, #22c55e 30%, transparent);
+  }
+
+  .key.verb {
+    background: color-mix(in srgb, #eab308 20%, transparent);
+    border-color: color-mix(in srgb, #eab308 40%, transparent);
+    color: #eab308;
+    box-shadow: 0 0 8px color-mix(in srgb, #eab308 30%, transparent);
+  }
+
+  .key.noun {
+    background: color-mix(in srgb, #3b82f6 20%, transparent);
+    border-color: color-mix(in srgb, #3b82f6 40%, transparent);
+    color: #3b82f6;
+    box-shadow: 0 0 8px color-mix(in srgb, #3b82f6 30%, transparent);
+  }
+
+  .key.panic {
+    background: color-mix(in srgb, #06b6d4 20%, transparent);
+    border-color: color-mix(in srgb, #06b6d4 40%, transparent);
+    color: #06b6d4;
+    box-shadow: 0 0 8px color-mix(in srgb, #06b6d4 30%, transparent);
+    animation: strobe 0.5s ease-in-out infinite;
+  }
+
+  .keyboard-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-left: 3px solid var(--key-color);
+    border-radius: 6px;
+  }
+
+  .legend-color {
+    width: 16px;
+    height: 16px;
+    background: var(--key-color);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--key-color) 50%, transparent);
+  }
+
+  .legend-color.strobe {
+    animation: strobe 0.5s ease-in-out infinite;
+  }
+
+  @keyframes strobe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .legend-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .legend-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .legend-keys kbd {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, var(--key-color) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--key-color) 30%, transparent);
+    border-radius: 4px;
+    color: var(--key-color);
+    font-weight: 600;
+  }
+
+  .legend-purpose {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .legend-desc {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  /* Grammar Container */
+  .grammar-container {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .grammar-formula {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 6px;
+    flex-wrap: wrap;
+  }
+
+  .formula-part {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+  }
+
+  .formula-part.verb {
+    background: color-mix(in srgb, #eab308 15%, transparent);
+    border: 1px solid color-mix(in srgb, #eab308 30%, transparent);
+    color: #eab308;
+  }
+
+  .formula-part.noun {
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 30%, transparent);
+    color: #3b82f6;
+  }
+
+  .formula-part.action {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+    color: #10b981;
+  }
+
+  .formula-operator {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.25rem;
+    opacity: 0.4;
+  }
+
+  .grammar-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .example-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .example-cmd {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 50px;
+    color: #10b981;
+  }
+
+  .example-breakdown {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .verb-tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    background: color-mix(in srgb, #eab308 15%, transparent);
+    border: 1px solid color-mix(in srgb, #eab308 25%, transparent);
+    border-radius: 3px;
+    color: #eab308;
+  }
+
+  .noun-tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 25%, transparent);
+    border-radius: 3px;
+    color: #3b82f6;
+  }
+
+  .example-meaning {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-left: auto;
+  }
+
+  /* Motions Grid */
+  .motions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .motion-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .motion-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .motion-cmd {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .motion-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  .motion-card p {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .motion-card kbd {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.35rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 3px;
+  }
+
+  /* Multiplier Example */
+  .multiplier-example {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1rem 0 1.5rem;
+  }
+
+  .mult-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .mult-formula {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .mult-part {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+  }
+
+  .mult-part.count {
+    background: color-mix(in srgb, #8b5cf6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #8b5cf6 30%, transparent);
+    color: #8b5cf6;
+  }
+
+  .mult-part.verb {
+    background: color-mix(in srgb, #eab308 15%, transparent);
+    border: 1px solid color-mix(in srgb, #eab308 30%, transparent);
+    color: #eab308;
+  }
+
+  .mult-part.noun {
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 30%, transparent);
+    color: #3b82f6;
+  }
+
+  .mult-op {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    opacity: 0.4;
+  }
+
+  .mult-result {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+  }
+
+  /* Plugin Grid */
+  .plugin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .plugin-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .plugin-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .plugin-icon {
+    font-size: 1.25rem;
+  }
+
+  .plugin-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .plugin-card p {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Status Block */
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-indicator.ongoing .status-pulse {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  .pending {
+    color: #f59e0b;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .grammar-formula {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .example-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .example-meaning {
+      margin-left: 0;
+    }
+  }
+</style>
