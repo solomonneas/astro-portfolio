@@ -1,53 +1,150 @@
 ---
 // src/components/EducationTerminal.astro
+import StatusLight from "./StatusLight.astro";
+
+const education = [
+  {
+    degree: "Master of Science in Cybersecurity Intelligence & Information Security",
+    school: "University of South Florida",
+    year: "Current",
+    focus: "Cybersecurity & Intelligence Analytics • Data Analytics",
+    status: "ongoing",
+  },
+  {
+    degree: "Bachelor of Applied Science in Supervision & Management",
+    school: "Polk State College",
+    year: "2025",
+    focus: "Business Information Technology • Database Implementation & Management",
+    status: "completed",
+  },
+  {
+    degree: "Associate in Science in Network Systems Engineering Technology",
+    school: "Polk State College",
+    year: "2022",
+    focus: "Specialization in Network Infrastructure & Systems Engineering",
+    status: "completed",
+  },
+  {
+    degree: "Collegiate High School",
+    school: "Polk State College",
+    year: "2007",
+    focus: "IT Program focus on Cisco Networking and Systems Administration",
+    status: "completed",
+  },
+  {
+    degree: "Harrison School for the Visual and Performing Arts",
+    school: "Lakeland, FL",
+    year: "2003-2005",
+    focus: "Visual Arts Program",
+    status: "completed",
+  },
+  {
+    degree: "Rochelle School of the Arts",
+    school: "Lakeland, FL",
+    year: null,
+    focus: "Orchestra (Cello) and Visual Arts",
+    status: "completed",
+  },
+];
 ---
 
-<div class="font-mono max-w-3xl mx-auto py-8 bg-zinc-950 p-8 rounded-xl shadow-2xl border border-zinc-900 my-8">
-    <h2 class="text-2xl text-emerald-400 mb-6 tracking-tight">
-        <span class="text-zinc-500">$</span> sudo tree education/
-    </h2>
+<div class="terminal-section">
+  <h2 class="section-header">$ tree ~/education/</h2>
 
-    <pre
-        class="education-tree font-mono text-base ml-2 text-zinc-300"><span class="tree-line">.</span>
-<span class="tree-line">├── </span><span class="degree-title">Master of Science in Cybersecurity Intelligence & Information Security</span>
-<span class="tree-line">│   ├── </span>University of South Florida (Current)
-<span class="tree-line">│   └── </span>Cybersecurity & Intelligence Analytics • Data Analytics
-<span class="tree-line">├── </span><span class="degree-title">Bachelor of Applied Science in Supervision & Management</span>
-<span class="tree-line">│   ├── </span>Polk State College (2025)
-<span class="tree-line">│   └── </span>Business Information Technology • Database Implementation & Management 
-<span class="tree-line">├── </span><span class="degree-title">Associate in Science in Network Systems Engineering Technology</span>
-<span class="tree-line">│   ├── </span>Polk State College (2022)
-<span class="tree-line">│   └── </span>Specialization in Network Infrastructure & Systems Engineering
-<span class="tree-line">├── </span><span class="degree-title">Collegiate High School</span>
-<span class="tree-line">│   ├── </span>Polk State College (2007)
-<span class="tree-line">│   └── </span>IT Program focus on Cisco Networking and Systems Administration
-<span class="tree-line">├── </span><span class="degree-title">Harrison School for the Visual and Performing Arts</span>
-<span class="tree-line">│   ├── </span>Lakeland, FL (2003-2005)
-<span class="tree-line">│   └── </span>Visual Arts Program
-<span class="tree-line">└── </span><span class="degree-title">Rochelle School of the Arts</span>
-<span class="tree-line">    ├── </span>Lakeland, FL
-<span class="tree-line">    └── </span>Orchestra (Cello) and Visual Arts</pre>
+  <div class="tree-container">
+    <div class="tree-root">.</div>
+    {education.map((item, index) => (
+      <div class="tree-item" data-last={index === education.length - 1 ? "true" : "false"}>
+        <div class="tree-branch">
+          <span class="branch-line">{index === education.length - 1 ? "└── " : "├── "}</span>
+          <span class="item-title">{item.degree}</span>
+          {item.status === "ongoing" && <StatusLight status="ongoing" />}
+        </div>
+        <div class="tree-children" data-last={index === education.length - 1 ? "true" : "false"}>
+          <div class="child-line">
+            <span class="branch-line">├── </span>
+            <span class="child-text">{item.school}{item.year && ` (${item.year})`}</span>
+          </div>
+          <div class="child-line">
+            <span class="branch-line">└── </span>
+            <span class="child-text focus">{item.focus}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
 </div>
 
 <style>
-    .education-tree {
-        white-space: pre;
-        line-height: 1.8;
-        overflow-x: auto;
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-    }
+  .terminal-section {
+    font-family: "IBM Plex Mono", monospace;
+    padding: 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
 
-    .education-tree::-webkit-scrollbar {
-        display: none; /* Chrome, Safari and Opera */
-    }
+  .section-header {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem 0;
+    color: #10b981;
+  }
 
-    .tree-line {
-        color: rgba(107, 114, 128, 0.7); /* Muted gray for tree lines */
-    }
+  .tree-container {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
 
-    .degree-title {
-        color: #34d399 !important; /* Emerald-400 to match ExperienceTimeline */
-        font-weight: 900; /* Extra bold */
-    }
+  .tree-root {
+    opacity: 0.5;
+    margin-bottom: 0.25rem;
+  }
+
+  .tree-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-branch {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .branch-line {
+    opacity: 0.35;
+    white-space: pre;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .item-title {
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .tree-children {
+    margin-left: 1.5rem;
+    padding-left: 1rem;
+    border-left: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .tree-children[data-last="true"] {
+    border-left: 1px solid transparent;
+  }
+
+  .child-line {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.1rem 0;
+  }
+
+  .child-text {
+    opacity: 0.75;
+  }
+
+  .child-text.focus {
+    opacity: 0.55;
+    font-style: italic;
+  }
 </style>

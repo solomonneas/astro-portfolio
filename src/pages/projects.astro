@@ -127,15 +127,21 @@ const projects = [
 ---
 
 <Layout pageTitle="Projects">
-  <section class="projects-log">
-    <header class="log-header">
+  <section class="projects-terminal">
+    <header class="terminal-header">
+      <div class="header-left">
+        <StatusLight status="ongoing" />
+        <span class="status-text">MONITORING</span>
+      </div>
       <h1>$ tail -f /var/log/projects.log</h1>
+    </header>
+
+    <div class="terminal-body">
       <p class="log-meta">
         [+] Displaying {projects.length} project entries | Last updated: {new Date().toISOString().split("T")[0]}
       </p>
-    </header>
 
-    <div class="log-entries">
+      <div class="log-entries">
       {
         projects.map((project) => (
           <article class="log-entry group">
@@ -193,33 +199,77 @@ const projects = [
           </article>
         ))
       }
-    </div>
+      </div>
 
-    <footer class="log-footer">
-      <span class="cursor-blink">█</span> EOF
-    </footer>
+      <!-- Navigation -->
+      <div class="nav-section">
+        <p class="nav-comment">// Continue exploring</p>
+        <div class="nav-links">
+          <a href="/experience" class="nav-link">$ cd /experience</a>
+          <a href="/hire" class="nav-link">$ cd /hire</a>
+          <a href="/blog" class="nav-link">$ cd /blog</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="terminal-footer">
+        <span class="cursor-blink">█</span> EOF
+      </div>
+    </div>
   </section>
 </Layout>
 
 <style>
-  /* Theme-compatible terminal styling */
-  .projects-log {
+  /* Terminal Wrapper */
+  .projects-terminal {
     font-family: "IBM Plex Mono", monospace;
-    padding: 2rem 0;
+    max-width: 52rem;
+    margin: 0 auto;
   }
 
-  .log-header h1 {
-    font-size: 1.25rem;
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-text {
+    font-size: 0.7rem;
     font-weight: 600;
-    color: currentColor;
-    margin: 0 0 0.5rem 0;
-    opacity: 0.9;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .terminal-header h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .terminal-body {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    background: color-mix(in srgb, currentColor 2%, transparent);
   }
 
   .log-meta {
     font-size: 0.75rem;
-    opacity: 0.6;
-    margin: 0 0 2rem 0;
+    opacity: 0.5;
+    margin: 0 0 1.5rem 0;
   }
 
   /* Log entries container */
@@ -360,9 +410,47 @@ const projects = [
     display: none;
   }
 
-  /* Footer */
-  .log-footer {
+  /* Navigation */
+  .nav-section {
     margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .nav-comment {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
+    font-style: italic;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    background: color-mix(in srgb, #10b981 5%, transparent);
+  }
+
+  /* Footer */
+  .terminal-footer {
+    margin-top: 1.5rem;
     font-size: 0.8rem;
     opacity: 0.5;
   }
@@ -372,17 +460,18 @@ const projects = [
   }
 
   @keyframes blink {
-    from,
-    to {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
   }
 
   /* Responsive adjustments */
   @media (max-width: 640px) {
+    .terminal-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
     .entry-field {
       flex-direction: column;
       gap: 0.25rem;
@@ -395,6 +484,11 @@ const projects = [
     .entry-header {
       flex-direction: column;
       align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .nav-links {
+      flex-direction: column;
       gap: 0.5rem;
     }
   }

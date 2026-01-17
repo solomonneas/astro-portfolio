@@ -9,32 +9,1379 @@ const frontmatter = {
   date: "2025.12",
   techStack: ["Wazuh", "TheHive", "Cortex", "MISP", "Zeek", "Suricata", "Elasticsearch", "Docker", "Proxmox", "Ubuntu"],
 };
+
+const components = [
+  { name: "Wazuh Server", os: "Ubuntu 24.04", software: "Wazuh Manager, Filebeat", role: "SIEM Core, Log Aggregation, Alerting", color: "#10b981" },
+  { name: "Wazuh Indexer", os: "Ubuntu 24.04", software: "Wazuh Indexer (ES fork)", role: "Database/Storage for SIEM data", color: "#3b82f6" },
+  { name: "Wazuh Dashboard", os: "Ubuntu 24.04", software: "Wazuh Dashboard (Kibana)", role: "Web UI for SIEM", color: "#8b5cf6" },
+  { name: "TheHive 5", os: "Ubuntu 22.04", software: "TheHive, Cassandra, ES", role: "Incident Response (Case Mgmt)", color: "#f59e0b" },
+  { name: "Cortex", os: "Ubuntu 22.04", software: "Cortex, Docker", role: "Observable Analysis Engine", color: "#ef4444" },
+  { name: "MISP", os: "Ubuntu 24.04", software: "MISP 2.5, MariaDB, Redis", role: "Threat Intelligence Platform", color: "#ec4899" },
+  { name: "NIDS", os: "Ubuntu 24.04", software: "Suricata, Zeek, Wazuh Agent", role: "Network Intrusion Detection", color: "#06b6d4" },
+];
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
   <h2>// Overview</h2>
   <p>
-    Building a full-stack Security Operations Center using entirely open-source tools. This project provides hands-on
-    experience with enterprise security monitoring while creating a functional threat detection and response platform
-    for the college network.
+    A full-stack Security Operations Center built entirely with open-source tools, deployed on virtualized infrastructure.
+    This project provides enterprise-grade threat detection, incident response, and threat intelligence capabilities
+    for monitoring the college network environment.
   </p>
 
-  <h2>// Technical Implementation</h2>
-  <p>The SOC architecture integrates multiple open-source security tools:</p>
-  <ul>
-    <li><strong>Wazuh:</strong> Host-based intrusion detection and log analysis</li>
-    <li><strong>Zeek & Suricata:</strong> Network traffic analysis and IDS/IPS</li>
-    <li><strong>TheHive & Cortex:</strong> Incident response and automated analysis</li>
-    <li><strong>MISP:</strong> Threat intelligence sharing platform</li>
-    <li><strong>Elasticsearch:</strong> Centralized log storage and search</li>
-  </ul>
+  <!-- High-Level Architecture Diagram -->
+  <h2>// High-Level Architecture</h2>
+  <div class="architecture-diagram">
+    <div class="arch-layer infra">
+      <span class="layer-label">INFRASTRUCTURE</span>
+      <div class="arch-box proxmox">
+        <span class="box-icon">&#9881;</span>
+        <span class="box-title">Proxmox VE 9.2.1</span>
+        <span class="box-desc">Hypervisor</span>
+      </div>
+      <div class="arch-connector vertical"></div>
+      <div class="arch-box network">
+        <span class="box-icon">&#8644;</span>
+        <span class="box-title">LACP Bond + VLAN Bridge</span>
+        <span class="box-desc">vmbr0 (802.3ad)</span>
+      </div>
+    </div>
 
-  <h2>// Architecture</h2>
-  <p>
-    All components are containerized using Docker and deployed on Proxmox VE for easy management and scalability. The
-    system ingests logs from Windows and Linux endpoints, network devices, and cloud services.
-  </p>
+    <div class="arch-divider">
+      <span class="divider-line"></span>
+      <span class="divider-text">ACL-Protected Boundary</span>
+      <span class="divider-line"></span>
+    </div>
 
-  <h2>// Status</h2>
-  <p>Core infrastructure deployed. Currently integrating threat intelligence feeds and building detection rules.</p>
+    <div class="arch-layer soc">
+      <span class="layer-label">SOC STACK</span>
+      <div class="soc-grid">
+        <div class="soc-node wazuh">
+          <div class="node-pulse"></div>
+          <span class="node-label">Wazuh</span>
+          <span class="node-role">SIEM/XDR</span>
+        </div>
+        <div class="soc-node thehive">
+          <div class="node-pulse"></div>
+          <span class="node-label">TheHive</span>
+          <span class="node-role">IR Platform</span>
+        </div>
+        <div class="soc-node cortex">
+          <div class="node-pulse"></div>
+          <span class="node-label">Cortex</span>
+          <span class="node-role">Analysis</span>
+        </div>
+        <div class="soc-node misp">
+          <div class="node-pulse"></div>
+          <span class="node-label">MISP</span>
+          <span class="node-role">Threat Intel</span>
+        </div>
+        <div class="soc-node nids">
+          <div class="node-pulse"></div>
+          <span class="node-label">NIDS</span>
+          <span class="node-role">Network IDS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-divider">
+      <span class="divider-line"></span>
+      <span class="divider-text">Monitored Networks</span>
+      <span class="divider-line"></span>
+    </div>
+
+    <div class="arch-layer endpoints">
+      <span class="layer-label">ENDPOINTS</span>
+      <div class="endpoint-grid">
+        <div class="endpoint-item"><span>Windows</span></div>
+        <div class="endpoint-item"><span>Linux</span></div>
+        <div class="endpoint-item"><span>Network Devices</span></div>
+        <div class="endpoint-item"><span>Cloud Services</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Component Inventory -->
+  <h2>// Component Inventory</h2>
+  <p class="section-intro">The SOC stack consists of seven specialized VMs, each serving a distinct security function:</p>
+
+  <div class="component-grid">
+    {components.map((comp, i) => (
+      <div class="component-card" style={`--accent: ${comp.color}; --delay: ${i * 0.1}s`}>
+        <div class="card-header">
+          <span class="card-indicator"></span>
+          <span class="card-name">{comp.name}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <span class="row-label">OS:</span>
+            <span class="row-value">{comp.os}</span>
+          </div>
+          <div class="card-row">
+            <span class="row-label">Software:</span>
+            <span class="row-value">{comp.software}</span>
+          </div>
+          <div class="card-row">
+            <span class="row-label">Role:</span>
+            <span class="row-value role">{comp.role}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Component Interaction Flowchart -->
+  <h2>// Component Interactions</h2>
+  <p class="section-intro">Data flows between components via authenticated APIs and agent protocols:</p>
+
+  <div class="flowchart">
+    <div class="flow-row sources">
+      <div class="flow-source-group">
+        <div class="flow-node source">
+          <span class="node-icon">&#128187;</span>
+          <span>Endpoints</span>
+        </div>
+        <div class="flow-arrow animated">
+          <span class="arrow-label">TCP/1514</span>
+          <div class="arrow-line">
+            <div class="arrow-particle"></div>
+          </div>
+          <span class="arrow-head">&#9654;</span>
+        </div>
+      </div>
+      <div class="flow-node wazuh-mgr central">
+        <span class="node-icon">&#128737;</span>
+        <span>Wazuh Manager</span>
+      </div>
+      <div class="flow-source-group reverse">
+        <div class="flow-arrow animated reverse-flow">
+          <span class="arrow-head flip">&#9654;</span>
+          <div class="arrow-line">
+            <div class="arrow-particle reverse"></div>
+          </div>
+          <span class="arrow-label">TCP/1514</span>
+        </div>
+        <div class="flow-node nids-source">
+          <span class="node-icon">&#128065;</span>
+          <span>NIDS</span>
+          <span class="node-sub">Suricata + Zeek</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-vertical">
+      <div class="vert-line">
+        <div class="vert-particle"></div>
+      </div>
+      <span class="vert-label">HTTPS/9200</span>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-node indexer">
+        <span class="node-icon">&#128451;</span>
+        <span>Wazuh Indexer</span>
+      </div>
+      <div class="flow-arrow reverse">
+        <span class="arrow-head flip">&#9654;</span>
+        <div class="arrow-line">
+          <div class="arrow-particle reverse"></div>
+        </div>
+        <span class="arrow-label">Query</span>
+      </div>
+      <div class="flow-node dashboard">
+        <span class="node-icon">&#128200;</span>
+        <span>Dashboard</span>
+      </div>
+    </div>
+
+    <div class="flow-branch">
+      <div class="branch-line left"></div>
+      <div class="branch-center">
+        <span class="branch-label">Alert Threshold Trigger</span>
+      </div>
+      <div class="branch-line right"></div>
+    </div>
+
+    <div class="flow-row integration">
+      <div class="flow-node script">
+        <span class="node-icon">&#128221;</span>
+        <span>custom-w2thive.py</span>
+      </div>
+      <div class="flow-arrow animated">
+        <span class="arrow-label">API/9000</span>
+        <div class="arrow-line">
+          <div class="arrow-particle"></div>
+        </div>
+        <span class="arrow-head">&#9654;</span>
+      </div>
+      <div class="flow-node thehive-node">
+        <span class="node-icon">&#128029;</span>
+        <span>TheHive</span>
+      </div>
+      <div class="flow-arrow animated">
+        <span class="arrow-label">API/9001</span>
+        <div class="arrow-line">
+          <div class="arrow-particle"></div>
+        </div>
+        <span class="arrow-head">&#9654;</span>
+      </div>
+      <div class="flow-node cortex-node">
+        <span class="node-icon">&#129504;</span>
+        <span>Cortex</span>
+      </div>
+    </div>
+
+    <div class="flow-row intel">
+      <div class="flow-node misp-node">
+        <span class="node-icon">&#128270;</span>
+        <span>MISP</span>
+      </div>
+      <div class="flow-bidirectional">
+        <div class="bidir-line">
+          <div class="bidir-particle left"></div>
+          <div class="bidir-particle right"></div>
+        </div>
+        <span class="bidir-label">Threat Intel Sync</span>
+      </div>
+      <div class="flow-node thehive-mirror">
+        <span class="node-icon">&#128029;</span>
+        <span>TheHive</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Flow Pipelines -->
+  <h2>// Data Flow Pipelines</h2>
+
+  <div class="pipeline-section">
+    <h3 class="pipeline-title">
+      <span class="pipeline-num">01</span>
+      Endpoint Intrusion Detection
+    </h3>
+    <p class="pipeline-desc">Example: PowerShell-based attack (MITRE T1059.001)</p>
+
+    <div class="pipeline-flow">
+      <div class="pipeline-step" style="--step: 1">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <span class="step-title">Detection</span>
+          <span class="step-desc">Wazuh Agent detects suspicious PowerShell execution</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 2">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <span class="step-title">Transport</span>
+          <span class="step-desc">Log sent to Wazuh Manager via TCP/1514</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 3">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <span class="step-title">Correlation</span>
+          <span class="step-desc">Manager correlates against MITRE ATT&CK rules</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 4">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <span class="step-title">Escalation</span>
+          <span class="step-desc">High severity alert pushed to TheHive via API</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 5">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <span class="step-title">Investigation</span>
+          <span class="step-desc">Analyst promotes alert to case, extracts observables</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 6">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <span class="step-title">Enrichment</span>
+          <span class="step-desc">Cortex queries VirusTotal, AbuseIPDB for context</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipeline-section">
+    <h3 class="pipeline-title">
+      <span class="pipeline-num">02</span>
+      Network Threat Detection
+    </h3>
+    <p class="pipeline-desc">Example: Malware Command & Control communication</p>
+
+    <div class="pipeline-flow">
+      <div class="pipeline-step" style="--step: 1">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <span class="step-title">Capture</span>
+          <span class="step-desc">NIDS receives mirrored traffic via SPAN port</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 2">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <span class="step-title">Analysis</span>
+          <span class="step-desc">Suricata matches signature, Zeek logs metadata</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 3">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <span class="step-title">Ingestion</span>
+          <span class="step-desc">Wazuh Agent reads JSON logs, ships to Manager</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 4">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <span class="step-title">Alerting</span>
+          <span class="step-desc">Manager generates alert from NIDS input</span>
+        </div>
+      </div>
+      <div class="pipeline-connector"><div class="connector-pulse"></div></div>
+
+      <div class="pipeline-step" style="--step: 5">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <span class="step-title">Intel Check</span>
+          <span class="step-desc">MISP queried for known IoC correlation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Component Deep Dives -->
+  <h2>// Component Deep Dive</h2>
+
+  <div class="deep-dive">
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #10b981">&#128737;</span>
+        Wazuh — The Nervous System
+      </h3>
+      <p>Central log collection, correlation, file integrity monitoring, and alert generation.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Ingestion</h4>
+          <ul>
+            <li><strong>Agents:</strong> Endpoints send logs via TCP/1514 to Manager</li>
+            <li><strong>NIDS:</strong> Zeek/Suricata JSON logs via local Wazuh Agent</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Processing</h4>
+          <ul>
+            <li>Decodes logs against decoders and rules</li>
+            <li>Correlates events against MITRE ATT&CK framework</li>
+            <li>Triggers alerts based on rule matches</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Storage</h4>
+          <ul>
+            <li>Ships data via HTTPS/9200 to Wazuh Indexer</li>
+            <li>Indexer provides long-term storage and search</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #f59e0b">&#128029;</span>
+        TheHive — The Brain
+      </h3>
+      <p>Central hub for alert management, case creation, and response coordination.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Backend</h4>
+          <ul>
+            <li><strong>Cassandra:</strong> Stores case data, tasks, and logs</li>
+            <li><strong>Elasticsearch:</strong> Indexing with X-Pack security and <code>thehive_role</code></li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Wazuh Integration</h4>
+          <ul>
+            <li>Custom <code>custom-w2thive.py</code> script on Wazuh Manager</li>
+            <li>Converts high-severity alerts to JSON, POSTs to TheHive API</li>
+            <li>Analysts promote alerts to cases for investigation</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Cluster Config</h4>
+          <ul>
+            <li>Configured as "Cluster of One" using Akka/Pekko</li>
+            <li>Prevents service shutdown from missing cluster peers</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #ef4444">&#129504;</span>
+        Cortex — The Muscle
+      </h3>
+      <p>Performs active analysis on observables extracted from cases.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Interaction</h4>
+          <ul>
+            <li>TheHive connects via API on port 9001</li>
+            <li>Receives observables (IPs, hashes, domains)</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Analyzers</h4>
+          <ul>
+            <li>Python scripts in Docker containers</li>
+            <li>Queries: VirusTotal, AbuseIPDB, MISP, etc.</li>
+            <li>Returns enrichment reports to TheHive</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #ec4899">&#128270;</span>
+        MISP — The Memory
+      </h3>
+      <p>Stores Indicators of Compromise and correlates against threat feeds.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>TheHive Integration</h4>
+          <ul>
+            <li>Pulls data via API (Port 443) to enrich cases</li>
+            <li>SSL: <code>ssl.loose.acceptAnyCertificate = true</code> for self-signed certs</li>
+            <li>Bi-directional: Import events, export case intel</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Cortex Integration</h4>
+          <ul>
+            <li>MISP Analyzer queries local database</li>
+            <li>"Have we seen this hash/IP before?"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <h3 class="dive-title">
+        <span class="dive-icon" style="--color: #06b6d4">&#128065;</span>
+        NIDS — The Eyes
+      </h3>
+      <p>Monitors raw network traffic via mirror port for signatures and anomalies.</p>
+
+      <div class="dive-details">
+        <div class="detail-block">
+          <h4>Software Stack</h4>
+          <ul>
+            <li><strong>Suricata:</strong> Signature-based IDS, outputs <code>eve.json</code></li>
+            <li><strong>Zeek:</strong> Protocol analysis, configured for JSON output (not default TSV)</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Integration</h4>
+          <ul>
+            <li>Wazuh Agent reads local JSON logs</li>
+            <li>Ships to Manager for correlation</li>
+            <li>Enables network-level visibility in SIEM</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuration Nuances -->
+  <h2>// Key Configuration Notes</h2>
+
+  <div class="config-grid">
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">&#128268;</span>
+        <span class="config-title">VLAN Tagging</span>
+      </div>
+      <p>Tags stripped by Proxmox Bridge (vmbr0) before reaching VM. Guest OS sees standard interface (ens18) — no internal VLAN config needed.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">&#128274;</span>
+        <span class="config-title">TheHive + Elasticsearch</span>
+      </div>
+      <p>TheHive 5 requires ES 8.x with X-Pack security. Must create <code>thehive_role</code> with proper index permissions.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">&#128196;</span>
+        <span class="config-title">Zeek JSON Output</span>
+      </div>
+      <p>Default is TSV. Apply local policy: <code>@load policy/tuning/json-logs.zeek</code> for Wazuh compatibility.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">&#128190;</span>
+        <span class="config-title">LVM Resizing</span>
+      </div>
+      <p>Ubuntu VMs default to 50% disk. Run <code>lvextend</code> and <code>resize2fs</code> to utilize full virtual disk.</p>
+    </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">&#128279;</span>
+        <span class="config-title">MISP Auth</span>
+      </div>
+      <p>Generate <code>authKey</code> in MISP, configure in TheHive's <code>application.conf</code> to bridge systems.</p>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <h2>// Current Status</h2>
+  <div class="status-block">
+    <div class="status-indicator active">
+      <div class="status-pulse"></div>
+      <span>Core infrastructure deployed and operational</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">&#10003;</span> Proxmox VE hypervisor configured</li>
+      <li><span class="check">&#10003;</span> Wazuh stack (Manager, Indexer, Dashboard) deployed</li>
+      <li><span class="check">&#10003;</span> TheHive 5 + Cortex integrated</li>
+      <li><span class="check">&#10003;</span> MISP threat intelligence platform online</li>
+      <li><span class="check">&#10003;</span> NIDS (Suricata + Zeek) monitoring network</li>
+      <li><span class="pending">&#9711;</span> Integrating additional threat intelligence feeds</li>
+      <li><span class="pending">&#9711;</span> Building custom detection rules</li>
+      <li><span class="pending">&#9711;</span> Developing response playbooks</li>
+    </ul>
+  </div>
 </ProjectLayout>
+
+<style>
+  /* Section Intro */
+  .section-intro {
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Architecture Diagram */
+  .architecture-diagram {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .arch-layer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .layer-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    text-transform: uppercase;
+  }
+
+  .arch-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem 2rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+  }
+
+  .box-icon {
+    font-size: 1.5rem;
+    opacity: 0.7;
+  }
+
+  .box-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .box-desc {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .arch-connector.vertical {
+    width: 2px;
+    height: 30px;
+    background: linear-gradient(to bottom, #10b981, transparent);
+  }
+
+  .arch-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, color-mix(in srgb, currentColor 20%, transparent), transparent);
+  }
+
+  .divider-text {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.5;
+    white-space: nowrap;
+  }
+
+  .soc-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .soc-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem 1.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .soc-node:hover {
+    border-color: #10b981;
+    transform: translateY(-2px);
+  }
+
+  .node-pulse {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .node-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .node-role {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .soc-node.wazuh { border-color: color-mix(in srgb, #10b981 40%, transparent); }
+  .soc-node.thehive { border-color: color-mix(in srgb, #f59e0b 40%, transparent); }
+  .soc-node.cortex { border-color: color-mix(in srgb, #ef4444 40%, transparent); }
+  .soc-node.misp { border-color: color-mix(in srgb, #ec4899 40%, transparent); }
+  .soc-node.nids { border-color: color-mix(in srgb, #06b6d4 40%, transparent); }
+
+  .endpoint-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .endpoint-item {
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  /* Component Grid */
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .component-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .card-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .card-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .card-body {
+    padding: 0.75rem 1rem;
+  }
+
+  .card-row {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0;
+  }
+
+  .row-label {
+    color: #10b981;
+    font-weight: 500;
+    min-width: 60px;
+  }
+
+  .row-value {
+    opacity: 0.8;
+  }
+
+  .row-value.role {
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* Flowchart */
+  .flowchart {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .flow-row.sources {
+    gap: 1.5rem;
+    justify-content: center;
+  }
+
+  .flow-source-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .flow-source-group.reverse {
+    flex-direction: row-reverse;
+  }
+
+  .flow-node.central {
+    border-color: #10b981;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+  }
+
+  .flow-node.nids-source {
+    border-color: color-mix(in srgb, #06b6d4 40%, transparent);
+  }
+
+  .node-sub {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+
+  .reverse-flow .arrow-line {
+    order: 2;
+  }
+
+  .reverse-flow .arrow-head {
+    order: 1;
+  }
+
+  .reverse-flow .arrow-label {
+    order: 3;
+  }
+
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .node-icon {
+    font-size: 1.25rem;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.65rem;
+    opacity: 0.7;
+  }
+
+  .arrow-label {
+    font-family: "IBM Plex Mono", monospace;
+    color: #10b981;
+  }
+
+  .arrow-line {
+    width: 40px;
+    height: 2px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arrow-particle {
+    position: absolute;
+    width: 10px;
+    height: 2px;
+    background: #10b981;
+    animation: flowRight 1.5s ease-in-out infinite;
+  }
+
+  .arrow-particle.reverse {
+    animation: flowLeft 1.5s ease-in-out infinite;
+  }
+
+  @keyframes flowRight {
+    0% { left: -10px; }
+    100% { left: 40px; }
+  }
+
+  @keyframes flowLeft {
+    0% { left: 40px; }
+    100% { left: -10px; }
+  }
+
+  .arrow-head {
+    color: #10b981;
+  }
+
+  .arrow-head.flip {
+    transform: rotate(180deg);
+  }
+
+  .flow-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .vert-line {
+    width: 2px;
+    height: 30px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vert-particle {
+    position: absolute;
+    width: 2px;
+    height: 10px;
+    background: #10b981;
+    animation: flowDown 1.5s ease-in-out infinite;
+  }
+
+  @keyframes flowDown {
+    0% { top: -10px; }
+    100% { top: 30px; }
+  }
+
+  .vert-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    color: #10b981;
+  }
+
+  .flow-branch {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0;
+  }
+
+  .branch-line {
+    flex: 1;
+    height: 1px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .branch-center {
+    padding: 0.25rem 1rem;
+    background: color-mix(in srgb, #f59e0b 10%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+    border-radius: 20px;
+  }
+
+  .branch-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: #f59e0b;
+  }
+
+  .flow-bidirectional {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .bidir-line {
+    width: 60px;
+    height: 2px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bidir-particle {
+    position: absolute;
+    width: 10px;
+    height: 2px;
+    background: #ec4899;
+  }
+
+  .bidir-particle.left {
+    animation: flowRight 2s ease-in-out infinite;
+  }
+
+  .bidir-particle.right {
+    animation: flowLeft 2s ease-in-out infinite 0.5s;
+  }
+
+  .bidir-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    color: #ec4899;
+  }
+
+  /* Pipeline Section */
+  .pipeline-section {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .pipeline-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: currentColor;
+  }
+
+  .pipeline-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 1px solid #10b981;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    color: #10b981;
+  }
+
+  .pipeline-desc {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    font-style: italic;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .pipeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    flex: 1;
+    min-width: 140px;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: calc(var(--step) * 0.1s);
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .step-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .step-desc {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  .pipeline-connector {
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem;
+    height: 60px;
+  }
+
+  .connector-pulse {
+    width: 20px;
+    height: 2px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    position: relative;
+  }
+
+  .connector-pulse::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 2px;
+    background: #10b981;
+    animation: connectorFlow 1s ease-in-out infinite;
+  }
+
+  @keyframes connectorFlow {
+    0% { left: 0; }
+    100% { left: 14px; }
+  }
+
+  /* Deep Dive */
+  .deep-dive {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .dive-section {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .dive-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: currentColor;
+  }
+
+  .dive-icon {
+    font-size: 1.25rem;
+    color: var(--color);
+  }
+
+  .dive-section > p {
+    opacity: 0.8;
+    margin: 0 0 1rem 0;
+  }
+
+  .dive-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .detail-block h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .detail-block ul {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .detail-block li {
+    margin-bottom: 0.35rem;
+    opacity: 0.8;
+  }
+
+  .detail-block code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  /* Config Grid */
+  .config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .config-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .config-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .config-icon {
+    font-size: 1.25rem;
+    opacity: 0.7;
+  }
+
+  .config-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .config-card p {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .config-card code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  /* Status Block */
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  .pending {
+    color: #f59e0b;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .architecture-diagram,
+    .flowchart,
+    .pipeline-section {
+      padding: 1rem;
+    }
+
+    .soc-grid {
+      flex-direction: column;
+    }
+
+    .flow-row {
+      flex-direction: column;
+    }
+
+    .flow-row.sources {
+      gap: 0.5rem;
+    }
+
+    .flow-source-group,
+    .flow-source-group.reverse {
+      flex-direction: column;
+    }
+
+    .flow-arrow,
+    .flow-bidirectional {
+      transform: rotate(90deg);
+    }
+
+    .pipeline-flow {
+      flex-direction: column;
+    }
+
+    .pipeline-connector {
+      height: auto;
+      padding: 0.5rem 0;
+      transform: rotate(90deg);
+    }
+
+    .dive-details {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

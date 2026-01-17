@@ -1,38 +1,112 @@
 ---
 // src/components/CertificationsTerminal.astro
+
+const certifications = [
+  {
+    name: "CompTIA A+ (Good-For-Life)",
+    issuer: "CompTIA",
+    date: "Issued May 2006",
+    credentialId: "COMP001004827739",
+  },
+];
 ---
 
-<div class="font-mono max-w-3xl mx-auto py-8 bg-zinc-950 p-8 rounded-xl shadow-2xl border border-zinc-900 my-8">
-    <h2 class="text-2xl text-emerald-400 mb-6 tracking-tight">
-        <span class="text-zinc-500">$</span> sudo tree certifications/
-    </h2>
+<div class="terminal-section">
+  <h2 class="section-header">$ tree ~/certifications/</h2>
 
-    <pre
-        class="education-tree font-mono text-base ml-2 text-zinc-300"><span class="tree-line">.</span>
-<span class="tree-line">└── </span><span class="degree-title">A+ Good-For-Life</span>
-<span class="tree-line">    ├── </span>CompTIA (Issued May 2006)
-<span class="tree-line">    └── </span>Credential ID COMP001004827739</pre>
+  <div class="tree-container">
+    <div class="tree-root">.</div>
+    {certifications.map((cert, index) => (
+      <div class="tree-item">
+        <div class="tree-branch">
+          <span class="branch-line">{index === certifications.length - 1 ? "└── " : "├── "}</span>
+          <span class="item-title">{cert.name}</span>
+        </div>
+        <div class="tree-children" data-last={index === certifications.length - 1 ? "true" : "false"}>
+          <div class="child-line">
+            <span class="branch-line">├── </span>
+            <span class="child-text">{cert.issuer} ({cert.date})</span>
+          </div>
+          <div class="child-line">
+            <span class="branch-line">└── </span>
+            <span class="child-text credential">Credential ID: {cert.credentialId}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
 </div>
 
 <style>
-    .education-tree {
-        white-space: pre;
-        line-height: 1.8;
-        overflow-x: auto;
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-    }
+  .terminal-section {
+    font-family: "IBM Plex Mono", monospace;
+    padding: 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
 
-    .education-tree::-webkit-scrollbar {
-        display: none; /* Chrome, Safari and Opera */
-    }
+  .section-header {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem 0;
+    color: #10b981;
+  }
 
-    .tree-line {
-        color: rgba(107, 114, 128, 0.7); /* Muted gray for tree lines */
-    }
+  .tree-container {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
 
-    .degree-title {
-        color: #34d399 !important; /* Emerald-400 to match ExperienceTimeline */
-        font-weight: 900; /* Extra bold */
-    }
+  .tree-root {
+    opacity: 0.5;
+    margin-bottom: 0.25rem;
+  }
+
+  .tree-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-branch {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .branch-line {
+    opacity: 0.35;
+    white-space: pre;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .item-title {
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .tree-children {
+    margin-left: 1.5rem;
+    padding-left: 1rem;
+    border-left: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .tree-children[data-last="true"] {
+    border-left: 1px solid transparent;
+  }
+
+  .child-line {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.1rem 0;
+  }
+
+  .child-text {
+    opacity: 0.75;
+  }
+
+  .child-text.credential {
+    opacity: 0.5;
+    font-size: 0.8rem;
+  }
 </style>
