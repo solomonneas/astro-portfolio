@@ -1,38 +1,1015 @@
 ---
-import ProjectLayout from "../../layouts/ProjectLayout.astro";
+import Layout from "../../layouts/Layout.astro";
+import StatusLight from "../../components/StatusLight.astro";
 
-const frontmatter = {
-    title: "Securing US Water and Wastewater Utilities",
-    status: "Completed",
-    statusType: "completed",
-    origin: "University of South Florida",
-    date: "2025.10",
-    techStack: ["ICS Security", "SCADA", "Critical Infrastructure", "Research"],
-};
+// Threat actors targeting WWS sector
+const threatActors = [
+  {
+    name: "Volt Typhoon",
+    nation: "China",
+    type: "State-Sponsored APT",
+    objective: "Pre-positioning for wartime disruption",
+    ttps: "Living-off-the-land, long-term persistence",
+    flag: "🇨🇳",
+  },
+  {
+    name: "APT44 / Sandworm",
+    nation: "Russia",
+    type: "GRU Unit 74455",
+    objective: "Sabotage and psychological operations",
+    ttps: "Destructive malware, ICS targeting",
+    flag: "🇷🇺",
+  },
+  {
+    name: "CyberAv3ngers",
+    nation: "Iran",
+    type: "IRGC-Affiliated",
+    objective: "Opportunistic disruption",
+    ttps: "Unitronics PLC exploitation, defacement",
+    flag: "🇮🇷",
+  },
+];
+
+// Notable incidents
+const incidents = [
+  {
+    date: "2021.02",
+    location: "Oldsmar, Florida",
+    description: "Attacker accessed HMI via TeamViewer, attempted to increase sodium hydroxide (lye) to 11,100 ppm—111x normal levels.",
+    outcome: "Operator detected and reversed changes in real-time. No public harm.",
+    vector: "Remote access (TeamViewer)",
+  },
+  {
+    date: "2023.11",
+    location: "Aliquippa, Pennsylvania",
+    description: "CyberAv3ngers compromised Unitronics Vision PLC at Municipal Water Authority booster station.",
+    outcome: "Operators switched to manual control. CISA issued ICS advisory.",
+    vector: "Default credentials on Unitronics PLC",
+  },
+  {
+    date: "2024.01",
+    location: "Muleshoe, Texas",
+    description: "Russian-linked actors caused water tank overflow by manipulating SCADA systems.",
+    outcome: "Physical overflow occurred. Demonstrated real-world impact capability.",
+    vector: "Exposed HMI/SCADA interface",
+  },
+];
+
+// Vulnerability categories
+const vulnerabilities = [
+  {
+    category: "Authentication",
+    issues: ["Default credentials", "Shared passwords", "No MFA on remote access"],
+    prevalence: "70%+ of utilities",
+  },
+  {
+    category: "Network Security",
+    issues: ["Flat networks (no segmentation)", "OT systems internet-exposed", "No firewalls between IT/OT"],
+    prevalence: "Widespread",
+  },
+  {
+    category: "System Maintenance",
+    issues: ["Unpatched PLCs and HMIs", "End-of-life operating systems", "Legacy protocols (Modbus, DNP3)"],
+    prevalence: "Common in small utilities",
+  },
+  {
+    category: "Monitoring",
+    issues: ["No logging on OT networks", "No intrusion detection", "Lack of asset inventory"],
+    prevalence: "Majority of systems",
+  },
+];
+
+// Sector statistics
+const sectorStats = [
+  { label: "Total WWS Systems", value: "50,000+", note: "Community water & wastewater" },
+  { label: "Americans Served", value: "324M", note: "97% of US population" },
+  { label: "Daily Economic Impact", value: "$43.5B", note: "If disrupted nationwide" },
+  { label: "Non-Compliant Systems", value: "70%", note: "Violate basic cyber requirements" },
+  { label: "Small Systems", value: "90%", note: "Serve <10,000 people" },
+  { label: "IT Staff (Small Utilities)", value: "0-1", note: "Limited dedicated security" },
+];
+
+// Regulatory framework
+const regulations = [
+  {
+    name: "Safe Drinking Water Act (SDWA)",
+    authority: "EPA",
+    requirement: "Risk & Resilience Assessments for systems serving >3,300",
+  },
+  {
+    name: "America's Water Infrastructure Act (AWIA)",
+    authority: "Congress",
+    requirement: "Cybersecurity in RRAs, emergency response plans",
+  },
+  {
+    name: "NSM-22 (2024)",
+    authority: "White House",
+    requirement: "EPA designated as Sector Risk Management Agency",
+  },
+  {
+    name: "CISA Advisories",
+    authority: "CISA",
+    requirement: "ICS-CERT alerts, mitigation guidance, free assessments",
+  },
+];
+
+// Recommended mitigations
+const mitigations = [
+  {
+    priority: "Critical",
+    action: "Change default credentials on all PLCs, HMIs, and network devices",
+    timeline: "Immediate",
+  },
+  {
+    priority: "Critical",
+    action: "Implement MFA on all remote access points",
+    timeline: "Immediate",
+  },
+  {
+    priority: "High",
+    action: "Segment OT networks from IT and internet",
+    timeline: "30 days",
+  },
+  {
+    priority: "High",
+    action: "Disable unnecessary remote access (TeamViewer, VNC)",
+    timeline: "Immediate",
+  },
+  {
+    priority: "Medium",
+    action: "Implement logging and monitoring on OT networks",
+    timeline: "60 days",
+  },
+  {
+    priority: "Medium",
+    action: "Conduct asset inventory of all ICS components",
+    timeline: "90 days",
+  },
+];
 ---
 
-<ProjectLayout frontmatter={frontmatter}>
-    <h2>// Overview</h2>
-    <p>
-        Researching security vulnerabilities in national critical infrastructure, specifically water and wastewater
-        treatment facilities. This project examined the unique challenges of securing operational technology
-        environments.
-    </p>
+<Layout pageTitle="Securing US Water & Wastewater Utilities">
+  <section class="intel-terminal">
+    <header class="terminal-header">
+      <div class="header-left">
+        <StatusLight status="completed" />
+        <span class="status-text">RESEARCH COMPLETE</span>
+      </div>
+      <h1>$ cat /intel/critical-infrastructure/wws-security.log</h1>
+    </header>
 
-    <h2>// Research Focus</h2>
-    <ul>
-        <li>Analysis of recent cyberattacks on water utilities</li>
-        <li>Common vulnerabilities in SCADA and ICS systems</li>
-        <li>Regulatory frameworks (AWIA, NIST CSF)</li>
-        <li>Best practices for small utility security programs</li>
-    </ul>
+    <div class="terminal-body">
+      <!-- BLUF Section -->
+      <div class="bluf-section">
+        <h2 class="section-title">[BLUF] Bottom Line Up Front</h2>
+        <div class="bluf-content">
+          <p class="bluf-text">
+            The United States Water and Wastewater Systems (WWS) sector faces escalating cyber threats from nation-state actors
+            seeking to pre-position for wartime disruption or conduct opportunistic attacks. With <span class="highlight">70% of utilities
+            violating basic cybersecurity requirements</span> and <span class="highlight">90% serving populations under 10,000</span> with
+            minimal IT resources, the sector represents a critical vulnerability in national infrastructure.
+          </p>
+          <div class="bluf-stats">
+            <span class="stat-item">50,000+ systems at risk</span>
+            <span class="stat-divider">|</span>
+            <span class="stat-item">324M Americans dependent</span>
+            <span class="stat-divider">|</span>
+            <span class="stat-item">$43.5B daily economic exposure</span>
+          </div>
+        </div>
+      </div>
 
-    <h2>// Key Findings</h2>
-    <p>
-        Many small utilities lack dedicated security staff and rely on outdated systems. The research proposed
-        practical, low-cost security improvements for resource-constrained organizations.
-    </p>
+      <!-- Sector Overview -->
+      <div class="sector-section">
+        <h2 class="section-title">[SECTOR] Critical Infrastructure Profile</h2>
+        <div class="stats-grid">
+          {sectorStats.map((stat) => (
+            <div class="stat-card">
+              <div class="stat-value">{stat.value}</div>
+              <div class="stat-label">{stat.label}</div>
+              <div class="stat-note">{stat.note}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-    <h2>// Status</h2>
-    <p>Research paper completed and submitted.</p>
-</ProjectLayout>
+      <!-- Threat Actors -->
+      <div class="threats-section">
+        <h2 class="section-title">[THREAT] Nation-State Actors Targeting WWS</h2>
+        <div class="threat-cards">
+          {threatActors.map((actor) => (
+            <div class="threat-card">
+              <div class="threat-header">
+                <span class="threat-flag">{actor.flag}</span>
+                <div class="threat-identity">
+                  <span class="threat-name">{actor.name}</span>
+                  <span class="threat-nation">{actor.nation}</span>
+                </div>
+              </div>
+              <div class="threat-details">
+                <div class="threat-field">
+                  <span class="field-label">TYPE:</span>
+                  <span class="field-value">{actor.type}</span>
+                </div>
+                <div class="threat-field">
+                  <span class="field-label">OBJECTIVE:</span>
+                  <span class="field-value">{actor.objective}</span>
+                </div>
+                <div class="threat-field">
+                  <span class="field-label">TTPs:</span>
+                  <span class="field-value">{actor.ttps}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Notable Incidents -->
+      <div class="incidents-section">
+        <h2 class="section-title">[INCIDENTS] Notable WWS Cyber Attacks</h2>
+        <div class="incidents-timeline">
+          {incidents.map((incident) => (
+            <div class="incident-entry">
+              <div class="incident-header">
+                <span class="incident-date">[{incident.date}]</span>
+                <span class="incident-location">{incident.location}</span>
+              </div>
+              <div class="incident-body">
+                <div class="incident-field">
+                  <span class="field-label">&gt;&gt; DESCRIPTION:</span>
+                  <span class="field-value">{incident.description}</span>
+                </div>
+                <div class="incident-field">
+                  <span class="field-label">&gt;&gt; OUTCOME:</span>
+                  <span class="field-value">{incident.outcome}</span>
+                </div>
+                <div class="incident-field">
+                  <span class="field-label">&gt;&gt; VECTOR:</span>
+                  <span class="field-value vector-tag">{incident.vector}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Vulnerabilities -->
+      <div class="vulns-section">
+        <h2 class="section-title">[VULNS] Common Security Gaps</h2>
+        <div class="vulns-grid">
+          {vulnerabilities.map((vuln) => (
+            <div class="vuln-card">
+              <div class="vuln-header">
+                <span class="vuln-category">{vuln.category}</span>
+                <span class="vuln-prevalence">{vuln.prevalence}</span>
+              </div>
+              <ul class="vuln-list">
+                {vuln.issues.map((issue) => (
+                  <li class="vuln-item">• {issue}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Regulatory Framework -->
+      <div class="regulatory-section">
+        <h2 class="section-title">[REGULATORY] Oversight Framework</h2>
+        <div class="reg-table">
+          <div class="reg-header-row">
+            <span class="reg-col">REGULATION</span>
+            <span class="reg-col">AUTHORITY</span>
+            <span class="reg-col">REQUIREMENT</span>
+          </div>
+          {regulations.map((reg) => (
+            <div class="reg-row">
+              <span class="reg-name">{reg.name}</span>
+              <span class="reg-authority">{reg.authority}</span>
+              <span class="reg-requirement">{reg.requirement}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Mitigations -->
+      <div class="mitigations-section">
+        <h2 class="section-title">[MITIGATIONS] Priority Actions</h2>
+        <div class="mitigations-list">
+          {mitigations.map((item) => (
+            <div class={`mitigation-entry priority-${item.priority.toLowerCase()}`}>
+              <div class="mitigation-priority">
+                <span class="priority-badge">{item.priority}</span>
+                <span class="mitigation-timeline">{item.timeline}</span>
+              </div>
+              <div class="mitigation-action">{item.action}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Key Findings -->
+      <div class="findings-section">
+        <h2 class="section-title">[ASSESSMENT] Key Findings</h2>
+        <div class="findings-content">
+          <div class="finding-item">
+            <span class="finding-marker">▸</span>
+            <span class="finding-text">
+              <strong>Pre-positioning confirmed:</strong> Volt Typhoon maintains persistent access to WWS infrastructure
+              for potential wartime activation, not immediate exploitation.
+            </span>
+          </div>
+          <div class="finding-item">
+            <span class="finding-marker">▸</span>
+            <span class="finding-text">
+              <strong>Low barrier to entry:</strong> Most successful attacks exploited default credentials and
+              internet-exposed HMI systems—no sophisticated exploits required.
+            </span>
+          </div>
+          <div class="finding-item">
+            <span class="finding-marker">▸</span>
+            <span class="finding-text">
+              <strong>Resource disparity:</strong> Small utilities lack budget and personnel for basic security hygiene,
+              yet serve millions cumulatively.
+            </span>
+          </div>
+          <div class="finding-item">
+            <span class="finding-marker">▸</span>
+            <span class="finding-text">
+              <strong>Cascading impact:</strong> Water disruption affects hospitals, manufacturing, firefighting,
+              and public health simultaneously.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF Viewer -->
+      <div class="pdf-section">
+        <h2 class="section-title">[DOCUMENT] Full Research Paper</h2>
+        <p class="pdf-meta">
+          // Original research document with complete analysis
+        </p>
+        <div class="pdf-container">
+          <iframe
+            src="/WWWS.pdf"
+            class="pdf-viewer"
+            title="Securing US Water and Wastewater Utilities - Full Report"
+          ></iframe>
+        </div>
+        <div class="pdf-fallback">
+          <a href="/WWWS.pdf" target="_blank" class="pdf-download">
+            &gt; Download PDF: WWWS_Security_Research.pdf
+          </a>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="nav-section">
+        <p class="nav-comment">// Continue exploring</p>
+        <div class="nav-links">
+          <a href="/projects" class="nav-link">$ cd /projects</a>
+          <a href="/projects/apt44-intelligence-report" class="nav-link">$ cat apt44.log</a>
+          <a href="/experience" class="nav-link">$ cd /experience</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="terminal-footer">
+        <span class="cursor-blink">█</span> EOF
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Terminal Wrapper */
+  .intel-terminal {
+    font-family: "IBM Plex Mono", monospace;
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .terminal-header h1 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .terminal-body {
+    padding: 1.5rem 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+  }
+
+  /* Section styling */
+  .section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #10b981;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  /* BLUF Section */
+  .bluf-section {
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: color-mix(in srgb, #ef4444 5%, transparent);
+    border: 1px solid color-mix(in srgb, #ef4444 20%, transparent);
+    border-radius: 4px;
+  }
+
+  .bluf-section .section-title {
+    color: #ef4444;
+    border-bottom-color: color-mix(in srgb, #ef4444 30%, transparent);
+  }
+
+  .bluf-text {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin: 0 0 1rem 0;
+    opacity: 0.9;
+  }
+
+  .highlight {
+    color: #ef4444;
+    font-weight: 600;
+  }
+
+  .bluf-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .stat-divider {
+    opacity: 0.4;
+  }
+
+  /* Sector Stats Grid */
+  .sector-section {
+    margin-bottom: 2rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 4%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    opacity: 0.9;
+  }
+
+  .stat-note {
+    font-size: 0.65rem;
+    margin-top: 0.25rem;
+    opacity: 0.5;
+  }
+
+  /* Threat Cards */
+  .threats-section {
+    margin-bottom: 2rem;
+  }
+
+  .threat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .threat-card {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 4%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 4px;
+  }
+
+  .threat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .threat-flag {
+    font-size: 1.5rem;
+  }
+
+  .threat-identity {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .threat-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .threat-nation {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .threat-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .threat-field {
+    font-size: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .threat-field .field-label {
+    color: #10b981;
+    font-weight: 600;
+    min-width: 80px;
+  }
+
+  .threat-field .field-value {
+    opacity: 0.85;
+  }
+
+  /* Incidents Timeline */
+  .incidents-section {
+    margin-bottom: 2rem;
+  }
+
+  .incidents-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .incident-entry {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .incident-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .incident-date {
+    font-weight: 600;
+    color: #f59e0b;
+    font-size: 0.8rem;
+  }
+
+  .incident-location {
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .incident-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .incident-field {
+    font-size: 0.8rem;
+    display: flex;
+    gap: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .incident-field .field-label {
+    color: #10b981;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .incident-field .field-value {
+    opacity: 0.85;
+  }
+
+  .vector-tag {
+    padding: 0.1rem 0.4rem;
+    background: color-mix(in srgb, #ef4444 10%, transparent);
+    border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  /* Vulnerabilities Grid */
+  .vulns-section {
+    margin-bottom: 2rem;
+  }
+
+  .vulns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .vuln-card {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+  }
+
+  .vuln-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .vuln-category {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #ef4444;
+  }
+
+  .vuln-prevalence {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 2px;
+    opacity: 0.7;
+  }
+
+  .vuln-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .vuln-item {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    line-height: 1.6;
+  }
+
+  /* Regulatory Table */
+  .regulatory-section {
+    margin-bottom: 2rem;
+  }
+
+  .reg-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .reg-header-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 3fr;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
+  .reg-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 3fr;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+
+  .reg-name {
+    font-weight: 600;
+  }
+
+  .reg-authority {
+    color: #10b981;
+  }
+
+  .reg-requirement {
+    opacity: 0.8;
+  }
+
+  /* Mitigations */
+  .mitigations-section {
+    margin-bottom: 2rem;
+  }
+
+  .mitigations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mitigation-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+  }
+
+  .mitigation-priority {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 70px;
+  }
+
+  .priority-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+  }
+
+  .priority-critical .priority-badge {
+    background: color-mix(in srgb, #ef4444 20%, transparent);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+  }
+
+  .priority-high .priority-badge {
+    background: color-mix(in srgb, #f59e0b 20%, transparent);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+  }
+
+  .priority-medium .priority-badge {
+    background: color-mix(in srgb, #3b82f6 20%, transparent);
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+  }
+
+  .mitigation-timeline {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+
+  .mitigation-action {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  /* Findings */
+  .findings-section {
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: color-mix(in srgb, #3b82f6 5%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 20%, transparent);
+    border-radius: 4px;
+  }
+
+  .findings-section .section-title {
+    color: #3b82f6;
+    border-bottom-color: color-mix(in srgb, #3b82f6 30%, transparent);
+  }
+
+  .findings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .finding-item {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .finding-marker {
+    color: #3b82f6;
+    flex-shrink: 0;
+  }
+
+  .finding-text {
+    opacity: 0.9;
+  }
+
+  .finding-text strong {
+    color: #3b82f6;
+  }
+
+  /* PDF Section */
+  .pdf-section {
+    margin-bottom: 2rem;
+  }
+
+  .pdf-meta {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 1rem 0;
+    font-style: italic;
+  }
+
+  .pdf-container {
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .pdf-viewer {
+    width: 100%;
+    height: 600px;
+    border: none;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  .pdf-fallback {
+    margin-top: 0.75rem;
+  }
+
+  .pdf-download {
+    font-size: 0.8rem;
+    color: currentColor;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+  }
+
+  .pdf-download:hover {
+    opacity: 1;
+    color: #10b981;
+  }
+
+  /* Navigation */
+  .nav-section {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .nav-comment {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
+    font-style: italic;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    background: color-mix(in srgb, #10b981 5%, transparent);
+  }
+
+  /* Footer */
+  .terminal-footer {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .terminal-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .terminal-header h1 {
+      font-size: 0.8rem;
+    }
+
+    .bluf-stats {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-divider {
+      display: none;
+    }
+
+    .reg-header-row,
+    .reg-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .reg-header-row {
+      display: none;
+    }
+
+    .reg-row {
+      padding: 1rem;
+    }
+
+    .reg-name {
+      font-size: 0.85rem;
+    }
+
+    .reg-requirement {
+      font-size: 0.75rem;
+    }
+
+    .mitigation-entry {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mitigation-priority {
+      flex-direction: row;
+      gap: 0.5rem;
+    }
+
+    .nav-links {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .incident-field {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+</style>
