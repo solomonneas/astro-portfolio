@@ -562,6 +562,14 @@ const components = [
       </div>
       <p>Generate <code>authKey</code> in MISP, configure in TheHive's <code>application.conf</code> to bridge systems.</p>
     </div>
+
+    <div class="config-card">
+      <div class="config-header">
+        <span class="config-icon">&#9749;</span>
+        <span class="config-title">JVM Memory Tuning</span>
+      </div>
+      <p>TheHive runs on JVM with Elasticsearch backend—both are memory-hungry. JVMs allocate heap at startup and don't release it. Tune <code>-Xms</code>/<code>-Xmx</code> flags carefully to balance performance without exhausting host RAM.</p>
+    </div>
   </div>
 
   <!-- Status -->
