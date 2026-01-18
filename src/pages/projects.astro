@@ -92,9 +92,9 @@ const projects = [
     status: "completed",
     identifier: "NDG_Proxmox_Workshop",
     origin: "Network Development Group",
-    description: "Designing deployment workflows for Proxmox in academic environments.",
+    description: "18-hour intensive workshop on deploying Proxmox VE 8 for NETLAB+ educational environments.",
     href: "/projects/ndg-proxmox-workshop",
-    techStack: ["Proxmox", "Linux"],
+    techStack: ["Proxmox VE 8", "NETLAB+", "Clustering", "KVM/QEMU"],
   },
   {
     date: "2025.07",
@@ -110,9 +110,9 @@ const projects = [
     status: "ongoing",
     identifier: "Obsidian_PKM",
     origin: "Personal Development",
-    description: "Building a second brain using interconnected markdown notes and zettelkasten.",
-    href: null,
-    techStack: ["Markdown", "Obsidian"],
+    description: "Building a second brain with PARA methodology, replacing fragmented OneNote notebooks with interconnected markdown.",
+    href: "/projects/obsidian-pkm",
+    techStack: ["Obsidian", "Markdown", "PARA", "Dataview", "Templater"],
   },
   {
     date: "2025.06",
@@ -162,7 +162,7 @@ const projects = [
                     {project.identifier}
                   </a>
                 ) : (
-                  <span class="field-value">{project.identifier}</span>
+                  <span class="field-value identifier">{project.identifier}</span>
                 )}
               </div>
 
@@ -348,21 +348,38 @@ const projects = [
     opacity: 0.85;
   }
 
+  .field-value.identifier {
+    color: #10b981;
+    font-weight: 700;
+    font-size: 1.1em;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+  }
+
   .field-value.description {
     max-width: 60ch;
   }
 
-  .identifier-link {
-    color: currentColor;
+  .identifier-link,
+  .identifier-link:visited {
+    color: #10b981;
     text-decoration: none;
-    border-bottom: 1px dashed currentColor;
-    opacity: 0.85;
-    transition: opacity 0.2s ease;
+    font-weight: 700;
+    font-size: 1.1em;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+    padding: 0.15rem 0.4rem;
+    margin: -0.15rem -0.4rem;
+    border-radius: 3px;
+    background: transparent;
+    border-bottom: none;
   }
 
   .identifier-link:hover {
-    opacity: 1;
-    border-bottom-style: solid;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    color: #34d399;
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+    border-bottom: none;
   }
 
   /* Tech stack badges */
@@ -390,11 +407,14 @@ const projects = [
     margin-top: 0.5rem;
   }
 
-  .case-study-link {
+  .case-study-link,
+  .case-study-link:visited {
     color: currentColor;
     text-decoration: none;
     opacity: 0.6;
     font-size: 0.75rem;
+    border-bottom: none;
+    background: transparent;
     transition:
       opacity 0.2s ease,
       color 0.2s ease;
@@ -403,6 +423,8 @@ const projects = [
   .case-study-link:hover {
     opacity: 1;
     color: #10b981;
+    background: transparent;
+    border-bottom: none;
   }
 
   /* Divider line */
@@ -430,7 +452,8 @@ const projects = [
     gap: 1rem;
   }
 
-  .nav-link {
+  .nav-link,
+  .nav-link:visited {
     font-size: 0.8rem;
     color: inherit;
     text-decoration: none;
@@ -439,6 +462,8 @@ const projects = [
     padding: 0.4rem 0.75rem;
     border: 1px solid transparent;
     border-radius: 3px;
+    border-bottom: none;
+    background: transparent;
   }
 
   .nav-link:hover {
@@ -446,6 +471,7 @@ const projects = [
     color: #10b981;
     border-color: color-mix(in srgb, #10b981 30%, transparent);
     background: color-mix(in srgb, #10b981 5%, transparent);
+    border-bottom: none;
   }
 
   /* Footer */

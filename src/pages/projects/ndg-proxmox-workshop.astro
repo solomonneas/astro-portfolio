@@ -1,37 +1,949 @@
 ---
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
+import PDFCarousel from "../../components/PDFCarousel.astro";
 
 const frontmatter = {
-    title: "NDG Proxmox VE 8 - NETLAB+ Deployment Workshop",
-    status: "Completed",
-    statusType: "completed",
-    origin: "Network Development Group",
-    date: "2025.07",
-    techStack: ["Proxmox VE", "NETLAB+", "Linux", "Academic IT"],
+  title: "NDG Proxmox VE 8 - NETLAB+ Deployment Workshop",
+  status: "Completed",
+  statusType: "completed",
+  origin: "Network Development Group",
+  date: "2025.07",
+  techStack: ["Proxmox VE 8", "NETLAB+", "Clustering", "KVM/QEMU", "Linux", "Docker", "Networking"],
 };
+
+// Workshop details
+const workshopDetails = {
+  duration: "18 hours",
+  days: "3 days",
+  dates: "July 8-10, 2025",
+  instructor: "Jason Zeller",
+  instructorUrl: "https://www.fhsu.edu/informatics/faculty-and-staff/Jason-Zeller/",
+  organization: "Network Development Group (NDG)",
+  format: "Virtual (Zoom)",
+};
+
+// Day-by-day agenda
+const agenda = [
+  {
+    day: 1,
+    title: "Infrastructure Foundations",
+    topics: [
+      "Proxmox VE architecture overview",
+      "Hardware requirements and server specifications",
+      "Storage configuration: NVMe, RAID vs HBA, ZFS considerations",
+      "Ceph clustering (why NDG doesn't use it)",
+      "Network topology and VLAN design",
+      "DNS and FQDN configuration for certificates",
+      "Management server vs User server architecture",
+    ],
+  },
+  {
+    day: 2,
+    title: "Clustering & VM Management",
+    topics: [
+      "Proxmox clustering and quorum configuration",
+      "High Availability (HA) setup",
+      "Proxmox Backup Server (PBS) integration",
+      "VM deployment strategies",
+      "LXC containers vs Docker containers",
+      "SPICE remote access configuration",
+      "Copy/paste and clipboard integration",
+      "VirtIO drivers and Windows 11 requirements",
+    ],
+  },
+  {
+    day: 3,
+    title: "NETLAB+ Deployment",
+    topics: [
+      "NDG post-install script execution",
+      "Deployment scenarios: Fresh Install vs Migration",
+      "VM distribution system and catalog",
+      "Pod deployment and linked clones",
+      "Golden image management",
+      "Custom VM preparation and migration",
+      "Backup strategies and PBS configuration",
+      "Python SDK automation scripts",
+    ],
+  },
+];
+
+// Key technical insights from workshop
+const keyInsights = [
+  {
+    topic: "Storage Architecture",
+    insight: "NDG recommends 15TB NVMe drives on user servers. RAID controllers become bottlenecks; prefer HBA mode. ZFS is not officially supported by NDG due to complexity.",
+    source: "Day 1 Discussion",
+  },
+  {
+    topic: "Cluster Networking",
+    insight: "Separate management, cluster, and storage traffic on dedicated networks. The cluster network handles VM migration and replication - needs high bandwidth (10G recommended).",
+    source: "Day 2 Discussion",
+  },
+  {
+    topic: "Windows 11 VMs",
+    insight: "CPU type MUST be set to 'Host' for Windows 11 VMs. VirtIO drivers must be pre-installed or injected via WinRE before first boot.",
+    source: "Day 3 Discussion",
+  },
+  {
+    topic: "Linked Clones",
+    insight: "Proxmox cannot span linked clones across different storage pools. Master and clones must reside on the same storage - hence the large NVMe requirement.",
+    source: "Day 1 Discussion",
+  },
+  {
+    topic: "SPICE Protocol",
+    insight: "NDG wants all VMs using SPICE for remote access. Enables copy/paste, multi-monitor support, and better performance than VNC.",
+    source: "Day 2 Discussion",
+  },
+  {
+    topic: "Backup Strategy",
+    insight: "Run Proxmox Backup Server on older hardware (Dell R720 recommended). Stop VMs before backup for consistency. Use vzdump for snapshot backups.",
+    source: "Day 3 Discussion",
+  },
+];
+
+// Deployment scenarios covered
+const scenarios = [
+  {
+    num: 1,
+    title: "Fresh Install",
+    description: "Complete new deployment. Blow away existing VMware infrastructure, install Proxmox from scratch, download all VMs fresh from NDG distribution.",
+    bestFor: "Institutions with simple setups or willing to start clean",
+  },
+  {
+    num: 2,
+    title: "VMware Migration",
+    description: "Preserve physical pod configurations (PDUs, routers, switches). Migrate NETLAB+ database and settings while changing hypervisor layer.",
+    bestFor: "Institutions with complex physical pod setups they don't want to reconfigure",
+  },
+  {
+    num: 3,
+    title: "Hybrid (Limited)",
+    description: "Run both VMware and Proxmox simultaneously during transition. Very limited use case with significant complexity.",
+    bestFor: "Large institutions needing zero-downtime migration",
+  },
+];
+
+// Tools and resources mentioned
+const resources = [
+  { name: "NDG Documentation", url: "https://netlab-docs.netdevgroup.com/", description: "Official NETLAB+ documentation" },
+  { name: "Proxmox VE Installation", url: "https://netlab-docs.netdevgroup.com/vmi/proxmox/install/", description: "NDG Proxmox deployment guide" },
+  { name: "Setup & Management Course", url: "https://portal.netdevgroup.com/learn/pve8-sm-training", description: "Proxmox VE 8 basics" },
+  { name: "Advanced Administration", url: "https://portal.netdevgroup.com/learn/pve8-aao-training", description: "Advanced Proxmox topics" },
+  { name: "Proxmox Helper Scripts", url: "https://community-scripts.github.io/ProxmoxVE/scripts", description: "Community automation scripts" },
+  { name: "SecGen CTF Generator", url: "https://github.com/cliffe/secgen", description: "Security scenario generator for labs" },
+];
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-    <h2>// Overview</h2>
-    <p>
-        Designed deployment workflows for Proxmox VE in academic environments using the NETLAB+ platform. This workshop
-        helped educational institutions migrate their virtualization infrastructure.
-    </p>
+  <h2>// Overview</h2>
+  <p>
+    Completed an intensive 18-hour workshop conducted by Network Development Group (NDG) covering the complete
+    deployment of Proxmox VE 8 for NETLAB+ educational lab environments. This workshop provided hands-on training
+    for migrating academic institutions from VMware to Proxmox following Broadcom's termination of educational licensing.
+  </p>
 
-    <h2>// Technical Implementation</h2>
-    <ul>
-        <li>Created step-by-step deployment guides for Proxmox VE 8</li>
-        <li>Integration procedures with NETLAB+ pod management</li>
-        <li>Network configuration for multi-tenant lab environments</li>
-        <li>Best practices for resource allocation and scheduling</li>
+  <!-- Certificate Display -->
+  <h2>// Certificate of Completion</h2>
+  <PDFCarousel
+    src="/proxmoxworkshop.pdf"
+    title="NDG Proxmox VE 8 Workshop Certificate"
+  />
+
+  <!-- Workshop Details -->
+  <h2>// Workshop Details</h2>
+  <div class="workshop-stats">
+    <div class="stat-card">
+      <span class="stat-icon">&#128337;</span>
+      <span class="stat-value">{workshopDetails.duration}</span>
+      <span class="stat-label">Total Training</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">&#128197;</span>
+      <span class="stat-value">{workshopDetails.days}</span>
+      <span class="stat-label">{workshopDetails.dates}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">&#127891;</span>
+      <a href={workshopDetails.instructorUrl} target="_blank" rel="noopener noreferrer" class="stat-value-link">{workshopDetails.instructor}</a>
+      <span class="stat-label">Lead Instructor</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">&#127760;</span>
+      <span class="stat-value">{workshopDetails.format}</span>
+      <span class="stat-label">Delivery Format</span>
+    </div>
+  </div>
+
+  <!-- Day-by-Day Agenda -->
+  <h2>// Workshop Agenda</h2>
+  <p class="section-intro">
+    The workshop covered the complete lifecycle of deploying Proxmox VE for educational environments,
+    from hardware planning through production deployment:
+  </p>
+
+  <div class="agenda-container">
+    {agenda.map((day) => (
+      <div class="agenda-day" style={`--day: ${day.day}`}>
+        <div class="day-header">
+          <div class="day-number">Day {day.day}</div>
+          <div class="day-title">{day.title}</div>
+        </div>
+        <ul class="day-topics">
+          {day.topics.map((topic) => (
+            <li>{topic}</li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <!-- Key Technical Insights -->
+  <h2>// Key Technical Insights</h2>
+  <p class="section-intro">
+    Critical knowledge gained from instructor presentations and participant discussions:
+  </p>
+
+  <div class="insights-grid">
+    {keyInsights.map((item, i) => (
+      <div class="insight-card" style={`--delay: ${i * 0.1}s`}>
+        <div class="insight-header">
+          <span class="insight-topic">{item.topic}</span>
+          <span class="insight-source">{item.source}</span>
+        </div>
+        <p class="insight-text">{item.insight}</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Deployment Scenarios -->
+  <h2>// Deployment Scenarios</h2>
+  <p class="section-intro">
+    NDG outlined three deployment paths for institutions migrating to Proxmox:
+  </p>
+
+  <div class="scenarios-container">
+    {scenarios.map((scenario) => (
+      <div class="scenario-card">
+        <div class="scenario-header">
+          <div class="scenario-num">{scenario.num}</div>
+          <div class="scenario-title">{scenario.title}</div>
+        </div>
+        <p class="scenario-desc">{scenario.description}</p>
+        <div class="scenario-footer">
+          <span class="best-for-label">Best for:</span>
+          <span class="best-for-text">{scenario.bestFor}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Infrastructure Requirements -->
+  <h2>// Infrastructure Requirements</h2>
+  <p class="section-intro">
+    NDG's recommended hardware specifications for NETLAB+ on Proxmox:
+  </p>
+
+  <div class="requirements-grid">
+    <div class="req-card management">
+      <div class="req-header">
+        <span class="req-icon">&#128081;</span>
+        <span class="req-title">Management Server</span>
+      </div>
+      <ul class="req-list">
+        <li><strong>Model:</strong> Lenovo SR630 V3 (recommended)</li>
+        <li><strong>RAM:</strong> 256 GB (minimum 128 GB)</li>
+        <li><strong>Storage:</strong> NVMe for OS, staging pods, NETLAB-VE, PBS</li>
+        <li><strong>Network:</strong> 10G NICs for cluster communication</li>
+        <li><strong>Role:</strong> Staging VMs, SDK, backup server</li>
+      </ul>
+    </div>
+    <div class="req-card user">
+      <div class="req-header">
+        <span class="req-icon">&#128421;</span>
+        <span class="req-title">User/Host Servers</span>
+      </div>
+      <ul class="req-list">
+        <li><strong>Model:</strong> Lenovo SR630 series</li>
+        <li><strong>RAM:</strong> 384-768 GB per server</li>
+        <li><strong>Storage:</strong> 15 TB NVMe (masters + linked clones)</li>
+        <li><strong>Network:</strong> LACP bonded 1G + dedicated 10G cluster</li>
+        <li><strong>Role:</strong> Running student lab pods</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Practical Tips -->
+  <h2>// Practical Tips from the Workshop</h2>
+  <div class="tips-container">
+    <div class="tip-card">
+      <div class="tip-header">
+        <span class="tip-icon">&#128268;</span>
+        <span class="tip-title">IPMI/iDRAC Configuration</span>
+      </div>
+      <p>Set up out-of-band management on a separate, segmented network. Configure BIOS for auto power-on after power failure. Critical for remote server management.</p>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-header">
+        <span class="tip-icon">&#128640;</span>
+        <span class="tip-title">Use TMUX</span>
+      </div>
+      <p>Install and use TMUX to keep shell sessions running if your connection drops. Critical when running long installation scripts or cluster operations.</p>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-header">
+        <span class="tip-icon">&#9888;</span>
+        <span class="tip-title">Don't Clone Through Proxmox</span>
+      </div>
+      <p>NEVER use Proxmox's default cloning for NETLAB pods. Use NETLAB's own pod management and linked clone system to maintain proper VM ID pools and configurations.</p>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-header">
+        <span class="tip-icon">&#128190;</span>
+        <span class="tip-title">Storage Naming</span>
+      </div>
+      <p>Name storage directories NETLAB1, NETLAB2, etc. Disable preallocation on all NETLAB storage. Use consistent naming across all cluster nodes.</p>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-header">
+        <span class="tip-icon">&#128274;</span>
+        <span class="tip-title">DNS for SSL</span>
+      </div>
+      <p>DNS must be externally resolvable if using LetsEncrypt certificates. Plan your FQDN carefully - it's hard to change later once the cluster is configured.</p>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-header">
+        <span class="tip-icon">&#9889;</span>
+        <span class="tip-title">UPS Integration</span>
+      </div>
+      <p>Configure APC UPS Daemon or NUT (Network UPS Tools) for graceful shutdown during power failures. Essential for protecting VM data integrity.</p>
+    </div>
+  </div>
+
+  <!-- Resources -->
+  <h2>// Resources & Documentation</h2>
+  <div class="resources-list">
+    {resources.map((resource) => (
+      <a href={resource.url} target="_blank" rel="noopener noreferrer" class="resource-link">
+        <span class="resource-icon">&#128279;</span>
+        <div class="resource-info">
+          <span class="resource-name">{resource.name}</span>
+          <span class="resource-desc">{resource.description}</span>
+        </div>
+        <span class="resource-arrow">&#8594;</span>
+      </a>
+    ))}
+  </div>
+
+  <!-- Real-World Application -->
+  <h2>// Real-World Application</h2>
+  <p class="section-intro">
+    This workshop wasn't just theory - I immediately applied it to production infrastructure:
+  </p>
+
+  <a href="/projects/vmware-to-proxmox-migration" class="project-link-card">
+    <div class="link-card-icon">&#128640;</div>
+    <div class="link-card-content">
+      <span class="link-card-label">Related Project</span>
+      <span class="link-card-title">VMware to Proxmox Migration</span>
+      <span class="link-card-desc">Deployed a 6-node Proxmox cluster at Polk State College, eliminating ~$68,600/year in VMware licensing costs while serving as the backbone for cybersecurity and networking education.</span>
+    </div>
+    <div class="link-card-arrow">&#8594;</div>
+  </a>
+
+  <div class="status-block">
+    <div class="status-indicator completed">
+      <div class="status-pulse"></div>
+      <span>Workshop completed - July 10, 2025</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">&#10003;</span> 18 hours of intensive training completed</li>
+      <li><span class="check">&#10003;</span> Certificate of attendance received</li>
+      <li><span class="check">&#10003;</span> Hands-on labs in NDG training environment</li>
+      <li><span class="check">&#10003;</span> Knowledge applied to production deployment</li>
     </ul>
-
-    <h2>// Deliverables</h2>
-    <p>
-        Complete workshop materials including documentation, configuration templates, and troubleshooting guides for
-        academic IT staff.
-    </p>
-
-    <h2>// Status</h2>
-    <p>Workshop completed and materials published for NDG partners.</p>
+  </div>
 </ProjectLayout>
+
+<style>
+  /* Section Intro */
+  .section-intro {
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Workshop Stats */
+  .workshop-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+  }
+
+  .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .stat-value-link {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #10b981;
+    text-decoration: none;
+    border-bottom: 1px dashed #10b981;
+    transition: all 0.2s ease;
+  }
+
+  .stat-value-link:hover {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-bottom-style: solid;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  /* Agenda */
+  .agenda-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .agenda-day {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: calc(var(--day) * 0.15s);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .day-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: #10b981;
+    color: white;
+    border-radius: 8px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .day-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .day-topics {
+    list-style: none;
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .day-topics li {
+    font-size: 0.8rem;
+    padding: 0.4rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+    opacity: 0.8;
+    border-bottom: 1px dotted color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .day-topics li:last-child {
+    border-bottom: none;
+  }
+
+  .day-topics li::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* Insights Grid */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .insight-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid #10b981;
+    border-radius: 6px;
+    padding: 1rem;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  .insight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .insight-topic {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .insight-source {
+    font-size: 0.65rem;
+    opacity: 0.5;
+    padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 3px;
+  }
+
+  .insight-text {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Scenarios */
+  .scenarios-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .scenario-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .scenario-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .scenario-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 2px solid #10b981;
+    color: #10b981;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .scenario-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .scenario-desc {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+  }
+
+  .scenario-footer {
+    padding-top: 0.75rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    font-size: 0.75rem;
+  }
+
+  .best-for-label {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .best-for-text {
+    opacity: 0.7;
+  }
+
+  /* Requirements Grid */
+  .requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .req-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .req-card.management {
+    border-top: 3px solid #f59e0b;
+  }
+
+  .req-card.user {
+    border-top: 3px solid #10b981;
+  }
+
+  .req-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .req-icon {
+    font-size: 1.5rem;
+  }
+
+  .req-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .req-list {
+    list-style: none;
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .req-list li {
+    font-size: 0.8rem;
+    padding: 0.4rem 0;
+    opacity: 0.8;
+    border-bottom: 1px dotted color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .req-list li:last-child {
+    border-bottom: none;
+  }
+
+  .req-list strong {
+    color: #10b981;
+  }
+
+  /* Tips Container */
+  .tips-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .tip-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .tip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tip-icon {
+    font-size: 1.25rem;
+  }
+
+  .tip-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .tip-card p {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Resources */
+  .resources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .resource-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .resource-link:hover {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+    transform: translateX(4px);
+  }
+
+  .resource-icon {
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+
+  .resource-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .resource-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .resource-desc {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .resource-arrow {
+    opacity: 0.4;
+    transition: all 0.2s ease;
+  }
+
+  .resource-link:hover .resource-arrow {
+    opacity: 1;
+    color: #10b981;
+  }
+
+  /* Status Block */
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-indicator.completed .status-pulse {
+    background: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  /* Link in text */
+  p a {
+    color: #10b981;
+    border-bottom: 1px dashed #10b981;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  p a:hover {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-bottom-style: solid;
+  }
+
+  /* Project Link Card */
+  .project-link-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    background: color-mix(in srgb, #10b981 5%, transparent);
+    border: 2px solid color-mix(in srgb, #10b981 30%, transparent);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .project-link-card:hover {
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border-color: #10b981;
+    transform: translateX(8px);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+  }
+
+  .link-card-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .link-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .link-card-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .link-card-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .link-card-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    line-height: 1.5;
+    margin-top: 0.25rem;
+  }
+
+  .link-card-arrow {
+    font-size: 1.5rem;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .project-link-card:hover .link-card-arrow {
+    opacity: 1;
+    color: #10b981;
+    transform: translateX(4px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .workshop-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .insight-header {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .project-link-card {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+
+    .project-link-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .link-card-arrow {
+      display: none;
+    }
+  }
+</style>

@@ -1,5 +1,6 @@
 ---
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
+import PDFCarousel from "../../components/PDFCarousel.astro";
 
 const frontmatter = {
   title: "APT44 Intelligence Assessment",
@@ -286,31 +287,10 @@ const notableAttacks = [
     The complete intelligence assessment report with detailed technical analysis, full malware catalog,
     and comprehensive source citations:
   </p>
-  <div class="pdf-viewer-container">
-    <div class="pdf-header">
-      <div class="pdf-info">
-        <span class="pdf-icon">📄</span>
-        <div class="pdf-details">
-          <span class="pdf-title">APT44 Intelligence Assessment Report</span>
-          <span class="pdf-meta">Solomon Neas | October 2025 | 24 pages</span>
-        </div>
-      </div>
-      <a href="/APT44.pdf" target="_blank" rel="noopener noreferrer" class="pdf-download">
-        <span>Open Full PDF</span>
-        <span class="download-icon">↗</span>
-      </a>
-    </div>
-    <div class="pdf-embed-wrapper">
-      <iframe
-        src="/APT44.pdf#view=FitH"
-        class="pdf-embed"
-        title="APT44 Intelligence Assessment Report"
-      ></iframe>
-    </div>
-    <div class="pdf-fallback">
-      <p>If the PDF doesn't load, <a href="/APT44.pdf" target="_blank" rel="noopener noreferrer">click here to download</a>.</p>
-    </div>
-  </div>
+  <PDFCarousel
+    src="/APT44.pdf"
+    title="APT44 Intelligence Assessment Report"
+  />
 </ProjectLayout>
 
 <style>
@@ -759,108 +739,8 @@ const notableAttacks = [
     opacity: 0.9;
   }
 
-  /* PDF Viewer */
-  .pdf-viewer-container {
-    margin: 1.5rem 0;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .pdf-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.25rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .pdf-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .pdf-icon {
-    font-size: 1.5rem;
-  }
-
-  .pdf-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .pdf-title {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-
-  .pdf-meta {
-    font-size: 0.7rem;
-    opacity: 0.6;
-  }
-
-  .pdf-download {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--text);
-    color: var(--background);
-    border-radius: 4px;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-    text-decoration: none;
-    transition: all 0.2s ease;
-  }
-
-  .pdf-download:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .download-icon {
-    font-size: 1rem;
-  }
-
-  .pdf-embed-wrapper {
-    position: relative;
-    width: 100%;
-    height: 600px;
-    background: #1a1a1a;
-  }
-
-  .pdf-embed {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-
-  .pdf-fallback {
-    padding: 0.75rem 1.25rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    font-size: 0.75rem;
-    text-align: center;
-    opacity: 0.7;
-  }
-
-  .pdf-fallback p {
-    margin: 0;
-  }
-
   /* Responsive */
   @media (max-width: 768px) {
-    .pdf-embed-wrapper {
-      height: 400px;
-    }
-
     .phase-ttps {
       margin-left: 0;
       margin-top: 0.5rem;
