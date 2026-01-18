@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import StatusLight from "../../components/StatusLight.astro";
+import PDFCarousel from "../../components/PDFCarousel.astro";
 
 // Threat actors targeting WWS sector
 const threatActors = [
@@ -347,21 +348,13 @@ const mitigations = [
       <!-- PDF Viewer -->
       <div class="pdf-section">
         <h2 class="section-title">[DOCUMENT] Full Research Paper</h2>
-        <p class="pdf-meta">
+        <p class="pdf-intro">
           // Original research document with complete analysis
         </p>
-        <div class="pdf-container">
-          <iframe
-            src="/WWWS.pdf"
-            class="pdf-viewer"
-            title="Securing US Water and Wastewater Utilities - Full Report"
-          ></iframe>
-        </div>
-        <div class="pdf-fallback">
-          <a href="/WWWS.pdf" target="_blank" class="pdf-download">
-            &gt; Download PDF: WWWS_Security_Research.pdf
-          </a>
-        </div>
+        <PDFCarousel
+          src="/WWWS.pdf"
+          title="Securing US Water & Wastewater Utilities"
+        />
       </div>
 
       <!-- Navigation -->
@@ -858,41 +851,11 @@ const mitigations = [
     margin-bottom: 2rem;
   }
 
-  .pdf-meta {
+  .pdf-intro {
     font-size: 0.75rem;
     opacity: 0.5;
     margin: 0 0 1rem 0;
     font-style: italic;
-  }
-
-  .pdf-container {
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .pdf-viewer {
-    width: 100%;
-    height: 600px;
-    border: none;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-  }
-
-  .pdf-fallback {
-    margin-top: 0.75rem;
-  }
-
-  .pdf-download {
-    font-size: 0.8rem;
-    color: currentColor;
-    text-decoration: none;
-    opacity: 0.6;
-    transition: all 0.2s ease;
-  }
-
-  .pdf-download:hover {
-    opacity: 1;
-    color: #10b981;
   }
 
   /* Navigation */

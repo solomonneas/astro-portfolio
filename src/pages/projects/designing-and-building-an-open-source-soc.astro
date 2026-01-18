@@ -570,6 +570,20 @@ const components = [
       </div>
       <p>TheHive runs on JVM with Elasticsearch backend—both are memory-hungry. JVMs allocate heap at startup and don't release it. Tune <code>-Xms</code>/<code>-Xmx</code> flags carefully to balance performance without exhausting host RAM.</p>
     </div>
+
+    <div class="config-card wide">
+      <div class="config-header">
+        <span class="config-icon">&#128039;</span>
+        <span class="config-title">Ubuntu 22.04 LTS for TheHive & Cortex</span>
+      </div>
+      <p>Ubuntu 22.04 LTS ("Jammy Jellyfish") provides a stable, secure, and modern foundation for running TheHive and Cortex, particularly in containerized environments. It ensures compatibility with updated dependencies like OpenSSL 3.0 and provides long-term support until 2032 for critical security infrastructure.</p>
+      <ul class="config-list">
+        <li><strong>Optimal Docker Environment:</strong> TheHive and Cortex are frequently deployed together using Docker Compose for 24/7 SOCs. Jammy's robust container support makes it ideal for high-load, single-server setups.</li>
+        <li><strong>Modern Security Requirements:</strong> Provides necessary libraries and security hardening including OpenSSL 3.0 and the 5.15 Linux kernel—crucial for running latest Java versions (TheHive) and secure network communication (Cortex analyzers).</li>
+        <li><strong>Stability & Performance:</strong> LTS nature ensures the OS remains stable for years, essential for security infrastructure that cannot afford downtime.</li>
+        <li><strong>Efficient Resource Handling:</strong> Optimized for enterprise-class deployments "from data center to edge," helping manage the resource-intensive nature of TheHive (with its Elasticsearch backend) and Cortex running together.</li>
+      </ul>
+    </div>
   </div>
 
   <!-- Status -->
@@ -1283,6 +1297,27 @@ const components = [
     opacity: 0.75;
     margin: 0;
     line-height: 1.5;
+  }
+
+  .config-card.wide {
+    grid-column: 1 / -1;
+  }
+
+  .config-list {
+    margin: 0.75rem 0 0 0;
+    padding-left: 1.25rem;
+    font-size: 0.8rem;
+  }
+
+  .config-list li {
+    margin-bottom: 0.5rem;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  .config-list li strong {
+    color: #10b981;
+    opacity: 1;
   }
 
   .config-card code {
