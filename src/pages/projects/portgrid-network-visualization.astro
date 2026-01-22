@@ -1,0 +1,1477 @@
+---
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+
+const frontmatter = {
+  title: "PortGrid - Modern Network Port Visualization",
+  status: "Completed",
+  statusType: "completed",
+  origin: "Polk State College",
+  date: "2026.01",
+  techStack: ["Next.js 15", "React 19", "TanStack Table", "TanStack Query", "TypeScript", "Tailwind CSS", "LibreNMS API", "dnd-kit"],
+};
+
+// Stack components
+const stackComponents = [
+  { name: "Next.js 15", role: "App Router + Server Components", purpose: "Modern React framework with API routes for backend proxy to LibreNMS", color: "#000000" },
+  { name: "React 19", role: "UI Component Library", purpose: "Latest React with concurrent features for responsive port table rendering", color: "#61dafb" },
+  { name: "TanStack Table", role: "Headless Table Engine", purpose: "Sortable, paginated port grids with 50+ ports per device without lag", color: "#ff4154" },
+  { name: "TanStack Query", role: "Server State Management", purpose: "60-second stale time with auto-refetch for near real-time port status", color: "#ff4154" },
+  { name: "dnd-kit", role: "Drag & Drop", purpose: "Device grouping via drag-to-combine UI for organizing switch views", color: "#8b5cf6" },
+  { name: "LibreNMS API", role: "Data Source", purpose: "REST API for ports, devices, and LLDP/CDP neighbor discovery", color: "#10b981" },
+];
+
+// Key features
+const features = [
+  { icon: "&#128268;", title: "Real-Time Port Status", description: "Color-coded rows: green (up), amber (inactive), red (disabled). Auto-refreshes every 60 seconds." },
+  { icon: "&#128269;", title: "Instant Search", description: "Filter by port name, MAC address, VLAN, neighbor hostname, or device. Results update as you type." },
+  { icon: "&#128194;", title: "Device Grouping", description: "Drag one device onto another to create groups. Organize switches by floor, building, or function." },
+  { icon: "&#128221;", title: "Port Notes", description: "Click any port to add persistent notes. Stored locally - survives page refreshes." },
+  { icon: "&#127769;", title: "Dark/Light Mode", description: "System-aware theme toggle. Respects OS preference, remembers your choice." },
+  { icon: "&#128230;", title: "One-Line LXC Deploy", description: "Proxmox installer script handles container creation, dependencies, and configuration." },
+];
+
+// Technical highlights
+const highlights = [
+  {
+    category: "Problem Solved",
+    title: "Eliminated Redundant Polling",
+    scenario: "Switchmap ran its own SNMP polls against every switch, duplicating work LibreNMS already performed hourly",
+    solution: "PortGrid consumes LibreNMS API directly - ports, devices, and LLDP links from existing poll data with zero additional network load",
+    impact: "Single source of truth with no polling overhead"
+  },
+  {
+    category: "User Experience",
+    title: "Instant Port Discovery",
+    scenario: "Needed to find which switch port a device was connected to based on MAC address",
+    solution: "Type any partial MAC in the search box - results filter in real-time across all devices and ports",
+    impact: "30-second lookup vs. manual cable tracing or multiple CLI commands"
+  },
+  {
+    category: "Operations",
+    title: "Device Organization at Scale",
+    scenario: "Managing visibility of 20+ switches with no logical grouping",
+    solution: "Drag-and-drop device grouping with named groups (e.g., 'Building A', 'Core', 'Access Layer'). Order persists to localStorage",
+    impact: "Relevant switches always visible, irrelevant ones collapsed"
+  },
+  {
+    category: "Deployment",
+    title: "Containerized Deployment",
+    scenario: "Traditional install required manual Node.js setup, dependency management, and service configuration",
+    solution: "Single bash script creates Proxmox LXC, installs dependencies, clones repo, configures systemd service, and starts the app",
+    impact: "Production deployment in under 5 minutes"
+  },
+];
+
+// Skills demonstrated
+const skills = [
+  { name: "Full-Stack Development", items: ["Next.js API routes", "React server/client components", "REST API integration"] },
+  { name: "Modern React Patterns", items: ["TanStack Query for server state", "Custom hooks (usePortNotes, usePorts)", "Hydration-safe localStorage"] },
+  { name: "Data Visualization", items: ["TanStack Table with pagination", "Status color coding", "Sortable columns"] },
+  { name: "UX Engineering", items: ["Drag-and-drop with dnd-kit", "Inline editing components", "Dark mode with next-themes"] },
+  { name: "DevOps", items: ["Proxmox LXC automation", "Systemd service creation", "Environment-based configuration"] },
+];
+---
+
+<ProjectLayout frontmatter={frontmatter}>
+  <!-- Logo Visual -->
+  <div class="logo-visual">
+    <svg xmlns="http://www.w3.org/2000/svg" width="240" height="50" viewBox="0 0 240 50" class="portgrid-logo">
+      <defs>
+        <linearGradient id="bar" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#22c55e"/>
+          <stop offset="50%" stop-color="#f59e0b"/>
+          <stop offset="100%" stop-color="#ef4444"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="240" height="3" rx="1.5" fill="url(#bar)"/>
+      <g transform="translate(8, 10)">
+        <rect x="0" y="0" width="10" height="10" rx="2" fill="#22c55e"/>
+        <rect x="12" y="0" width="10" height="10" rx="2" fill="#22c55e"/>
+        <rect x="24" y="0" width="10" height="10" rx="2" fill="#f59e0b"/>
+        <rect x="0" y="12" width="10" height="10" rx="2" fill="#22c55e"/>
+        <rect x="12" y="12" width="10" height="10" rx="2" fill="#ef4444"/>
+        <rect x="24" y="12" width="10" height="10" rx="2" fill="#22c55e"/>
+        <rect x="0" y="24" width="10" height="10" rx="2" fill="#f59e0b"/>
+        <rect x="12" y="24" width="10" height="10" rx="2" fill="#22c55e"/>
+        <rect x="24" y="24" width="10" height="10" rx="2" fill="#22c55e"/>
+      </g>
+      <text x="52" y="35" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="26" font-weight="bold">
+        <tspan fill="currentColor" opacity="0.8">Port</tspan><tspan fill="#22c55e">Grid</tspan>
+      </text>
+    </svg>
+    <p class="logo-tagline">Modern Network Port Visualization</p>
+  </div>
+
+  <h2>// Overview</h2>
+  <p>
+    I built PortGrid from scratch to solve a real problem in my production environment. The existing tool (Switchmap)
+    was dead - last updated in 2016, Perl dependencies rotting, and worst of all, it ran redundant SNMP polls against
+    switches that LibreNMS was already monitoring. I designed and developed a modern replacement that pulls directly
+    from the LibreNMS API, eliminating duplicate network load while providing real-time port visualization, instant
+    search, and drag-and-drop device organization.
+  </p>
+  <p class="repo-callout">
+    <strong>This is my project.</strong> I identified the problem, architected the solution, wrote every line of code,
+    and deployed it to production. The full source is available at
+    <a href="https://github.com/solomonneas/portgrid" target="_blank" rel="noopener noreferrer">github.com/solomonneas/portgrid</a>.
+  </p>
+
+  <!-- Motivation Section -->
+  <h2>// The Problem I Solved</h2>
+  <div class="motivation-grid">
+    <div class="motivation-card">
+      <div class="motivation-header">
+        <span class="motivation-icon">&#128683;</span>
+        <span class="motivation-label">THE PROBLEM</span>
+      </div>
+      <div class="motivation-title">Switchmap: Dead Since 2016</div>
+      <p>
+        Switchmap was the go-to tool for network port visualization. Perl-based, it generated static HTML pages
+        showing port status and connected devices. But the last commit was <strong>2016</strong>. Perl dependencies
+        rotted. Modern switches weren't fully supported. The web interface looked like it came from 2005.
+      </p>
+    </div>
+    <div class="motivation-card">
+      <div class="motivation-header">
+        <span class="motivation-icon">&#128260;</span>
+        <span class="motivation-label">THE REDUNDANCY</span>
+      </div>
+      <div class="motivation-title">LibreNMS Already Has The Data</div>
+      <p>
+        Here's what bothered me: LibreNMS already polls every switch via SNMP. It knows port status, MAC tables,
+        LLDP neighbors - everything. Why run a second poller (Switchmap) against the same devices? That's duplicate
+        network load and duplicate maintenance. The data already exists.
+      </p>
+    </div>
+    <div class="motivation-card">
+      <div class="motivation-header">
+        <span class="motivation-icon">&#128338;</span>
+        <span class="motivation-label">THE LIMITATION</span>
+      </div>
+      <div class="motivation-title">Static HTML = Stale Data</div>
+      <p>
+        Switchmap regenerated HTML files on a cron schedule. If a port went down between runs, you wouldn't know
+        for an hour. No search. No filtering. No device organization. Just a directory listing of static HTML files
+        per switch.
+      </p>
+    </div>
+  </div>
+
+  <!-- Before/After Comparison -->
+  <h2>// What I Replaced</h2>
+  <div class="transformation-grid">
+    <div class="transform-card before">
+      <div class="transform-header">
+        <span class="transform-icon">&#128683;</span>
+        <span class="transform-label">SWITCHMAP</span>
+      </div>
+      <ul class="transform-list">
+        <li>Perl + SNMP polling (redundant with LibreNMS)</li>
+        <li>Static HTML generation via cron</li>
+        <li>No search or filtering capability</li>
+        <li>No device grouping or organization</li>
+        <li>Unstyled table output</li>
+        <li>Last updated: 2016</li>
+      </ul>
+    </div>
+    <div class="transform-arrow">&#8594;</div>
+    <div class="transform-card after">
+      <div class="transform-header">
+        <span class="transform-icon">&#9989;</span>
+        <span class="transform-label">MY SOLUTION: PORTGRID</span>
+      </div>
+      <ul class="transform-list">
+        <li>Built on LibreNMS API (zero polling overhead)</li>
+        <li>60-second auto-refresh I implemented</li>
+        <li>Instant search I designed from scratch</li>
+        <li>Drag-and-drop grouping with dnd-kit</li>
+        <li>Modern UI with dark/light mode</li>
+        <li>Actively maintained: 2026</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <h2>// System Architecture</h2>
+  <div class="architecture-diagram">
+    <div class="arch-layer collectors">
+      <span class="layer-label">DATA SOURCE</span>
+      <div class="collector-grid">
+        <div class="arch-node librenms">
+          <span class="node-icon">&#128225;</span>
+          <span class="node-label">LibreNMS</span>
+          <span class="node-sub">Already Polling</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector-vertical">
+      <div class="connector-line">
+        <div class="connector-particle"></div>
+      </div>
+      <span class="connector-label">REST API</span>
+    </div>
+
+    <div class="arch-layer processing">
+      <span class="layer-label">BACKEND PROXY</span>
+      <div class="processing-grid">
+        <div class="arch-node nextjs-node">
+          <div class="node-pulse"></div>
+          <span class="node-label">Next.js API Route</span>
+          <span class="node-sub">/api/ports</span>
+        </div>
+      </div>
+      <div class="api-details">
+        <span class="api-item">Fetch ports, devices, links</span>
+        <span class="api-item">Device filtering (include/exclude patterns)</span>
+        <span class="api-item">Enrich with neighbor hostnames</span>
+      </div>
+    </div>
+
+    <div class="arch-connector-vertical">
+      <div class="connector-line">
+        <div class="connector-particle"></div>
+      </div>
+      <span class="connector-label">JSON Response</span>
+    </div>
+
+    <div class="arch-layer processing">
+      <span class="layer-label">CLIENT STATE</span>
+      <div class="processing-grid">
+        <div class="arch-node query-node">
+          <div class="node-pulse"></div>
+          <span class="node-label">TanStack Query</span>
+          <span class="node-sub">60s Stale Time</span>
+        </div>
+        <div class="arch-node storage-node">
+          <div class="node-pulse"></div>
+          <span class="node-label">localStorage</span>
+          <span class="node-sub">Groups + Notes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector-vertical">
+      <div class="connector-line">
+        <div class="connector-particle"></div>
+      </div>
+      <span class="connector-label">React State</span>
+    </div>
+
+    <div class="arch-layer presentation">
+      <span class="layer-label">VISUALIZATION</span>
+      <div class="presentation-items">
+        <span class="present-item">Device Accordion</span>
+        <span class="present-item">Port Grid Table</span>
+        <span class="present-item">Status Colors</span>
+        <span class="present-item">Inline Notes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Features -->
+  <h2>// Key Features</h2>
+  <div class="features-grid">
+    {features.map((feature) => (
+      <div class="feature-card">
+        <div class="feature-icon" set:html={feature.icon}></div>
+        <div class="feature-content">
+          <span class="feature-title">{feature.title}</span>
+          <span class="feature-desc">{feature.description}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Tech Stack -->
+  <h2>// Tech Stack</h2>
+  <p class="section-intro">
+    Modern JavaScript ecosystem with React 19 and Next.js 15 for optimal developer experience and performance:
+  </p>
+
+  <div class="stack-grid">
+    {stackComponents.map((comp, i) => (
+      <div class="stack-card" style={`--accent: ${comp.color}; --delay: ${i * 0.1}s`}>
+        <div class="stack-header">
+          <span class="stack-indicator"></span>
+          <span class="stack-name">{comp.name}</span>
+        </div>
+        <div class="stack-role">{comp.role}</div>
+        <p class="stack-purpose">{comp.purpose}</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Technical Implementation -->
+  <h2>// How I Built It</h2>
+
+  <div class="impl-section">
+    <h3 class="impl-title">
+      <span class="impl-num">01</span>
+      LibreNMS API Adapter
+    </h3>
+    <div class="impl-content">
+      <div class="impl-block">
+        <h4>Parallel Data Fetching</h4>
+        <div class="code-block">
+          <code>// Fetch ports, devices, and links in parallel</code>
+          <code>const [portsRes, devicesRes, linksRes] = await Promise.all([</code>
+          <code>  fetch(`$&#123;baseUrl&#125;/api/v0/ports?columns=$&#123;portColumns&#125;`),</code>
+          <code>  fetch(`$&#123;baseUrl&#125;/api/v0/devices?columns=$&#123;deviceColumns&#125;`),</code>
+          <code>  fetch(`$&#123;baseUrl&#125;/api/v0/links`).catch(() =&gt; null)</code>
+          <code>]);</code>
+        </div>
+      </div>
+      <div class="impl-block">
+        <h4>Device Filtering (Glob Patterns)</h4>
+        <div class="code-block">
+          <code># Environment variables</code>
+          <code>DEVICE_EXCLUDE=test*,spare*,10.0.0.*</code>
+          <code>DEVICE_INCLUDE=core-*,access-*</code>
+          <code></code>
+          <code>// Glob matching with wildcard support</code>
+          <code>function matchPattern(value: string, pattern: string) {</code>
+          <code>  const regex = pattern.replace(/\*/g, '.*');</code>
+          <code>  return new RegExp(`^$&#123;regex&#125;$`, 'i').test(value);</code>
+          <code>}</code>
+        </div>
+      </div>
+    </div>
+    <p class="impl-note">
+      LibreNMS requires explicit <code>?columns=</code> parameter to include fields like device_id.
+      Without it, many fields are omitted from the response. The links endpoint is optional and gracefully
+      degrades if LLDP/CDP data is unavailable.
+    </p>
+  </div>
+
+  <div class="impl-section">
+    <h3 class="impl-title">
+      <span class="impl-num">02</span>
+      Real-Time Updates with TanStack Query
+    </h3>
+    <div class="impl-content">
+      <div class="impl-block">
+        <h4>Query Configuration</h4>
+        <div class="code-block">
+          <code>// QueryProvider setup</code>
+          <code>const queryClient = new QueryClient({</code>
+          <code>  defaultOptions: {</code>
+          <code>    queries: {</code>
+          <code>      staleTime: 60 * 1000,        // 60 seconds</code>
+          <code>      refetchInterval: 60 * 1000,  // Auto-refresh</code>
+          <code>    },</code>
+          <code>  },</code>
+          <code>});</code>
+        </div>
+      </div>
+      <div class="impl-block">
+        <h4>usePorts Hook</h4>
+        <div class="code-block">
+          <code>export function usePorts() {</code>
+          <code>  return useQuery({</code>
+          <code>    queryKey: ["ports"],</code>
+          <code>    queryFn: async () => {</code>
+          <code>      const res = await fetch("/api/ports");</code>
+          <code>      return res.json();</code>
+          <code>    },</code>
+          <code>  });</code>
+          <code>}</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="impl-section">
+    <h3 class="impl-title">
+      <span class="impl-num">03</span>
+      Drag-and-Drop Device Grouping
+    </h3>
+    <div class="impl-content">
+      <div class="impl-block">
+        <h4>Group Logic (dnd-kit)</h4>
+        <div class="code-block">
+          <code>// Case 1: Both ungrouped → Create new group</code>
+          <code>// Case 2: Drag ungrouped → grouped → Add to group</code>
+          <code>// Case 3: Drag grouped → ungrouped → Add to group</code>
+          <code>// Case 4: Different groups → Move to target</code>
+          <code></code>
+          <code>// DragOverlay uses plain div (not AccordionItem)</code>
+          <code>// to avoid Radix context errors</code>
+        </div>
+      </div>
+      <div class="impl-block">
+        <h4>localStorage Persistence</h4>
+        <div class="code-block">
+          <code>// Device groups structure</code>
+          <code>interface DeviceGroup {</code>
+          <code>  id: string;</code>
+          <code>  name: string;</code>
+          <code>  deviceIds: number[];</code>
+          <code>}</code>
+          <code></code>
+          <code>// Key: portgrid-device-groups</code>
+        </div>
+      </div>
+    </div>
+    <p class="impl-note">
+      Groups auto-dissolve when only one device remains. The DragOverlay component renders outside the
+      Accordion context, so using AccordionItem causes React context errors - solved by using a plain div
+      for the overlay content.
+    </p>
+  </div>
+
+  <div class="impl-section">
+    <h3 class="impl-title">
+      <span class="impl-num">04</span>
+      Hydration-Safe localStorage
+    </h3>
+    <div class="impl-content">
+      <div class="impl-block">
+        <h4>Mounted State Pattern</h4>
+        <div class="code-block">
+          <code>const [mounted, setMounted] = useState(false);</code>
+          <code>const [notes, setNotes] = useState({});</code>
+          <code></code>
+          <code>useEffect(() => {</code>
+          <code>  // Only access localStorage after mount</code>
+          <code>  const stored = localStorage.getItem(STORAGE_KEY);</code>
+          <code>  if (stored) setNotes(JSON.parse(stored));</code>
+          <code>  setMounted(true);</code>
+          <code>}, []);</code>
+          <code></code>
+          <code>// Only persist when mounted</code>
+          <code>useEffect(() => {</code>
+          <code>  if (mounted) {</code>
+          <code>    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));</code>
+          <code>  }</code>
+          <code>}, [notes, mounted]);</code>
+        </div>
+      </div>
+    </div>
+    <p class="impl-note">
+      React Server Components run on the server where localStorage doesn't exist. The mounted state pattern
+      prevents hydration mismatches by deferring localStorage access until the component is client-side.
+    </p>
+  </div>
+
+  <!-- LXC Deployment -->
+  <h2>// Proxmox LXC Deployment</h2>
+  <div class="deployment-section">
+    <div class="deployment-header">
+      <span class="deployment-icon">&#128230;</span>
+      <span class="deployment-title">One-Line Installation</span>
+    </div>
+    <p class="deployment-intro">
+      The installer script automates the entire deployment process on Proxmox VE. Run from the Proxmox host shell:
+    </p>
+    <div class="code-block large">
+      <code>bash -c "$(curl -fsSL https://raw.githubusercontent.com/solomonneas/portgrid/main/scripts/install-lxc.sh)"</code>
+    </div>
+
+    <div class="deployment-steps">
+      <div class="step-card">
+        <span class="step-num">1</span>
+        <span class="step-title">Container Creation</span>
+        <span class="step-desc">Creates Debian 12 LXC with 4GB RAM, 2 cores, 8GB disk</span>
+      </div>
+      <div class="step-card">
+        <span class="step-num">2</span>
+        <span class="step-title">Dependencies</span>
+        <span class="step-desc">Installs Node.js 20 LTS, npm, git, build-essential</span>
+      </div>
+      <div class="step-card">
+        <span class="step-num">3</span>
+        <span class="step-title">App Setup</span>
+        <span class="step-desc">Clones repo, runs npm install, npm run build</span>
+      </div>
+      <div class="step-card">
+        <span class="step-num">4</span>
+        <span class="step-title">Service Config</span>
+        <span class="step-desc">Creates systemd service, enables on boot, starts app</span>
+      </div>
+    </div>
+
+    <div class="env-config">
+      <h4>Environment Configuration</h4>
+      <div class="code-block">
+        <code># /opt/portgrid/.env.local</code>
+        <code>DATA_SOURCE=librenms</code>
+        <code>LIBRENMS_URL=https://librenms.example.com</code>
+        <code>LIBRENMS_API_TOKEN=your-api-token-here</code>
+        <code></code>
+        <code># Optional: Device filtering</code>
+        <code>DEVICE_EXCLUDE=test*,spare*</code>
+        <code>DEVICE_INCLUDE=core-*,access-*</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case Studies -->
+  <h2>// Impact & Use Cases</h2>
+  <div class="highlights-grid">
+    {highlights.map((item, i) => (
+      <div class="highlight-card" style={`--delay: ${i * 0.1}s`}>
+        <div class="highlight-header">
+          <span class="highlight-category">{item.category}</span>
+          <span class="highlight-title">{item.title}</span>
+        </div>
+        <div class="highlight-body">
+          <div class="highlight-row">
+            <span class="row-label">Scenario:</span>
+            <span class="row-value">{item.scenario}</span>
+          </div>
+          <div class="highlight-row">
+            <span class="row-label">Solution:</span>
+            <span class="row-value">{item.solution}</span>
+          </div>
+          <div class="highlight-row impact">
+            <span class="row-label">Impact:</span>
+            <span class="row-value">{item.impact}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Skills Matrix -->
+  <h2>// Skills Demonstrated</h2>
+  <div class="skills-grid">
+    {skills.map((skill) => (
+      <div class="skill-card">
+        <div class="skill-header">
+          <span class="skill-name">{skill.name}</span>
+        </div>
+        <ul class="skill-items">
+          {skill.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <!-- Repository Link -->
+  <h2>// My Source Code</h2>
+  <div class="repo-card">
+    <div class="repo-header">
+      <span class="repo-icon">&#128193;</span>
+      <span class="repo-name">solomonneas/portgrid</span>
+    </div>
+    <p class="repo-desc">
+      I've open-sourced the entire project. Every component, every hook, every line - written by me.
+      MIT licensed so others facing the same Switchmap problem can use it too.
+    </p>
+    <a href="https://github.com/solomonneas/portgrid" target="_blank" rel="noopener noreferrer" class="repo-link">
+      <span class="prompt">$</span> git clone https://github.com/solomonneas/portgrid.git
+    </a>
+  </div>
+
+  <!-- Status -->
+  <h2>// Project Status</h2>
+  <div class="status-block">
+    <div class="status-indicator completed">
+      <div class="status-pulse"></div>
+      <span>PortGrid v1.0 deployed and operational</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">&#10003;</span> LibreNMS API integration complete</li>
+      <li><span class="check">&#10003;</span> Real-time port status with auto-refresh</li>
+      <li><span class="check">&#10003;</span> Instant search across all fields</li>
+      <li><span class="check">&#10003;</span> Drag-and-drop device grouping</li>
+      <li><span class="check">&#10003;</span> Inline port notes with localStorage persistence</li>
+      <li><span class="check">&#10003;</span> Dark/light mode with system detection</li>
+      <li><span class="check">&#10003;</span> Proxmox LXC installer script</li>
+      <li><span class="check">&#10003;</span> Production deployment at Polk State</li>
+    </ul>
+  </div>
+</ProjectLayout>
+
+<style>
+  /* Logo Visual */
+  .logo-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+  }
+
+  .portgrid-logo {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .logo-tagline {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin: 0;
+    letter-spacing: 0.05em;
+  }
+
+  /* Repo Callout */
+  .repo-callout {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-left: 3px solid #10b981;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .repo-callout strong {
+    color: #10b981;
+  }
+
+  .repo-callout a {
+    color: #10b981;
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, #10b981 40%, transparent);
+  }
+
+  .repo-callout a:hover {
+    border-bottom-color: #10b981;
+  }
+
+  /* Section Intro */
+  .section-intro {
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Motivation Grid */
+  .motivation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .motivation-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .motivation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .motivation-icon {
+    font-size: 1.25rem;
+  }
+
+  .motivation-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #ef4444;
+  }
+
+  .motivation-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .motivation-card p {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .motivation-card strong {
+    color: #10b981;
+  }
+
+  /* Transformation Grid */
+  .transformation-grid {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .transform-card {
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .transform-card.before {
+    border-top: 3px solid #ef4444;
+  }
+
+  .transform-card.after {
+    border-top: 3px solid #10b981;
+  }
+
+  .transform-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .transform-icon {
+    font-size: 1.25rem;
+  }
+
+  .transform-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .transform-card.before .transform-label { color: #ef4444; }
+  .transform-card.after .transform-label { color: #10b981; }
+
+  .transform-list {
+    list-style: none;
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .transform-list li {
+    font-size: 0.8rem;
+    padding: 0.4rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+    opacity: 0.8;
+    border-bottom: 1px dotted color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .transform-list li:last-child {
+    border-bottom: none;
+  }
+
+  .transform-card.before .transform-list li::before {
+    content: "x";
+    position: absolute;
+    left: 0;
+    color: #ef4444;
+    font-weight: bold;
+  }
+
+  .transform-card.after .transform-list li::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  .transform-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    color: #10b981;
+    opacity: 0.6;
+  }
+
+  /* Features Grid */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .feature-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .feature-icon {
+    font-size: 1.75rem;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .feature-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .feature-desc {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  /* Stack Grid */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .stack-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 1rem;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stack-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .stack-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .stack-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .stack-role {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .stack-purpose {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Architecture Diagram */
+  .architecture-diagram {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .arch-layer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .layer-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    text-transform: uppercase;
+  }
+
+  .collector-grid, .processing-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .arch-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    min-width: 100px;
+    text-align: center;
+    position: relative;
+  }
+
+  .node-icon {
+    font-size: 1.25rem;
+    opacity: 0.8;
+  }
+
+  .node-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .node-sub {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .node-pulse {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .librenms { border-color: color-mix(in srgb, #10b981 40%, transparent); }
+  .nextjs-node { border-color: color-mix(in srgb, #000000 40%, transparent); }
+  .query-node { border-color: color-mix(in srgb, #ff4154 40%, transparent); }
+  .storage-node { border-color: color-mix(in srgb, #8b5cf6 40%, transparent); }
+
+  .api-details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .api-item {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 3px;
+  }
+
+  .arch-connector-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .connector-line {
+    width: 2px;
+    height: 30px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .connector-particle {
+    position: absolute;
+    width: 2px;
+    height: 10px;
+    background: #10b981;
+    animation: flowDown 1.5s ease-in-out infinite;
+  }
+
+  @keyframes flowDown {
+    0% { top: -10px; }
+    100% { top: 30px; }
+  }
+
+  .connector-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    color: #10b981;
+  }
+
+  .presentation-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .present-item {
+    padding: 0.4rem 0.8rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #10b981;
+  }
+
+  /* Implementation Sections */
+  .impl-section {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .impl-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: currentColor;
+  }
+
+  .impl-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 1px solid #10b981;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    color: #10b981;
+  }
+
+  .impl-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .impl-block h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .code-block {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    padding: 0.75rem;
+    overflow-x: auto;
+  }
+
+  .code-block.large {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .code-block code {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .code-block code:empty {
+    height: 0.5rem;
+  }
+
+  .impl-note {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 1rem 0 0 0;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-left: 2px solid #10b981;
+    line-height: 1.6;
+  }
+
+  .impl-note code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  /* Deployment Section */
+  .deployment-section {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .deployment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .deployment-icon {
+    font-size: 1.5rem;
+  }
+
+  .deployment-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .deployment-intro {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+  }
+
+  .deployment-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .step-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .step-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .step-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .step-desc {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .env-config {
+    margin-top: 1.5rem;
+  }
+
+  .env-config h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    color: #10b981;
+    margin: 0 0 0.75rem 0;
+  }
+
+  /* Highlights Grid */
+  .highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .highlight-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  .highlight-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .highlight-category {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .highlight-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .highlight-body {
+    padding: 1rem;
+  }
+
+  .highlight-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .highlight-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-row .row-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .highlight-row .row-value {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+
+  .highlight-row.impact .row-value {
+    color: #10b981;
+    font-weight: 500;
+    opacity: 1;
+  }
+
+  /* Skills Grid */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .skill-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .skill-header {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .skill-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .skill-items {
+    list-style: none;
+    padding: 0.75rem 1rem;
+    margin: 0;
+  }
+
+  .skill-items li {
+    font-size: 0.75rem;
+    padding: 0.3rem 0;
+    padding-left: 1rem;
+    position: relative;
+    opacity: 0.75;
+  }
+
+  .skill-items li::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* Repository Card */
+  .repo-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .repo-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .repo-icon {
+    font-size: 1.25rem;
+  }
+
+  .repo-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .repo-desc {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin: 0 0 1rem 0;
+  }
+
+  .repo-link {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: currentColor;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .repo-link:hover {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-color: #10b981;
+  }
+
+  .repo-link .prompt {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  /* Status Block */
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-indicator.completed .status-pulse {
+    background: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .transformation-grid {
+      flex-direction: column;
+    }
+
+    .transform-arrow {
+      transform: rotate(90deg);
+    }
+
+    .transform-card {
+      max-width: none;
+    }
+
+    .architecture-diagram {
+      padding: 1rem;
+    }
+
+    .collector-grid, .processing-grid {
+      flex-direction: column;
+    }
+
+    .impl-content {
+      grid-template-columns: 1fr;
+    }
+
+    .motivation-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
