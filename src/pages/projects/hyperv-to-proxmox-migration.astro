@@ -2,39 +2,1067 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-    title: "HyperV to Proxmox Migration",
-    status: "In Progress",
-    statusType: "ongoing",
-    origin: "Polk State College",
-    date: "2026.01",
-    techStack: ["Windows Server", "Hyper-V", "Proxmox VE", "Linux", "PowerShell"],
+  title: "Hyper-V to Proxmox Migration",
+  status: "In Progress",
+  statusType: "ongoing",
+  origin: "Polk State College",
+  date: "2026.01",
+  techStack: ["Windows Server", "Hyper-V", "Proxmox VE", "Active Directory", "PowerShell", "QEMU", "Linux"],
 };
+
+// Migration scope
+const migrationScope = [
+  {
+    category: "Domain Controllers",
+    method: "Leapfrog (New Build + Replication)",
+    risk: "Zero V2V",
+    color: "#ef4444"
+  },
+  {
+    category: "Linux VMs",
+    method: "VHDX Transfer → QCOW2 Conversion",
+    risk: "Reconfiguration Required",
+    color: "#3b82f6"
+  },
+];
+
+// Critical warnings
+const criticalWarnings = [
+  {
+    title: "NEVER V2V Domain Controllers",
+    risk: "USN Rollback",
+    result: "Permanent AD database corruption and replication failure",
+    solution: "Use the Leapfrog method (new VM + replication)"
+  },
+];
+
+// Hyper-V generation mapping
+const generationMapping = [
+  { gen: "Gen 1", bios: "SeaBIOS", machine: "i440fx" },
+  { gen: "Gen 2", bios: "OVMF (UEFI)", machine: "q35 (recommended)" },
+];
+
+// Leapfrog steps
+const leapfrogSteps = [
+  {
+    step: "Provision",
+    action: "Create fresh Windows Server VM on Proxmox",
+    detail: "Name it NEW-DC1 or similar"
+  },
+  {
+    step: "Network",
+    action: "Assign temporary IP (e.g., 10.2.50.15)",
+    detail: "Set DNS to existing active DC (not itself)"
+  },
+  {
+    step: "Promote",
+    action: "Install AD DS role → Promote to Domain Controller",
+    detail: "Verify with: repadmin /showrepl"
+  },
+  {
+    step: "FSMO Transfer",
+    action: "Move all roles from Old DC to New DC",
+    detail: "PowerShell: Move-ADDirectoryServerOperationMasterRole"
+  },
+  {
+    step: "Demote & Swap",
+    action: "Demote OLD-DC1, shut it down",
+    detail: "Re-assign its static IP to NEW-DC1"
+  },
+];
+
+// V2V shell creation steps
+const shellSteps = [
+  { setting: "OS", value: "Do not use media (Linux 5.x/6.x Kernel)" },
+  { setting: "System", value: "Check QEMU Agent. Match BIOS to source generation" },
+  { setting: "Disks", value: "DELETE the default 32GB scsi0 drive. List must be empty" },
+  { setting: "CPU/RAM", value: "Right-size resources (e.g., 16 cores → 4 cores)" },
+  { setting: "Network", value: "Bridge vmbr0, Model VirtIO" },
+];
+
+// Post-migration issues
+const postMigrationIssues = [
+  {
+    issue: "Loss of Network Connectivity",
+    symptom: "VM boots but cannot ping gateway",
+    cause: "Interface name change (eth0 → ens18)",
+    fix: "Update /etc/netplan/*.yaml with new interface name, then run netplan apply"
+  },
+  {
+    issue: "Missing QEMU Guest Agent",
+    symptom: "Proxmox shows no IP; Shutdown button doesn't work",
+    cause: "Agent not installed on migrated VM",
+    fix: "apt install qemu-guest-agent && systemctl enable --now qemu-guest-agent"
+  },
+];
+
+// App-specific troubleshooting
+const appTroubleshooting = [
+  {
+    app: "LibreNMS",
+    symptom: "UI 502 Bad Gateway or Poller Failures",
+    cause: "Permissions broken during transfer",
+    fix: "Run validator as librenms user: sudo su - librenms && ./validate.php",
+    note: "Follow script output explicitly (pip3 install, lnms migrate, chown commands)"
+  },
+  {
+    app: "Netdisco",
+    symptom: "Services fail to start; DB connection refused",
+    cause: "Multiple configuration issues",
+    fixes: [
+      "DB Host: Edit ~/environments/deployment.yml, change IP to localhost",
+      "Cookie Crash: Add session_cookie_key: 'random_string_1234' to deployment.yml",
+      "Manual Start: sudo su - netdisco && ~/bin/netdisco-backend start && ~/bin/netdisco-web start"
+    ]
+  },
+];
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-    <h2>// Overview</h2>
+  <!-- Overview -->
+  <h2>// Overview</h2>
+  <p>
+    Leading a critical infrastructure migration to transition production systems from Microsoft Hyper-V
+    to Proxmox VE. This project encompasses Active Directory Domain Controllers and Linux-based network
+    monitoring tools (LibreNMS, Netdisco), requiring different migration strategies based on workload type.
+  </p>
+
+  <!-- Migration Scope -->
+  <div class="scope-section">
+    <h2>// Migration Scope & Strategy</h2>
+    <div class="scope-grid">
+      {migrationScope.map((item) => (
+        <div class="scope-card" style={`border-left-color: ${item.color}`}>
+          <span class="scope-category" style={`color: ${item.color}`}>{item.category}</span>
+          <span class="scope-method">{item.method}</span>
+          <span class="scope-risk">{item.risk}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Critical Warning -->
+  <div class="warning-section">
+    <h2>// Critical Warning</h2>
+    {criticalWarnings.map((warning) => (
+      <div class="critical-warning">
+        <div class="warning-header">
+          <span class="warning-icon">⚠️</span>
+          <span class="warning-title">{warning.title}</span>
+        </div>
+        <div class="warning-body">
+          <div class="warning-row">
+            <span class="warning-label">Risk:</span>
+            <span class="warning-value danger">{warning.risk}</span>
+          </div>
+          <div class="warning-row">
+            <span class="warning-label">Result:</span>
+            <span class="warning-value">{warning.result}</span>
+          </div>
+          <div class="warning-row">
+            <span class="warning-label">Solution:</span>
+            <span class="warning-value solution">{warning.solution}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Pre-Migration: Generation Check -->
+  <div class="gen-section">
+    <h2>// Pre-Migration: Hyper-V Generation Check</h2>
     <p>
-        Leading a critical infrastructure migration project to transition the college's virtualization platform from
-        Microsoft Hyper-V to Proxmox VE. This initiative aims to reduce licensing costs while improving flexibility and
-        performance for academic lab environments.
+      Before creating the Proxmox VM shell, identify the source generation to match BIOS settings.
+      Check via: <code>Hyper-V Manager → VM → Summary Tab → "Generation"</code>
+    </p>
+    <div class="gen-table">
+      <div class="gen-header">
+        <span>Source</span>
+        <span>Proxmox BIOS</span>
+        <span>Machine Type</span>
+      </div>
+      {generationMapping.map((item) => (
+        <div class="gen-row">
+          <span class="gen-source">{item.gen}</span>
+          <span class="gen-bios">{item.bios}</span>
+          <span class="gen-machine">{item.machine}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Domain Controller Strategy -->
+  <div class="leapfrog-section">
+    <h2>// Active Directory: The "Leapfrog" Method</h2>
+    <p class="section-intro">
+      Migrate Domain Controllers without IP changes or downtime by building new DCs on Proxmox
+      and using AD replication to transfer data safely.
     </p>
 
-    <h2>// Technical Implementation</h2>
-    <p>The migration involves careful planning and execution across multiple phases:</p>
-    <ul>
-        <li>Inventory and assessment of existing Hyper-V virtual machines and configurations</li>
-        <li>Setting up Proxmox VE cluster with high availability</li>
-        <li>Converting VHDX disk images to QCOW2 format</li>
-        <li>Migrating network configurations and VLAN assignments</li>
-        <li>Testing and validation in parallel environment before cutover</li>
-    </ul>
+    <div class="leapfrog-steps">
+      {leapfrogSteps.map((item, i) => (
+        <div class="leapfrog-step">
+          <div class="step-number">{i + 1}</div>
+          <div class="step-content">
+            <span class="step-name">{item.step}</span>
+            <span class="step-action">{item.action}</span>
+            <span class="step-detail">{item.detail}</span>
+          </div>
+        </div>
+      ))}
+    </div>
 
-    <h2>// Challenges</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">PowerShell</span>
+        <span class="code-desc">FSMO Role Transfer</span>
+      </div>
+      <pre><code>Move-ADDirectoryServerOperationMasterRole -Identity "NEW-DC1" `
+  -OperationMasterRole SchemaMaster, DomainNamingMaster, `
+  PDCEmulator, RIDMaster, InfrastructureMaster</code></pre>
+    </div>
+  </div>
+
+  <!-- Linux VM V2V -->
+  <div class="v2v-section">
+    <h2>// Standard Linux VMs: V2V Process</h2>
+    <p>For Linux VMs like Netdisco, Switchmap, and LibreNMS, use direct disk conversion.</p>
+
+    <!-- Phase 1: Shell Creation -->
+    <div class="phase-block">
+      <h3>Phase 1: Create the "Shell" (Proxmox GUI)</h3>
+      <p>Create the VM chassis but <strong>do not create a hard drive</strong>.</p>
+      <div class="shell-steps">
+        {shellSteps.map((item) => (
+          <div class="shell-step">
+            <span class="shell-setting">{item.setting}</span>
+            <span class="shell-value">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Phase 2: Disk Transfer -->
+    <div class="phase-block">
+      <h3>Phase 2: Disk Transfer (SCP)</h3>
+      <p>Push the VHDX file from the Hyper-V host to Proxmox.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PowerShell</span>
+          <span class="code-desc">Run on Windows Host</span>
+        </div>
+        <pre><code>scp "C:\Path\To\Disk.vhdx" root@PROXMOX_IP:/var/lib/vz/dump/</code></pre>
+      </div>
+    </div>
+
+    <!-- Phase 3: Import -->
+    <div class="phase-block">
+      <h3>Phase 3: Import & Attach (Proxmox Shell)</h3>
+      <p>Convert the VHDX to QCOW2 and map it to the VM ID.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Bash</span>
+          <span class="code-desc">Proxmox Host</span>
+        </div>
+        <pre><code># Syntax: qm importdisk &lt;vmid&gt; &lt;source_path&gt; &lt;storage_id&gt;
+qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
+      </div>
+      <div class="attach-steps">
+        <div class="attach-step">
+          <span class="attach-num">1</span>
+          <span>Hardware → Double-click <strong>Unused Disk 0</strong> → Add as SCSI</span>
+        </div>
+        <div class="attach-step">
+          <span class="attach-num">2</span>
+          <span>Options → Boot Order → Enable and prioritize <strong>scsi0</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-Migration Issues -->
+  <div class="issues-section">
+    <h2>// Post-Migration Hiccups & Fixes</h2>
+    <div class="issues-grid">
+      {postMigrationIssues.map((item) => (
+        <div class="issue-card">
+          <div class="issue-header">
+            <span class="issue-title">{item.issue}</span>
+          </div>
+          <div class="issue-body">
+            <div class="issue-row">
+              <span class="issue-label">Symptom:</span>
+              <span class="issue-value">{item.symptom}</span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-label">Cause:</span>
+              <span class="issue-value">{item.cause}</span>
+            </div>
+            <div class="issue-row fix">
+              <span class="issue-label">Fix:</span>
+              <span class="issue-value">{item.fix}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- App-Specific Troubleshooting -->
+  <div class="app-section">
+    <h2>// Application-Specific Troubleshooting</h2>
+
+    {appTroubleshooting.map((app) => (
+      <div class="app-card">
+        <div class="app-header">
+          <span class="app-name">{app.app}</span>
+          <span class="app-symptom">{app.symptom}</span>
+        </div>
+        <div class="app-body">
+          <div class="app-row">
+            <span class="app-label">Cause:</span>
+            <span class="app-value">{app.cause}</span>
+          </div>
+          {app.fix && (
+            <div class="app-row fix">
+              <span class="app-label">Fix:</span>
+              <span class="app-value">{app.fix}</span>
+            </div>
+          )}
+          {app.fixes && (
+            <div class="app-fixes">
+              <span class="app-label">Fixes:</span>
+              <ul>
+                {app.fixes.map((fix) => (
+                  <li>{fix}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {app.note && (
+            <div class="app-note">
+              <span class="note-icon">💡</span>
+              <span>{app.note}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Upcoming: File Server -->
+  <div class="fileserver-section">
+    <h2>// Upcoming: File Server Consolidation</h2>
     <p>
-        Key challenges include maintaining uptime during migration, ensuring compatibility with existing Active
-        Directory integration, and retraining staff on the new platform.
+      The current environment has multiple Windows 10 machines acting as file servers in a "split-brain"
+      configuration; files scattered across machines with no centralized management, inconsistent
+      permissions, and no proper backup strategy.
     </p>
+    <div class="fileserver-plan">
+      <div class="plan-header">
+        <span class="plan-icon">🐧</span>
+        <span class="plan-title">Planned Solution: Linux File Server</span>
+      </div>
+      <div class="plan-body">
+        <ul>
+          <li>Deploy a Linux-based file server VM on Proxmox (Samba for SMB shares)</li>
+          <li>Use Robocopy to migrate data from existing Windows 10 filers</li>
+          <li>Centralize all departmental file shares under one roof</li>
+          <li>Integrate with Active Directory for authentication and permissions</li>
+          <li>Configure Group Policy for automatic drive mapping on student and network machines</li>
+          <li>Set up automated backups and Proxmox snapshots</li>
+          <li>Decommission the Windows 10 "filer" machines</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
-    <h2>// Status</h2>
-    <p>Currently in the planning and assessment phase. Target completion: Q2 2026.</p>
+  <!-- Current Status -->
+  <div class="status-section">
+    <h2>// Current Status</h2>
+    <div class="status-block">
+      <div class="status-indicator ongoing">
+        <div class="status-pulse"></div>
+        <span>Migration in progress</span>
+      </div>
+      <ul class="status-list">
+        <li><span class="check">✓</span> Pre-migration analysis complete</li>
+        <li><span class="check">✓</span> Proxmox cluster provisioned</li>
+        <li><span class="check">✓</span> Domain Controller leapfrog strategy documented</li>
+        <li><span class="check">✓</span> Linux VM conversion process validated</li>
+        <li><span class="check">✓</span> LibreNMS migrated and operational</li>
+        <li><span class="check">✓</span> Netdisco migrated and operational</li>
+        <li><span class="check">✓</span> Switchmap migrated and operational</li>
+        <li><span class="pending">○</span> Domain Controller migration (scheduled)</li>
+        <li><span class="pending">○</span> New file server to replace split-brain Windows 10 filers</li>
+        <li><span class="pending">○</span> Final cutover and decommissioning</li>
+      </ul>
+    </div>
+  </div>
 </ProjectLayout>
+
+<style>
+  /* Section Intro */
+  .section-intro {
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Scope Section */
+  .scope-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .scope-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .scope-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 4px solid;
+    border-radius: 4px;
+  }
+
+  .scope-category {
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .scope-method {
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  .scope-risk {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* Warning Section */
+  .warning-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .critical-warning {
+    background: color-mix(in srgb, #ef4444 8%, transparent);
+    border: 1px solid color-mix(in srgb, #ef4444 25%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+
+  .warning-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, #ef4444 20%, transparent);
+  }
+
+  .warning-icon {
+    font-size: 1.25rem;
+  }
+
+  .warning-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #ef4444;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .warning-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .warning-row {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .warning-label {
+    font-weight: 600;
+    min-width: 70px;
+    opacity: 0.7;
+  }
+
+  .warning-value {
+    flex: 1;
+  }
+
+  .warning-value.danger {
+    color: #ef4444;
+    font-weight: 600;
+  }
+
+  .warning-value.solution {
+    color: #10b981;
+  }
+
+  /* Generation Section */
+  .gen-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .gen-section code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+
+  .gen-table {
+    margin-top: 1rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .gen-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    font-weight: 600;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .gen-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  .gen-row:last-child {
+    border-bottom: none;
+  }
+
+  .gen-source {
+    font-weight: 600;
+    color: #3b82f6;
+  }
+
+  .gen-bios {
+    font-family: "IBM Plex Mono", monospace;
+    color: #10b981;
+  }
+
+  .gen-machine {
+    opacity: 0.8;
+  }
+
+  /* Leapfrog Section */
+  .leapfrog-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .leapfrog-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .leapfrog-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #10b981;
+    color: #000;
+    font-weight: 700;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    flex: 1;
+  }
+
+  .step-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #10b981;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .step-action {
+    font-size: 0.85rem;
+  }
+
+  .step-detail {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* Code Block */
+  .code-block {
+    margin: 1rem 0;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .code-lang {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    background: color-mix(in srgb, #3b82f6 20%, transparent);
+    color: #3b82f6;
+    border-radius: 3px;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .code-desc {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .code-block pre {
+    margin: 0;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    overflow-x: auto;
+  }
+
+  .code-block code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* V2V Section */
+  .v2v-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .phase-block {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .phase-block h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    color: #3b82f6;
+  }
+
+  .phase-block p {
+    font-size: 0.85rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+  }
+
+  .shell-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .shell-step {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+
+  .shell-setting {
+    font-weight: 600;
+    min-width: 80px;
+    color: #f59e0b;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .shell-value {
+    opacity: 0.85;
+  }
+
+  .attach-steps {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .attach-step {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+
+  .attach-num {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3b82f6;
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 50%;
+  }
+
+  /* Issues Section */
+  .issues-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .issues-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .issue-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .issue-header {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, #f59e0b 10%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .issue-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #f59e0b;
+  }
+
+  .issue-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .issue-row {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .issue-label {
+    font-weight: 600;
+    min-width: 65px;
+    opacity: 0.7;
+  }
+
+  .issue-row.fix .issue-value {
+    color: #10b981;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  /* App Section */
+  .app-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .app-card {
+    margin: 1rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 4px solid #ef4444;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, #ef4444 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .app-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .app-symptom {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    font-style: italic;
+  }
+
+  .app-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .app-row {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .app-label {
+    font-weight: 600;
+    min-width: 50px;
+    opacity: 0.7;
+  }
+
+  .app-row.fix .app-value {
+    color: #10b981;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .app-fixes {
+    font-size: 0.8rem;
+  }
+
+  .app-fixes ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.25rem;
+  }
+
+  .app-fixes li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .app-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .note-icon {
+    flex-shrink: 0;
+  }
+
+  /* File Server Section */
+  .fileserver-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .fileserver-plan {
+    margin-top: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 4px solid #8b5cf6;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .plan-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, #8b5cf6 10%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .plan-icon {
+    font-size: 1.1rem;
+  }
+
+  .plan-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #8b5cf6;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .plan-body {
+    padding: 1rem;
+  }
+
+  .plan-body ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .plan-body li {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .plan-body li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Status Section */
+  .status-section {
+    margin-bottom: 1rem;
+  }
+
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-indicator.ongoing .status-pulse {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  .pending {
+    color: #f59e0b;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .scope-grid,
+    .issues-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .gen-header,
+    .gen-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .gen-header span:not(:first-child),
+    .gen-row span:not(:first-child) {
+      padding-left: 1rem;
+      font-size: 0.75rem;
+    }
+
+    .leapfrog-step {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      font-size: 0.85rem;
+    }
+
+    .warning-row,
+    .issue-row,
+    .app-row {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .warning-label,
+    .issue-label,
+    .app-label {
+      min-width: auto;
+    }
+  }
+</style>
