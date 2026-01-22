@@ -42,9 +42,15 @@ CODEX.md
 .codex/
 COPILOT.md
 .copilot/
+.agent/
+.cursor/
+.aider/
+.continue/
 plan.md
 *.plan.md
 blueprint.md
+*-context.md
+AGENTS.md
 
 # Project notes
 SOC.md
