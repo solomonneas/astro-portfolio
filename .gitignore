@@ -33,6 +33,15 @@ yarn-error.log*
 .astro/
 dist/
 
-# Blueprint
-blueprint.md
+# AI CLI Tools
+CLAUDE.md
+.claude/
 GEMINI.md
+.gemini/
+CODEX.md
+.codex/
+COPILOT.md
+.copilot/
+plan.md
+*.plan.md
+blueprint.md
