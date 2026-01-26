@@ -2,79 +2,129 @@
 import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
-  title: "Enterprise Network Observability & Infrastructure Visibility",
-  status: "Completed",
-  statusType: "completed",
-  origin: "Polk State College",
-  date: "2025.08",
-  techStack: ["Netdisco", "LibreNMS", "Switchmap", "SNMP", "Ubuntu", "PostgreSQL", "Perl", "Cron", "Linux"],
+  title: "LAIM: Lab Asset Inventory Manager",
+  status: "Active",
+  statusType: "ongoing",
+  origin: "Work Project",
+  date: "2025.01",
+  techStack: ["FastAPI", "PostgreSQL", "SQLAlchemy", "Docker", "Tailwind CSS", "JWT", "Python 3.12", "Netdisco", "LibreNMS"],
 };
 
 // Stack components
 const stackComponents = [
-  { name: "Netdisco", role: "L2/L3 Topology & Device Discovery", purpose: "Automated device discovery, MAC address tracking, port mapping, and network topology visualization", color: "#10b981" },
-  { name: "LibreNMS", role: "Performance Monitoring & Alerting", purpose: "SNMP polling, bandwidth graphs, uptime tracking, and threshold-based alerts", color: "#3b82f6" },
-  { name: "Switchmap", role: "Directory-Style Port Mapping", purpose: "Human-readable port status pages, VLAN assignments, and connected device inventory", color: "#8b5cf6" },
-];
-
-// Infrastructure tracked
-const infrastructure = [
-  { type: "Switches", details: "Cisco Catalyst (4x enterprise-grade)", icon: "&#128268;" },
-  { type: "Wireless APs", details: "Enterprise access points (4x)", icon: "&#128246;" },
-  { type: "Servers", details: "Lenovo SR630s (6x), Dell PowerEdge R720s (~6x)", icon: "&#128421;" },
-  { type: "Virtual Machines", details: "~20 production VMs across hypervisors", icon: "&#128187;" },
-  { type: "Firewalls", details: "Palo Alto Next-Gen (2x)", icon: "&#128737;" },
+  { name: "FastAPI", role: "Async Web Framework", purpose: "Modern Python framework with automatic OpenAPI docs, async/await support, and dependency injection", color: "#009688" },
+  { name: "PostgreSQL", role: "Database", purpose: "Relational database with asyncpg driver for high-performance async queries", color: "#336791" },
+  { name: "SQLAlchemy 2.0", role: "ORM & Migrations", purpose: "Async ORM with Alembic migrations for schema versioning and type-safe queries", color: "#d71f00" },
+  { name: "Netdisco + LibreNMS", role: "Device Discovery", purpose: "Multi-source network discovery with intelligent merge logic for automated asset population", color: "#10b981" },
 ];
 
 // Technical highlights
 const highlights = [
   {
-    category: "Operational Efficiency",
-    title: "Remote Port Identification",
-    scenario: "Needed to configure switchports for a 5-NIC Proxmox host without physical access",
-    solution: "Used Netdisco's MAC-to-port mapping to query NIC addresses from documentation, instantly identifying which Catalyst ports corresponded to each interface",
-    impact: "Replaced manual cable tracing with a 30-second database query",
+    category: "Architecture",
+    title: "Async-First Design",
+    scenario: "Legacy PHP used blocking I/O for database and external API calls",
+    solution: "Built entirely on async/await from HTTP handling through database operations to external API integrations with connection pooling and retry logic",
+    impact: "Non-blocking request handling with efficient resource utilization",
   },
   {
-    category: "Systems Administration",
-    title: "Database Schema Recovery",
-    scenario: "Netdisco frontend crashes and backend desync after schema drift (v90 to v93)",
-    solution: "Diagnosed version mismatch, stopped services, ran netdisco-db-deploy for schema migration, implemented automated service restarts via cron",
-    impact: "Restored stability and prevented future outages with proactive maintenance",
+    category: "Integration",
+    title: "Multi-Source Device Sync",
+    scenario: "Manual data entry was tedious and error-prone for large device inventories",
+    solution: "Integrated Netdisco and LibreNMS APIs with intelligent deduplication by serial → MAC → hostname+IP, scheduled via APScheduler every 6 hours",
+    impact: "Automated device discovery eliminates manual entry for network-connected assets",
   },
   {
-    category: "Automation",
-    title: "Scheduled Network Polling",
-    scenario: "Manual discovery caused stale data and missed topology changes",
-    solution: "Implemented custom cron jobs for hourly arpwalk, macwalk, and discoverall operations with force flags for complete refreshes",
-    impact: "Network state always reflects reality within 60 minutes of any change",
+    category: "Security",
+    title: "Role-Based Access Control",
+    scenario: "Original system had basic session auth with no permission levels",
+    solution: "JWT-based authentication with bcrypt password hashing, two-tier RBAC (superuser/admin), dependency injection for route protection",
+    impact: "Granular access control with secure session management",
   },
   {
-    category: "Standardization",
-    title: "Unified SNMP Configuration",
-    scenario: "Inconsistent SNMP configurations across physical and virtual assets",
-    solution: "Deployed standardized snmpd.conf across all Linux hosts, configured read-only community strings, and documented the process for future deployments",
-    impact: "100% SNMP coverage with consistent data quality across all monitored assets",
+    category: "Operations",
+    title: "Backup & Restore System",
+    scenario: "No way to recover from accidental deletions or rollback changes",
+    solution: "Point-in-time JSON snapshots with atomic restore operations that soft-delete current items and reactivate backup state",
+    impact: "Full data recovery capability with audit trail",
   },
 ];
 
 // Skills demonstrated
 const skills = [
-  { name: "Linux Administration", items: ["Ubuntu 22.04 server management", "Service lifecycle (systemctl)", "User/permission management"] },
-  { name: "Network Engineering", items: ["L2/L3 topology understanding", "VLAN configuration", "MAC address tables", "Port trunking"] },
-  { name: "SNMP Protocol", items: ["SNMPv2c configuration", "Community string security", "MIB polling", "Agent deployment"] },
-  { name: "Automation", items: ["Cron job scheduling", "Perl CPAN management", "Bash scripting", "Service orchestration"] },
-  { name: "Database", items: ["PostgreSQL administration", "Schema migrations", "Query optimization", "Backup procedures"] },
+  { name: "Python & FastAPI", items: ["Async/await patterns", "Dependency injection", "Pydantic validation", "Background tasks"] },
+  { name: "Database Design", items: ["SQLAlchemy ORM", "Alembic migrations", "Indexing strategy", "Soft deletes"] },
+  { name: "API Integration", items: ["httpx async client", "Retry logic", "Rate limiting", "Data merging"] },
+  { name: "Frontend", items: ["Jinja2 templating", "Tailwind CSS", "Dark/light mode", "Real-time search"] },
+  { name: "DevOps", items: ["Docker Compose", "Health checks", "Environment config", "Non-root containers"] },
+];
+
+// Feature comparison
+const legacyFeatures = [
+  "PHP + MySQL + Nginx stack",
+  "Table-based layouts, inline CSS",
+  "window.open() popup forms",
+  "Full page refresh for search",
+  "Hardcoded categories (37 locations!)",
+  "Manual registration via email",
+  "Basic session auth, no RBAC",
+  "No API, server-rendered only",
+];
+
+const modernFeatures = [
+  "FastAPI + PostgreSQL + async",
+  "Tailwind CSS, responsive design",
+  "Modal dialogs, SPA-like UX",
+  "Real-time client-side filtering",
+  "Configurable via settings API",
+  "Self-service registration with roles",
+  "JWT auth with RBAC enforcement",
+  "RESTful API with OpenAPI docs",
 ];
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
   <h2>// Overview</h2>
   <p>
-    Designed and deployed an integrated network monitoring stack to transform a "dark network" into a fully observed
-    infrastructure. Prior to this project, the environment lacked port-level mapping and real-time visibility -relying
-    solely on configuration backup files and physical cable tracing to determine connectivity.
+    A complete rewrite of a legacy PHP inventory system I built as a college capstone project. LAIM transforms
+    manual spreadsheet-based asset tracking into an automated, API-driven platform with multi-source device
+    discovery, role-based access control, and modern deployment patterns.
   </p>
+  <p>
+    The original system was functional but showed its age -table-based layouts, popup windows, hardcoded
+    dropdown values, and no API layer. LAIM addresses these limitations while adding capabilities that
+    weren't feasible in the original architecture: automated device sync from Netdisco and LibreNMS,
+    backup/restore functionality, and a proper separation of concerns.
+  </p>
+
+  <!-- GitHub Repo Link -->
+  <div class="github-callout">
+    <div class="github-content">
+      <div class="github-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+      </div>
+      <div class="github-text">
+        <span class="github-label">Open Source</span>
+        <p class="github-desc">This project is open source! Check out the code, fork it, or give it a star if you find it useful.</p>
+      </div>
+    </div>
+    <div class="github-actions">
+      <a href="https://github.com/solomonneas/laim" target="_blank" class="github-link repo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+        <span>View Repository</span>
+      </a>
+      <a href="https://github.com/solomonneas/laim/stargazers" target="_blank" class="github-link star">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+        </svg>
+        <span>Star on GitHub</span>
+      </a>
+    </div>
+  </div>
 
   <!-- Before/After Comparison -->
   <h2>// The Transformation</h2>
@@ -82,36 +132,32 @@ const skills = [
     <div class="transform-card before">
       <div class="transform-header">
         <span class="transform-icon">&#128683;</span>
-        <span class="transform-label">BEFORE</span>
+        <span class="transform-label">BEFORE: PHP Capstone (2024)</span>
       </div>
       <ul class="transform-list">
-        <li>No real-time network visibility</li>
-        <li>Manual cable tracing for port identification</li>
-        <li>Static configuration backups only</li>
-        <li>Unknown device inventory</li>
-        <li>Reactive troubleshooting</li>
+        {legacyFeatures.map((feature) => (
+          <li>{feature}</li>
+        ))}
       </ul>
     </div>
     <div class="transform-arrow">&#8594;</div>
     <div class="transform-card after">
       <div class="transform-header">
         <span class="transform-icon">&#9989;</span>
-        <span class="transform-label">AFTER</span>
+        <span class="transform-label">AFTER: LAIM (2025)</span>
       </div>
       <ul class="transform-list">
-        <li>Complete L2/L3 topology mapping</li>
-        <li>Instant MAC-to-port queries</li>
-        <li>Real-time performance metrics</li>
-        <li>Automated device discovery</li>
-        <li>Proactive alerting</li>
+        {modernFeatures.map((feature) => (
+          <li>{feature}</li>
+        ))}
       </ul>
     </div>
   </div>
 
-  <!-- Monitoring Stack -->
-  <h2>// Monitoring Stack</h2>
+  <!-- Tech Stack -->
+  <h2>// Tech Stack</h2>
   <p class="section-intro">
-    Three complementary tools deployed on Ubuntu 22.04 VMs provide full-spectrum network observability:
+    Modern async Python stack with external integrations for automated device discovery:
   </p>
 
   <div class="stack-grid">
@@ -127,40 +173,26 @@ const skills = [
     ))}
   </div>
 
-  <!-- Infrastructure Tracked -->
-  <h2>// Infrastructure Coverage</h2>
-  <div class="infra-grid">
-    {infrastructure.map((item) => (
-      <div class="infra-card">
-        <span class="infra-icon" set:html={item.icon}></span>
-        <div class="infra-info">
-          <span class="infra-type">{item.type}</span>
-          <span class="infra-details">{item.details}</span>
-        </div>
-      </div>
-    ))}
-  </div>
-
   <!-- Architecture Diagram -->
   <h2>// System Architecture</h2>
   <div class="architecture-diagram">
     <div class="arch-layer collectors">
-      <span class="layer-label">DATA COLLECTION</span>
+      <span class="layer-label">EXTERNAL SOURCES</span>
       <div class="collector-grid">
-        <div class="arch-node snmp">
+        <div class="arch-node">
           <span class="node-icon">&#128225;</span>
-          <span class="node-label">SNMP Agents</span>
-          <span class="node-sub">UDP/161</span>
+          <span class="node-label">Netdisco</span>
+          <span class="node-sub">L2/L3 Discovery</span>
         </div>
-        <div class="arch-node discovery">
-          <span class="node-icon">&#128269;</span>
-          <span class="node-label">CDP/LLDP</span>
-          <span class="node-sub">Neighbor Discovery</span>
+        <div class="arch-node">
+          <span class="node-icon">&#128202;</span>
+          <span class="node-label">LibreNMS</span>
+          <span class="node-sub">SNMP Monitoring</span>
         </div>
-        <div class="arch-node arp">
-          <span class="node-icon">&#128203;</span>
-          <span class="node-label">ARP/MAC Tables</span>
-          <span class="node-sub">L2 Mapping</span>
+        <div class="arch-node">
+          <span class="node-icon">&#128196;</span>
+          <span class="node-label">CSV Import</span>
+          <span class="node-sub">Bulk Upload</span>
         </div>
       </div>
     </div>
@@ -169,26 +201,26 @@ const skills = [
       <div class="connector-line">
         <div class="connector-particle"></div>
       </div>
-      <span class="connector-label">Poll Data</span>
+      <span class="connector-label">Sync / Import</span>
     </div>
 
     <div class="arch-layer processing">
-      <span class="layer-label">PROCESSING & STORAGE</span>
+      <span class="layer-label">APPLICATION LAYER</span>
       <div class="processing-grid">
-        <div class="arch-node netdisco-node">
+        <div class="arch-node fastapi-node">
           <div class="node-pulse"></div>
-          <span class="node-label">Netdisco</span>
-          <span class="node-sub">PostgreSQL Backend</span>
+          <span class="node-label">FastAPI</span>
+          <span class="node-sub">Async Routes + Auth</span>
         </div>
-        <div class="arch-node librenms-node">
+        <div class="arch-node sqlalchemy-node">
           <div class="node-pulse"></div>
-          <span class="node-label">LibreNMS</span>
-          <span class="node-sub">MySQL + RRDtool</span>
+          <span class="node-label">SQLAlchemy</span>
+          <span class="node-sub">Async ORM</span>
         </div>
-        <div class="arch-node switchmap-node">
+        <div class="arch-node scheduler-node">
           <div class="node-pulse"></div>
-          <span class="node-label">Switchmap</span>
-          <span class="node-sub">Perl + HTML Gen</span>
+          <span class="node-label">APScheduler</span>
+          <span class="node-sub">Background Jobs</span>
         </div>
       </div>
     </div>
@@ -197,16 +229,17 @@ const skills = [
       <div class="connector-line">
         <div class="connector-particle"></div>
       </div>
-      <span class="connector-label">Web Interface</span>
+      <span class="connector-label">Async Queries</span>
     </div>
 
     <div class="arch-layer presentation">
-      <span class="layer-label">VISUALIZATION</span>
+      <span class="layer-label">DATA LAYER</span>
       <div class="presentation-items">
-        <span class="present-item">Topology Maps</span>
-        <span class="present-item">Port Status</span>
-        <span class="present-item">Bandwidth Graphs</span>
-        <span class="present-item">Device Inventory</span>
+        <span class="present-item">PostgreSQL</span>
+        <span class="present-item">Inventory Items</span>
+        <span class="present-item">Users & Roles</span>
+        <span class="present-item">Backups</span>
+        <span class="present-item">Sync Logs</span>
       </div>
     </div>
   </div>
@@ -217,45 +250,43 @@ const skills = [
   <div class="impl-section">
     <h3 class="impl-title">
       <span class="impl-num">01</span>
-      Netdisco Configuration
+      Async Database Operations
     </h3>
     <div class="impl-content">
       <div class="impl-block">
-        <h4>Device Discovery</h4>
+        <h4>Session Management</h4>
         <div class="code-block">
-          <code>sudo -iu netdisco</code>
-          <code>~/bin/netdisco-do discover -d &lt;DEVICE_IP&gt;</code>
-          <code># Bulk discovery loop for subnet</code>
-          <code>for ip in &lt;IP_RANGE&gt;; do</code>
-          <code>  ~/bin/netdisco-do add -d "$ip" -c &lt;COMMUNITY&gt;</code>
-          <code>done</code>
+          <code>from sqlalchemy.ext.asyncio import AsyncSession</code>
+          <code>from sqlalchemy.ext.asyncio import create_async_engine</code>
+          <code></code>
+          <code>engine = create_async_engine(</code>
+          <code>    DATABASE_URL,</code>
+          <code>    pool_size=10,</code>
+          <code>    max_overflow=20</code>
+          <code>)</code>
+          <code></code>
+          <code>async def get_db() -> AsyncGenerator:</code>
+          <code>    async with AsyncSession(engine) as session:</code>
+          <code>        yield session</code>
         </div>
       </div>
       <div class="impl-block">
-        <h4>Automated Polling (Crontab)</h4>
+        <h4>Route with Dependency Injection</h4>
         <div class="code-block">
-          <code># Hourly full network refresh</code>
-          <code>0 * * * * ~/bin/netdisco-do discoverall --force --quiet</code>
-          <code>10 * * * * ~/bin/netdisco-do macwalk --force --quiet</code>
-          <code>20 * * * * ~/bin/netdisco-do arpwalk --force --quiet</code>
-          <code></code>
-          <code># Daily web frontend restart for stability</code>
-          <code>0 3 * * * ~/bin/netdisco-web restart >> ~/netdisco_restart.log 2>&1</code>
-        </div>
-      </div>
-      <div class="impl-block">
-        <h4>Schema Migration (v90 → v93)</h4>
-        <div class="code-block">
-          <code># Stop services before upgrade</code>
-          <code>~/bin/netdisco-backend stop</code>
-          <code>~/bin/netdisco-web stop</code>
-          <code></code>
-          <code># Deploy schema updates</code>
-          <code>~/bin/netdisco-db-deploy</code>
-          <code></code>
-          <code># Restart services</code>
-          <code>~/bin/netdisco-backend start</code>
-          <code>~/bin/netdisco-web start</code>
+          <code>@app.get("/api/items")</code>
+          <code>async def list_items(</code>
+          <code>    db: AsyncSession = Depends(get_db),</code>
+          <code>    user: User = Depends(get_current_user),</code>
+          <code>    search: str = None,</code>
+          <code>    item_type: ItemType = None</code>
+          <code>):</code>
+          <code>    query = select(InventoryItem)</code>
+          <code>        .where(InventoryItem.is_active == True)</code>
+          <code>    if search:</code>
+          <code>        query = query.where(</code>
+          <code>            InventoryItem.hostname.ilike(f"%{'{'}search{'}'}%")</code>
+          <code>        )</code>
+          <code>    return await db.execute(query)</code>
         </div>
       </div>
     </div>
@@ -264,135 +295,104 @@ const skills = [
   <div class="impl-section">
     <h3 class="impl-title">
       <span class="impl-num">02</span>
-      LibreNMS Integration
+      Multi-Source Device Sync
     </h3>
     <div class="impl-content">
       <div class="impl-block">
-        <h4>Adding Devices via CLI</h4>
+        <h4>Deduplication Strategy</h4>
         <div class="code-block">
-          <code>ssh user@monitoring-server</code>
-          <code>sudo su - librenms</code>
-          <code>./lnms device:add --v2c -c &lt;COMMUNITY&gt; &lt;DEVICE_IP&gt;</code>
+          <code># Priority: serial_number > mac_address > hostname+ip</code>
+          <code>def merge_devices(netdisco: list, librenms: list):</code>
+          <code>    merged = {`{}`}</code>
+          <code>    </code>
+          <code>    for device in netdisco + librenms:</code>
+          <code>        key = (</code>
+          <code>            device.serial_number or</code>
+          <code>            device.mac_address or</code>
+          <code>            f"{`{device.hostname}`}:{`{device.ip}`}"</code>
+          <code>        )</code>
+          <code>        if key in merged:</code>
+          <code>            # LibreNMS has higher data quality</code>
+          <code>            merged[key].update(device)</code>
+          <code>        else:</code>
+          <code>            merged[key] = device</code>
+          <code>    </code>
+          <code>    return list(merged.values())</code>
         </div>
       </div>
       <div class="impl-block">
-        <h4>Maintenance Procedures</h4>
+        <h4>Scheduled Sync</h4>
         <div class="code-block">
-          <code># Fix daily.sh failures</code>
-          <code>sudo -u librenms -H bash</code>
-          <code>cd /opt/librenms</code>
-          <code>tail -n 200 logs/daily.log</code>
-          <code>./daily.sh</code>
+          <code>from apscheduler.schedulers.asyncio import</code>
+          <code>    AsyncIOScheduler</code>
           <code></code>
-          <code># Clean dirty git tree</code>
-          <code>git reset --hard && git clean -fd</code>
-          <code>./scripts/github-remove -d</code>
-          <code>git pull --rebase --autostash</code>
-          <code>composer install --no-dev -o</code>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="impl-section">
-    <h3 class="impl-title">
-      <span class="impl-num">03</span>
-      Switchmap Deployment
-    </h3>
-    <div class="impl-content">
-      <div class="impl-block">
-        <h4>Installation</h4>
-        <div class="code-block">
-          <code># Download and extract to web root</code>
-          <code>cd /var/www/html</code>
-          <code>wget https://sourceforge.net/projects/switchmap/files/latest</code>
-          <code>tar zxvf switchmap-*.tar.gz</code>
-          <code>mv switchmap-* switchmap</code>
-        </div>
-      </div>
-      <div class="impl-block">
-        <h4>Perl Dependencies</h4>
-        <div class="code-block">
-          <code># Debian/Ubuntu packages</code>
-          <code>sudo apt install libnet-snmp-perl</code>
-          <code>sudo apt install liblog-log4perl-perl</code>
-          <code>sudo apt install liblog-dispatch-perl</code>
+          <code>scheduler = AsyncIOScheduler()</code>
           <code></code>
-          <code># Or via CPAN</code>
-          <code>perl -MCPAN -e 'install Net::SNMP'</code>
-          <code>perl -MCPAN -e 'install Log::Log4perl'</code>
-          <code>perl -MCPAN -e 'install Log::Dispatch::Screen'</code>
-        </div>
-      </div>
-      <div class="impl-block">
-        <h4>Configuration (ThisSite.pm)</h4>
-        <div class="code-block">
-          <code># Set SNMP community string</code>
-          <code>$Community = '&lt;COMMUNITY_STRING&gt;';</code>
-          <code></code>
-          <code># Or use per-switch community file</code>
-          <code>$CmstrFile = '/path/to/communities.txt';</code>
-          <code></code>
-          <code># Define switches to poll</code>
-          <code>@Ession = ('switch1.domain.local',</code>
-          <code>           'switch2.domain.local');</code>
-        </div>
-      </div>
-      <div class="impl-block">
-        <h4>Cron Jobs (Scheduled Polling)</h4>
-        <div class="code-block">
-          <code># Hourly ARP table collection from L3 devices</code>
-          <code>44 * * * * perl /var/www/html/switchmap/GetArp.pl</code>
-          <code></code>
-          <code># Hourly switch scan (MAC tables, port status)</code>
-          <code>49 * * * * perl /var/www/html/switchmap/ScanSwitch.pl</code>
-          <code></code>
-          <code># Daily HTML generation</code>
-          <code>05 6 * * * perl /var/www/html/switchmap/SwitchMap.pl</code>
+          <code>@scheduler.scheduled_job(</code>
+          <code>    'interval',</code>
+          <code>    hours=SYNC_INTERVAL_HOURS</code>
+          <code>)</code>
+          <code>async def scheduled_sync():</code>
+          <code>    async with AsyncSession(engine) as db:</code>
+          <code>        await sync_service.sync_all(db)</code>
         </div>
       </div>
     </div>
     <p class="impl-note">
-      Switchmap runs three scripts in sequence: <code>GetArp.pl</code> retrieves ARP tables from routers/L3 switches,
-      <code>ScanSwitch.pl</code> polls MAC address tables and port status via SNMP, and <code>SwitchMap.pl</code>
-      generates static HTML pages served by Apache/Nginx.
+      Device sync fetches from both Netdisco (L2/L3 topology) and LibreNMS (SNMP data), then merges
+      by serial number, MAC address, or hostname+IP to prevent duplicates while preserving the
+      highest-quality data from each source.
     </p>
   </div>
 
   <div class="impl-section">
     <h3 class="impl-title">
-      <span class="impl-num">04</span>
-      SNMP Agent Deployment
+      <span class="impl-num">03</span>
+      JWT Authentication & RBAC
     </h3>
     <div class="impl-content">
       <div class="impl-block">
-        <h4>Standard Configuration (/etc/snmp/snmpd.conf)</h4>
+        <h4>Token Generation</h4>
         <div class="code-block">
-          <code># Location and contact metadata</code>
-          <code>sysLocation    &lt;DATACENTER_LOCATION&gt;</code>
-          <code>sysContact     &lt;ADMIN_NAME&gt; &lt;ADMIN_EMAIL&gt;</code>
+          <code>from jose import jwt</code>
+          <code>from passlib.context import CryptContext</code>
           <code></code>
-          <code># Read-only community (no write access)</code>
-          <code>rocommunity &lt;COMMUNITY_STRING&gt;</code>
+          <code>pwd_context = CryptContext(schemes=["bcrypt"])</code>
           <code></code>
-          <code># Listen on management interface</code>
-          <code>agentAddress udp:161</code>
+          <code>def create_access_token(user_id: int) -> str:</code>
+          <code>    expire = datetime.utcnow() + timedelta(hours=8)</code>
+          <code>    return jwt.encode(</code>
+          <code>        {`{"sub": str(user_id), "exp": expire}`},</code>
+          <code>        SECRET_KEY,</code>
+          <code>        algorithm="HS256"</code>
+          <code>    )</code>
         </div>
       </div>
       <div class="impl-block">
-        <h4>Service Activation</h4>
+        <h4>Role Enforcement</h4>
         <div class="code-block">
-          <code>sudo apt update && sudo apt install snmpd snmp libsnmp-dev</code>
-          <code>sudo systemctl enable snmpd</code>
-          <code>sudo systemctl restart snmpd</code>
-          <code>sudo systemctl status snmpd</code>
+          <code>class UserRole(str, Enum):</code>
+          <code>    SUPERUSER = "superuser"</code>
+          <code>    ADMIN = "admin"</code>
+          <code></code>
+          <code>def require_admin(user = Depends(get_current_user)):</code>
+          <code>    if user.role not in [Role.ADMIN, Role.SUPERUSER]:</code>
+          <code>        raise HTTPException(403, "Admin required")</code>
+          <code>    return user</code>
+          <code></code>
+          <code>@app.post("/api/items")</code>
+          <code>async def create_item(</code>
+          <code>    data: ItemCreate,</code>
+          <code>    user: User = Depends(require_admin)</code>
+          <code>):</code>
+          <code>    ...</code>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Case Studies -->
-  <h2>// Case Studies & Impact</h2>
+  <h2>// Technical Highlights</h2>
   <div class="highlights-grid">
     {highlights.map((item, i) => (
       <div class="highlight-card" style={`--delay: ${i * 0.1}s`}>
@@ -402,7 +402,7 @@ const skills = [
         </div>
         <div class="highlight-body">
           <div class="highlight-row">
-            <span class="row-label">Scenario:</span>
+            <span class="row-label">Problem:</span>
             <span class="row-value">{item.scenario}</span>
           </div>
           <div class="highlight-row">
@@ -410,7 +410,7 @@ const skills = [
             <span class="row-value">{item.solution}</span>
           </div>
           <div class="highlight-row impact">
-            <span class="row-label">Impact:</span>
+            <span class="row-label">Result:</span>
             <span class="row-value">{item.impact}</span>
           </div>
         </div>
@@ -436,55 +436,55 @@ const skills = [
   </div>
 
   <!-- Deployment Notes -->
-  <h2>// Deployment Notes</h2>
+  <h2>// Deployment</h2>
   <div class="notes-grid">
     <div class="note-card">
       <div class="note-header">
-        <span class="note-icon">&#128187;</span>
-        <span class="note-title">Virtualization</span>
+        <span class="note-icon">&#128051;</span>
+        <span class="note-title">Docker Compose</span>
       </div>
-      <p>All monitoring tools deployed on Ubuntu 22.04 LTS VMs running on Hyper-V. Future consideration: migrate to LXC containers for reduced overhead.</p>
-    </div>
-
-    <div class="note-card">
-      <div class="note-header">
-        <span class="note-icon">&#128260;</span>
-        <span class="note-title">Perl Dependencies</span>
-      </div>
-      <p>Switchmap requires careful Perl CPAN module management. Used localenv wrapper for Netdisco to isolate Perl dependencies from system packages.</p>
-    </div>
-
-    <div class="note-card">
-      <div class="note-header">
-        <span class="note-icon">&#128336;</span>
-        <span class="note-title">Polling Intervals</span>
-      </div>
-      <p>Hourly polling balances freshness with resource usage. Low-change environment doesn't require more aggressive intervals.</p>
+      <p>Single-command deployment with PostgreSQL and FastAPI services, health checks, and named volumes for data persistence.</p>
     </div>
 
     <div class="note-card">
       <div class="note-header">
         <span class="note-icon">&#128274;</span>
-        <span class="note-title">Security Posture</span>
+        <span class="note-title">Security</span>
       </div>
-      <p>SNMP v2c with read-only community strings. Monitoring VMs isolated on management VLAN with ACL-restricted access.</p>
+      <p>Non-root container user, HttpOnly JWT cookies, bcrypt password hashing, and environment-based secrets management.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-header">
+        <span class="note-icon">&#128295;</span>
+        <span class="note-title">Configuration</span>
+      </div>
+      <p>Environment variables for all settings: database URL, API tokens, sync intervals, room locations, and excluded IP ranges.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-header">
+        <span class="note-icon">&#128193;</span>
+        <span class="note-title">Migrations</span>
+      </div>
+      <p>Alembic-managed schema with versioned migrations. Current schema at version 006 with full upgrade/downgrade paths.</p>
     </div>
   </div>
 
   <!-- Status -->
   <h2>// Project Status</h2>
   <div class="status-block">
-    <div class="status-indicator completed">
+    <div class="status-indicator ongoing">
       <div class="status-pulse"></div>
-      <span>Monitoring stack deployed and operational</span>
+      <span>Active development</span>
     </div>
     <ul class="status-list">
-      <li><span class="check">&#10003;</span> Netdisco topology mapping operational</li>
-      <li><span class="check">&#10003;</span> LibreNMS performance monitoring active</li>
-      <li><span class="check">&#10003;</span> Switchmap port directory generated</li>
-      <li><span class="check">&#10003;</span> SNMP deployed across all physical/virtual assets</li>
-      <li><span class="check">&#10003;</span> Automated polling schedules configured</li>
-      <li><span class="check">&#10003;</span> Database maintenance procedures documented</li>
+      <li><span class="check">&#10003;</span> Core CRUD operations functional</li>
+      <li><span class="check">&#10003;</span> JWT authentication with RBAC</li>
+      <li><span class="check">&#10003;</span> Netdisco + LibreNMS sync integration</li>
+      <li><span class="check">&#10003;</span> Backup/restore system operational</li>
+      <li><span class="check">&#10003;</span> Docker deployment configured</li>
+      <li><span class="check">&#10003;</span> Dark/light mode with real-time search</li>
     </ul>
   </div>
 </ProjectLayout>
@@ -539,9 +539,9 @@ const skills = [
 
   .transform-label {
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
   }
 
   .transform-card.before .transform-label { color: #ef4444; }
@@ -653,46 +653,6 @@ const skills = [
     line-height: 1.5;
   }
 
-  /* Infrastructure Grid */
-  .infra-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
-    margin: 1.5rem 0;
-  }
-
-  .infra-card {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    border-radius: 6px;
-  }
-
-  .infra-icon {
-    font-size: 1.5rem;
-    opacity: 0.7;
-  }
-
-  .infra-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-  }
-
-  .infra-type {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .infra-details {
-    font-size: 0.7rem;
-    opacity: 0.6;
-  }
-
   /* Architecture Diagram */
   .architecture-diagram {
     background: color-mix(in srgb, currentColor 3%, transparent);
@@ -771,9 +731,9 @@ const skills = [
     animation: pulse 2s ease-in-out infinite;
   }
 
-  .netdisco-node { border-color: color-mix(in srgb, #10b981 40%, transparent); }
-  .librenms-node { border-color: color-mix(in srgb, #3b82f6 40%, transparent); }
-  .switchmap-node { border-color: color-mix(in srgb, #8b5cf6 40%, transparent); }
+  .fastapi-node { border-color: color-mix(in srgb, #009688 40%, transparent); }
+  .sqlalchemy-node { border-color: color-mix(in srgb, #d71f00 40%, transparent); }
+  .scheduler-node { border-color: color-mix(in srgb, #8b5cf6 40%, transparent); }
 
   .arch-connector-vertical {
     display: flex;
@@ -899,13 +859,6 @@ const skills = [
     background: color-mix(in srgb, currentColor 3%, transparent);
     border-left: 2px solid #10b981;
     line-height: 1.6;
-  }
-
-  .impl-note code {
-    background: color-mix(in srgb, currentColor 8%, transparent);
-    padding: 0.1rem 0.3rem;
-    border-radius: 2px;
-    font-size: 0.75rem;
   }
 
   /* Highlights Grid */
@@ -1072,6 +1025,103 @@ const skills = [
     line-height: 1.5;
   }
 
+  /* GitHub Callout */
+  .github-callout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid #6e5494;
+    border-radius: 6px;
+  }
+
+  .github-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .github-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: color-mix(in srgb, #6e5494 15%, transparent);
+    border-radius: 6px;
+    color: #6e5494;
+  }
+
+  .github-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .github-text {
+    flex: 1;
+  }
+
+  .github-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6e5494;
+  }
+
+  .github-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0.25rem 0 0 0;
+    line-height: 1.5;
+  }
+
+  .github-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .github-link.repo {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    color: currentColor;
+  }
+
+  .github-link.repo:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  .github-link.star {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+    color: #f59e0b;
+  }
+
+  .github-link.star:hover {
+    background: color-mix(in srgb, #f59e0b 25%, transparent);
+    border-color: #f59e0b;
+  }
+
+  .github-link svg {
+    flex-shrink: 0;
+  }
+
   /* Status Block */
   .status-block {
     background: color-mix(in srgb, currentColor 3%, transparent);
@@ -1091,9 +1141,9 @@ const skills = [
     margin-bottom: 1rem;
   }
 
-  .status-indicator.completed .status-pulse {
-    background: #10b981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  .status-indicator.ongoing .status-pulse {
+    background: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
   }
 
   .status-pulse {
