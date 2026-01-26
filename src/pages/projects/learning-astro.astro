@@ -7,7 +7,7 @@ const frontmatter = {
   statusType: "ongoing",
   origin: "Personal Development",
   date: "2025.12",
-  techStack: ["Astro", "Tailwind CSS", "Vite", "Node.js", "Vercel", "GitHub"],
+  techStack: ["Astro", "Tailwind CSS", "Vite", "Node.js", "Vercel", "Cloudflare", "GitHub"],
 };
 
 const components = [
@@ -16,6 +16,7 @@ const components = [
   { name: "Vite", category: "Build Tool", role: "Dev server, HMR, asset bundling", color: "#646cff" },
   { name: "Content Collections", category: "CMS", role: "Type-safe content with Zod schema validation", color: "#10b981" },
   { name: "Vercel", category: "Hosting", role: "CI/CD, edge deployment, automatic HTTPS", color: "#000000" },
+  { name: "Cloudflare", category: "DNS & CDN", role: "DNS management, edge caching, DDoS protection", color: "#f38020" },
   { name: "GitHub", category: "Source Control", role: "Version control, deployment triggers", color: "#6e5494" },
 ];
 
@@ -38,6 +39,10 @@ const pages = [
     A performant, content-driven portfolio website built with modern web technologies. This project serves as both a
     professional portfolio and a learning playground for the Astro framework, showcasing a custom "Industrial Terminal /
     NOC Dashboard" design system.
+  </p>
+  <p class="domain-note">
+    <span class="domain-highlight">.dev</span> was chosen intentionally to signal developer focus while enforcing HTTPS
+    by default. All .dev domains are on the HSTS preload list, making secure connections mandatory.
   </p>
 
   <!-- GitHub Repo Link -->
@@ -419,8 +424,8 @@ const pages = [
         <div class="detail-block">
           <h4>Core Mechanism</h4>
           <ul>
-            <li><code>hue-rotate()</code> — shifts entire color palette</li>
-            <li><code>invert()</code> — toggles light/dark mode</li>
+            <li><code>hue-rotate()</code>  - shifts entire color palette</li>
+            <li><code>invert()</code>  - toggles light/dark mode</li>
             <li>Full-page filter via <code>#filter</code> overlay</li>
           </ul>
         </div>
@@ -454,8 +459,8 @@ const pages = [
         <div class="detail-block">
           <h4>Font Stack</h4>
           <ul>
-            <li><strong>IBM Plex Mono</strong> — Code, terminals, UI</li>
-            <li><strong>IBM Plex Sans</strong> — Body text</li>
+            <li><strong>IBM Plex Mono</strong>  - Code, terminals, UI</li>
+            <li><strong>IBM Plex Sans</strong>  - Body text</li>
           </ul>
         </div>
         <div class="detail-block">
@@ -604,6 +609,23 @@ const pages = [
   .section-intro {
     opacity: 0.8;
     margin-bottom: 1.5rem;
+  }
+
+  /* Domain Note */
+  .domain-note {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-left: 2px solid #10b981;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .domain-highlight {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: #10b981;
   }
 
   /* GitHub Callout */

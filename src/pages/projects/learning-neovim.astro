@@ -44,9 +44,8 @@ const keyGroups = [
     keys: ["Esc", "Caps→Esc", "Ctrl"],
     color: "#06b6d4",
     colorName: "Cyan",
-    purpose: "Panic Keys",
-    description: "Strobe effect. Caps Lock remapped to Esc (no hand stretching). Ctrl for combos.",
-    strobe: true,
+    purpose: "Escape & Modifiers",
+    description: "Caps Lock remapped to Esc (no hand stretching). Ctrl for combos.",
   },
 ];
 
@@ -322,6 +321,114 @@ const grammarExamples = [
     </div>
   </div>
 
+  <!-- Power Shortcuts -->
+  <h2>// Power Shortcuts</h2>
+  <p class="section-intro">
+    These are the shortcuts that make Neovim feel like magic. Leader key is <kbd>Space</kbd> in most configs.
+  </p>
+
+  <div class="shortcuts-container">
+    <div class="shortcut-group">
+      <h3 class="shortcut-group-title">🔭 Telescope</h3>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>f</kbd><kbd>f</kbd></div>
+          <span class="shortcut-desc">Find files - fuzzy search any file in project</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>f</kbd><kbd>g</kbd></div>
+          <span class="shortcut-desc">Live grep - search text across all files</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>f</kbd><kbd>b</kbd></div>
+          <span class="shortcut-desc">Find buffers - switch between open files</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>f</kbd><kbd>h</kbd></div>
+          <span class="shortcut-desc">Help tags - search Neovim documentation</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>f</kbd><kbd>o</kbd></div>
+          <span class="shortcut-desc">Old files - recently opened files</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shortcut-group">
+      <h3 class="shortcut-group-title">🪝 Harpoon</h3>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>a</kbd></div>
+          <span class="shortcut-desc">Add file to harpoon list</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>h</kbd></div>
+          <span class="shortcut-desc">Toggle harpoon menu</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>1-4</kbd></div>
+          <span class="shortcut-desc">Jump to harpooned file 1-4</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shortcut-group">
+      <h3 class="shortcut-group-title">⚡ LSP Actions</h3>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>g</kbd><kbd>d</kbd></div>
+          <span class="shortcut-desc">Go to definition</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>g</kbd><kbd>r</kbd></div>
+          <span class="shortcut-desc">Go to references</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>K</kbd></div>
+          <span class="shortcut-desc">Hover documentation</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>c</kbd><kbd>a</kbd></div>
+          <span class="shortcut-desc">Code actions (quick fixes)</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Space</kbd><kbd>r</kbd><kbd>n</kbd></div>
+          <span class="shortcut-desc">Rename symbol</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shortcut-group">
+      <h3 class="shortcut-group-title">🚀 Power Motions</h3>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>d</kbd></div>
+          <span class="shortcut-desc">Jump half page down (centered)</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>u</kbd></div>
+          <span class="shortcut-desc">Jump half page up (centered)</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>z</kbd><kbd>z</kbd></div>
+          <span class="shortcut-desc">Center cursor on screen</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>{</kbd> / <kbd>}</kbd></div>
+          <span class="shortcut-desc">Jump between paragraphs/blocks</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>o</kbd></div>
+          <span class="shortcut-desc">Jump back to previous location</span>
+        </div>
+        <div class="shortcut-item">
+          <div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>i</kbd></div>
+          <span class="shortcut-desc">Jump forward in jump list</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Configuration Journey -->
   <h2>// Configuration Journey</h2>
   <p>
@@ -468,7 +575,6 @@ const grammarExamples = [
     border-color: color-mix(in srgb, #06b6d4 40%, transparent);
     color: #06b6d4;
     box-shadow: 0 0 8px color-mix(in srgb, #06b6d4 30%, transparent);
-    animation: strobe 0.5s ease-in-out infinite;
   }
 
   .keyboard-legend {
@@ -498,14 +604,6 @@ const grammarExamples = [
     box-shadow: 0 0 8px color-mix(in srgb, var(--key-color) 50%, transparent);
   }
 
-  .legend-color.strobe {
-    animation: strobe 0.5s ease-in-out infinite;
-  }
-
-  @keyframes strobe {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
 
   .legend-info {
     display: flex;
