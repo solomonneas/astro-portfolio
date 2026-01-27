@@ -8,12 +8,18 @@ import StatusLight from "../components/StatusLight.astro";
 const experienceData = [
   {
     date: "2025-PRESENT",
-    role: "OWNER, FULL STACK WEB DEVELOPER, WEBMASTER",
+    role: "OWNER, FULL STACK SOFTWARE DEVELOPER",
     company: "SOLOMONNEAS.DEV",
     status: "ongoing",
     description: [
       "Passionate about bringing ideas to life through modern web technologies, full-stack development, and dedicated site management.",
       "Specializing in building responsive, user-centric web applications and managing end-to-end digital experiences.",
+    ],
+    projects: [
+      { title: "LAIM Inventory System", href: "/projects/laim" },
+      { title: "NSET Hardware Inventory", href: "/projects/nset-hardware-inventory" },
+      { title: "PortGrid Network Visualization", href: "/projects/portgrid-network-visualization" },
+      { title: "Learning Astro", href: "/projects/learning-astro" },
     ],
   },
   {
@@ -22,16 +28,23 @@ const experienceData = [
     company: "POLK STATE COLLEGE [Network Systems Engineering Technology]",
     status: "ongoing",
     description: [
-      "As the sole IT support for the Network Systems Engineering Technology department, I architect and maintain full-stack infrastructure supporting four classrooms, 200+ devices, and hands-on learning for dozens of students.",
-      "Engineered and built an open-source Security Operations Center (SOC) based off Wazuh, Cortex, MISP, TheHive, Zeek, and Suricata.",
-      "Infrastructure & Operations: Migrated NDG Netlab+ from VMware ESXi to Proxmox VE, eliminating ~$68,600 in annual licensing costs while improving scalability and performance.",
+      "As the sole IT support for the Network Systems Engineering Technology department, I architect and maintain full-stack infrastructure supporting four classrooms, 200+ devices, and hands-on learning for nearly 300 students.",
+      "Engineered and deployed a 7-component open-source Security Operations Center (Wazuh SIEM, TheHive IR, MISP threat intel, Cortex analyzers, Zeek/Suricata NIDS) achieving $140K–$217K in cost avoidance vs. outsourced MSSP services over 3 years.",
+      "Infrastructure & Operations: Migrated NDG Netlab+ from VMware ESXi to Proxmox VE following Broadcom's acquisition and licensing changes, eliminating ~$68,600 in annual costs while improving scalability.",
       "Administer Windows/Linux servers, Active Directory, domain controllers, Hyper-V, and automated SCCM imaging.",
       "Design and operate Cisco Catalyst switches, Palo Alto firewalls, and UniFi wireless systems with VLANs, ACLs, and port security.",
       "Deploy LibreNMS, NetDisco, and Wazuh XDR/SIEM for network monitoring, topology mapping, and threat detection.",
       "Lab Design & Education Support: Designed custom cybersecurity and Linux+ labs aligned with NDG curriculum and certification objectives.",
       "Mentor students in lab operations and infrastructure concepts; collaborate with faculty on program alignment.",
       "Primary technical advisor to department leadership on infrastructure strategy and scalability.",
-      "Key Impact: Averted ~$68,600 annual VMware licensing costs | Enterprise monitoring and security deployment | Lab environments supporting student certification success",
+      "Key Impact: $140K–$217K SOC cost avoidance | $68,600/year VMware licensing eliminated | Educational platform comparable to $50K–$150K commercial cyber ranges",
+    ],
+    projects: [
+      { title: "Open Source SOC", href: "/projects/designing-and-building-an-open-source-soc" },
+      { title: "VMware to Proxmox Migration", href: "/projects/vmware-to-proxmox-migration" },
+      { title: "Hyper-V to Proxmox Migration", href: "/projects/hyperv-to-proxmox-migration" },
+      { title: "Network Observability", href: "/projects/enterprise-network-observability" },
+      { title: "Linux+ Labs Design", href: "/projects/linux-vm-labs-and-documentation" },
     ],
   },
   {
@@ -75,6 +88,9 @@ const experienceData = [
       "Led high-performing culinary teams in fast-paced environments, ensuring operational excellence and quality control.",
       "Managed budgets, inventory, and supply chains to optimize food costs and minimize waste.",
       "Developed creative menus and culinary concepts, driving customer engagement and satisfaction.",
+    ],
+    projects: [
+      { title: "Full Experience on LinkedIn", href: "https://www.linkedin.com/in/solomon-neas/details/experience/" },
     ],
   },
 ];
