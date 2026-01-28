@@ -39,7 +39,7 @@ const features = [
     desc: "Switch between Physical (cable connections) and Logical (VLAN relationships) topology views",
     tech: "ReactFlow layout transforms",
     icon: "🔀",
-    anchor: null
+    anchor: "l2l3-toggle"
   },
   {
     name: "Cisco-Style Port Grid",
@@ -2263,6 +2263,629 @@ Output: {`{
       <div class="api-endpoint">
         <code>GET /api/vms/node/{`{node_name}`}</code>
         <span>Full node detail with VMs, LXCs, storage (used by panel)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: L2/L3 Topology Toggle -->
+  <div class="feature-deepdive" id="l2l3-toggle">
+    <h2>// Feature Deep Dive: L2/L3 Topology Toggle</h2>
+    <p class="deepdive-intro">
+      Toggles between two fundamentally different network visualizations: L2 Physical View shows CDP/LLDP
+      discovered switch connections and device clusters, while L3 Logical View groups devices by VLAN
+      membership with gateway routing relationships.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🔀</span>
+        <span class="usecase-title">Use Case: Dual Perspectives for Network Engineers</span>
+      </div>
+      <p class="usecase-desc">
+        Network engineers need to see the network from two perspectives. The Physical (L2) view shows
+        "what's plugged into what": actual cable connections discovered via CDP/LLDP. The Logical (L3)
+        view shows "what talks to what": devices grouped by their VLAN assignments with inter-VLAN
+        gateways highlighted.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Architecture</h3>
+    <div class="l2l3-architecture">
+      <div class="arch-trigger">
+        <div class="arch-trigger-label">VIEW MODE TOGGLE</div>
+        <div class="arch-trigger-desc">User clicks "Physical (L2)" or "Logical (L3)"</div>
+      </div>
+
+      <div class="arch-split">
+        <div class="arch-branch l2">
+          <div class="branch-header">
+            <span class="branch-badge l2">L2 Physical</span>
+          </div>
+          <div class="branch-flow">
+            <div class="branch-step">TopologyCanvas.tsx</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step">Uses cached topology data from WebSocket updates</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step">topologyToNodes() / topologyToEdges()</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-creates">
+              <span class="creates-label">Creates:</span>
+              <ul>
+                <li>ClusterNode for each cluster</li>
+                <li>DeviceNode when expanded</li>
+                <li>ExternalNode for WAN links</li>
+                <li>PhysicalLinkEdge for CDP/LLDP</li>
+              </ul>
+            </div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-result">ReactFlow renders L2 topology with clusters, devices, and CDP/LLDP connections</div>
+          </div>
+        </div>
+
+        <div class="arch-branch l3">
+          <div class="branch-header">
+            <span class="branch-badge l3">L3 Logical</span>
+          </div>
+          <div class="branch-flow">
+            <div class="branch-step">fetchL3Topology()</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step api">GET /api/topology/l3</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step">BACKEND: get_l3_topology()</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-creates">
+              <span class="creates-label">Aggregator:</span>
+              <ul>
+                <li>Load VLANs from Redis</li>
+                <li>Map LibreNMS IDs → topology IDs</li>
+                <li>Group devices by VLAN</li>
+                <li>Identify gateway devices</li>
+              </ul>
+            </div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step">l3TopologyToNodes() / l3TopologyToEdges()</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-result">ReactFlow renders L3 topology with VLAN groups and routing edges</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Layout</h3>
+
+    <div class="view-mockup-container">
+      <div class="view-mockup l2-mockup">
+        <div class="mockup-header">
+          <span class="mockup-title">L2 Physical View</span>
+          <span class="mockup-theme">(Cyan theme)</span>
+        </div>
+        <div class="mockup-toolbar">
+          <span class="toggle-btn active l2">Physical (L2)</span>
+          <span class="toggle-btn l3">Logical (L3)</span>
+          <span class="mockup-spacer"></span>
+          <span class="toolbar-btn">Visualize</span>
+          <span class="toolbar-btn">Export</span>
+          <span class="toolbar-btn">Reset</span>
+        </div>
+        <div class="mockup-canvas">
+          <div class="l2-cluster core">
+            <div class="cluster-name">Core Network</div>
+            <div class="cluster-devices">
+              <span class="device-dot up"></span> cat-1
+              <span class="device-dot up"></span> cat-2
+              <span class="device-dot up"></span> cat-3
+            </div>
+          </div>
+          <div class="l2-link core-fw">10G</div>
+          <div class="l2-cluster firewall">
+            <div class="cluster-name">Firewalls</div>
+            <div class="cluster-devices">
+              <span class="device-dot up"></span> pa-3410
+            </div>
+          </div>
+          <div class="l2-link core-access">10G</div>
+          <div class="l2-link fw-wan">1G</div>
+          <div class="l2-cluster access">
+            <div class="cluster-name">Access Layer</div>
+            <div class="cluster-devices collapsed">+ 6 devices</div>
+          </div>
+          <div class="l2-external">
+            <span class="external-icon">☁</span> Internet
+            <span class="wan-badge">WAN</span>
+          </div>
+        </div>
+        <div class="mockup-legend">
+          <span class="legend-title">LINK COLORS</span>
+          <div class="legend-items">
+            <span class="legend-item"><span class="link-color green"></span> Healthy (Speedtest OK)</span>
+            <span class="legend-item"><span class="link-color blue"></span> Active Link</span>
+            <span class="legend-item"><span class="link-color yellow"></span> Degraded / Warning</span>
+            <span class="legend-item"><span class="link-color red"></span> Down</span>
+            <span class="legend-item"><span class="link-color grey"></span> Dumb switch (no CDP)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-mockup l3-mockup">
+        <div class="mockup-header">
+          <span class="mockup-title">L3 Logical View</span>
+          <span class="mockup-theme">(Purple theme)</span>
+        </div>
+        <div class="mockup-toolbar">
+          <span class="toggle-btn l2">Physical (L2)</span>
+          <span class="toggle-btn active l3">Logical (L3)</span>
+          <span class="mockup-spacer"></span>
+          <span class="toolbar-btn">Reset Layout</span>
+        </div>
+        <div class="mockup-canvas l3-canvas">
+          <div class="vlan-row">
+            <div class="vlan-group">
+              <div class="vlan-header">
+                <span class="vlan-icon">🔲</span>
+                <span class="vlan-id">VLAN 10</span>
+                <span class="gw-badge">GW</span>
+              </div>
+              <div class="vlan-name">Management</div>
+              <div class="vlan-devices">
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+              </div>
+              <div class="vlan-count">4 devices</div>
+            </div>
+            <div class="vlan-edge">GW</div>
+            <div class="vlan-group">
+              <div class="vlan-header">
+                <span class="vlan-icon">🔲</span>
+                <span class="vlan-id">VLAN 20</span>
+                <span class="gw-badge">GW</span>
+              </div>
+              <div class="vlan-name">Servers</div>
+              <div class="vlan-devices">
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+              </div>
+              <div class="vlan-count">5 devices</div>
+            </div>
+          </div>
+          <div class="vlan-connectors">
+            <span class="vlan-connector-line"></span>
+            <span class="vlan-connector-line"></span>
+          </div>
+          <div class="vlan-row">
+            <div class="vlan-group">
+              <div class="vlan-header">
+                <span class="vlan-icon">🔲</span>
+                <span class="vlan-id">VLAN 100</span>
+              </div>
+              <div class="vlan-name">Student Labs</div>
+              <div class="vlan-devices">
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot down"></span>
+              </div>
+              <div class="vlan-count">12 devices</div>
+            </div>
+            <div class="vlan-edge">GW</div>
+            <div class="vlan-group">
+              <div class="vlan-header">
+                <span class="vlan-icon">🔲</span>
+                <span class="vlan-id">VLAN 200</span>
+              </div>
+              <div class="vlan-name">Faculty</div>
+              <div class="vlan-devices">
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+                <span class="vlan-dot up"></span>
+              </div>
+              <div class="vlan-count">3 devices</div>
+            </div>
+          </div>
+        </div>
+        <div class="mockup-legend vlan-filter">
+          <span class="legend-title">VLAN FILTER</span>
+          <div class="filter-chips">
+            <span class="filter-chip active">☑ VLAN 10</span>
+            <span class="filter-chip active">☑ VLAN 20</span>
+            <span class="filter-chip">☐ VLAN 100</span>
+            <span class="filter-chip">☐ VLAN 200</span>
+            <span class="filter-clear">[Clear]</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// VlanGroupNode Component</h3>
+    <div class="vlan-node-mockup">
+      <div class="vng-header">
+        <span class="vng-icon">🔲</span>
+        <span class="vng-id">VLAN 10</span>
+        <span class="vng-gw">GW</span>
+      </div>
+      <div class="vng-name">Management Network</div>
+      <div class="vng-grid">
+        <span class="vng-dot up"></span>
+        <span class="vng-dot up"></span>
+        <span class="vng-dot up"></span>
+        <span class="vng-dot up gw"></span>
+        <span class="vng-dot up"></span>
+        <span class="vng-dot up"></span>
+        <span class="vng-dot up gw"></span>
+        <span class="vng-dot down"></span>
+        <span class="vng-dot up"></span>
+        <span class="vng-dot up"></span>
+      </div>
+      <div class="vng-footer">
+        <span class="vng-count">10 devices</span>
+        <span class="vng-status healthy">All healthy</span>
+      </div>
+      <div class="vng-legend">
+        <span class="vng-legend-item"><span class="vng-dot up small"></span> up (green)</span>
+        <span class="vng-legend-item"><span class="vng-dot down small"></span> down (red)</span>
+        <span class="vng-legend-item"><span class="vng-dot up gw small"></span> gateway (purple ring)</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Gateway Detection Algorithm</h3>
+    <div class="algorithm-block">
+      <div class="algo-step">
+        <span class="algo-num">1</span>
+        <div class="algo-content">
+          <span class="algo-title">Build device-to-VLAN mapping</span>
+          <code>For each VLAN membership: device_vlans[device_id].add(vlan_id)</code>
+        </div>
+      </div>
+      <div class="algo-step">
+        <span class="algo-num">2</span>
+        <div class="algo-content">
+          <span class="algo-title">Identify gateways</span>
+          <code>IF len(device_vlans[device]) &gt; 1: gateway_devices.append(device)</code>
+        </div>
+      </div>
+      <div class="algo-step">
+        <span class="algo-num">3</span>
+        <div class="algo-content">
+          <span class="algo-title">Mark gateways in VLAN groups</span>
+          <code>device.is_gateway = device_id in gateway_devices</code>
+        </div>
+      </div>
+      <div class="algo-result">
+        <span class="result-icon">→</span>
+        <div class="result-content">
+          <div class="result-item"><span class="result-check">✓</span> Core switches are gateways (in VLAN 1, 10, 20, 100, etc.)</div>
+          <div class="result-item"><span class="result-check">✓</span> Access devices are NOT gateways (only in one VLAN)</div>
+          <div class="result-item"><span class="result-check">✓</span> L3 edges connect VLANs that share gateway devices</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// L3 Edge Connection Algorithm</h3>
+    <div class="algorithm-block">
+      <div class="algo-step">
+        <span class="algo-num">1</span>
+        <div class="algo-content">
+          <span class="algo-title">Build gateway-to-VLANs map</span>
+          <code>gatewayToVlans[gateway_device].append(vlan_id)</code>
+        </div>
+      </div>
+      <div class="algo-step">
+        <span class="algo-num">2</span>
+        <div class="algo-content">
+          <span class="algo-title">Create edges between VLANs sharing gateways</span>
+          <code>For each pair (vlan_i, vlan_j): Create edge vlan-i ↔ vlan-j</code>
+        </div>
+      </div>
+      <div class="algo-example">
+        <span class="example-label">Example:</span>
+        <div class="example-content">
+          <div class="example-input">Gateway "cat-1" is in VLANs [10, 20, 100]</div>
+          <div class="example-output">
+            Creates edges: VLAN 10 ↔ VLAN 20, VLAN 10 ↔ VLAN 100, VLAN 20 ↔ VLAN 100
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Models</h3>
+    <div class="models-grid">
+      <div class="model-block">
+        <div class="model-header">
+          <span class="model-icon">🐍</span>
+          <span class="model-title">Backend Models (vlan.py)</span>
+        </div>
+        <div class="model-code">
+          <pre><code>{`class Vlan:
+    vlan_id: int           # e.g., 10, 20, 100
+    vlan_name: str | None  # e.g., "Management"
+    device_count: int
+
+class VlanMembership:
+    device_id: str         # Topology device ID
+    librenms_device_id: int
+    port_name: str | None  # e.g., "Gi1/0/24"
+    vlan_id: int
+    is_untagged: bool
+
+class L3TopologyNode:
+    device_id: str
+    display_name: str
+    status: str            # "up", "down", "unknown"
+    is_gateway: bool       # True if multi-VLAN
+    vlan_ids: list[int]
+
+class L3TopologyVlanGroup:
+    vlan_id: int
+    vlan_name: str | None
+    devices: list[L3TopologyNode]
+    gateway_devices: list[str]`}</code></pre>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-header">
+          <span class="model-icon">📘</span>
+          <span class="model-title">Frontend Types (vlan.ts)</span>
+        </div>
+        <div class="model-code">
+          <pre><code>{`type ViewMode = 'l2' | 'l3'
+
+interface L3Topology {
+  vlans: Vlan[]
+  memberships: VlanMembership[]
+  vlan_groups: L3TopologyVlanGroup[]
+  gateway_devices: string[]
+}
+
+// Zustand Store (nocStore.ts)
+interface NocState {
+  viewMode: ViewMode
+  l3Topology: L3Topology | null
+  selectedVlans: Set<number>
+
+  setViewMode: (mode: ViewMode) => void
+  setL3Topology: (t: L3Topology | null) => void
+  toggleVlanFilter: (id: number) => void
+  clearVlanFilter: () => void
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Flow</h3>
+    <div class="deepdive-flow">
+      <div class="flow-block config">
+        <div class="block-header">
+          <span class="block-icon">📡</span>
+          <span class="block-title">LIBRENMS API</span>
+        </div>
+        <div class="block-steps">
+          <code>GET /resources/vlans</code>
+          <span class="step-desc">Returns all VLANs with device_id mappings</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">⏱️</span>
+          <span class="block-title">SCHEDULER (poll_vlans)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Runs every 300 seconds</div>
+          <div class="backend-step"><span class="step-num">2</span> Stores CACHE_VLANS (unique VLANs)</div>
+          <div class="backend-step"><span class="step-num">3</span> Stores CACHE_VLAN_MEMBERSHIPS (port→VLAN)</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+      <div class="api-call-label">GET /api/topology/l3</div>
+      <div class="flow-arrow-down">▼</div>
+
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🔧</span>
+          <span class="block-title">AGGREGATOR (get_l3_topology)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Map LibreNMS IDs to topology IDs</div>
+          <div class="backend-step"><span class="step-num">2</span> Group devices by VLAN</div>
+          <div class="backend-step"><span class="step-num">3</span> Detect gateways (multi-VLAN devices)</div>
+          <div class="backend-step"><span class="step-num">4</span> Build vlan_groups with nodes</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📋</span>
+          <span class="block-title">API RESPONSE</span>
+        </div>
+        <div class="block-code">
+          <pre><code>{`{
+  "vlans": [{ "vlan_id": 10, "vlan_name": "Management", "device_count": 8 }],
+  "memberships": [{ "device_id": "cat-1", "vlan_id": 10, "port_name": "Gi1/0/1" }],
+  "vlan_groups": [{
+    "vlan_id": 10,
+    "vlan_name": "Management",
+    "devices": [{ "device_id": "cat-1", "is_gateway": true, "status": "up" }],
+    "gateway_devices": ["cat-1", "cat-2"]
+  }],
+  "gateway_devices": ["cat-1", "cat-2", "cat-3"]
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <div class="flow-block widget">
+        <div class="block-header">
+          <span class="block-icon">⚛️</span>
+          <span class="block-title">FRONTEND TRANSFORM</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> l3TopologyToNodes() creates VlanGroupNode per VLAN</div>
+          <div class="backend-step"><span class="step-num">2</span> Grid layout: columns = √(vlan_count)</div>
+          <div class="backend-step"><span class="step-num">3</span> l3TopologyToEdges() connects shared-gateway VLANs</div>
+          <div class="backend-step"><span class="step-num">4</span> Purple dashed edges for routing relationships</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Component Hierarchy</h3>
+    <div class="component-tree">
+      <div class="tree-root">TopologyCanvas.tsx</div>
+      <div class="tree-children">
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">View Mode Toggle</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">"Physical (L2)" button <span class="tree-note">[Cyan when active]</span></span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">"Logical (L3)" button <span class="tree-note">[Purple when active]</span></span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">L2 Mode (viewMode === 'l2')</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">ClusterNode[] - device clusters with status dots</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">DeviceNode[] - expanded cluster devices</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">ExternalNode[] - WAN links</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">PhysicalLinkEdge[] - CDP/LLDP connections</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">Mermaid export buttons</span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">└──</span>
+          <span class="tree-name">L3 Mode (viewMode === 'l3')</span>
+          <div class="tree-sub">
+            <span class="tree-connector">   ├──</span>
+            <span class="tree-leaf">VlanGroupNode[] - VLAN boxes with device grids</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">   ├──</span>
+            <span class="tree-leaf">L3 Edges - purple dashed gateway connections</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">   └──</span>
+            <span class="tree-leaf">VLAN Filter Sidebar - checkbox chips</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">VLAN polling</span>
+        <span class="tech-value">300s interval (same as topology)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Gateway detection</span>
+        <span class="tech-value">Devices in &gt;1 VLAN automatically flagged</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">L3 node layout</span>
+        <span class="tech-value">Grid with √(count) columns</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">L3 edge creation</span>
+        <span class="tech-value">Connect VLANs sharing gateway devices</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">View persistence</span>
+        <span class="tech-value">LocalStorage for node positions per view mode</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">VLAN filter</span>
+        <span class="tech-value">Clickable chips, filters displayed groups</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Theme colors</span>
+        <span class="tech-value">Cyan = L2/Physical, Purple = L3/Logical</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Loading state</span>
+        <span class="tech-value">"Loading L3 topology..." while fetching</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// UI States</h3>
+    <div class="ui-states-table">
+      <div class="state-row header">
+        <span class="state-name">State</span>
+        <span class="state-display">Display</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">L2 active</span>
+        <span class="state-display">Cyan toggle button, cluster/device/link view</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">L3 active</span>
+        <span class="state-display">Purple toggle button, VLAN group view</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">L3 loading</span>
+        <span class="state-display">Centered "Loading L3 topology..." spinner</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">VLAN filtered</span>
+        <span class="state-display">Only selected VLANs visible, Clear button enabled</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">No filter</span>
+        <span class="state-display">All VLANs displayed in grid</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Tech Stack</h3>
+    <div class="tech-stack-table">
+      <div class="stack-row">
+        <span class="stack-layer">Data Source</span>
+        <span class="stack-tech">LibreNMS /resources/vlans endpoint</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Backend</span>
+        <span class="stack-tech">FastAPI, Redis cache</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Polling</span>
+        <span class="stack-tech">APScheduler (300s interval)</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Frontend</span>
+        <span class="stack-tech">React, TypeScript, ReactFlow</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">State</span>
+        <span class="stack-tech">Zustand store</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Styling</span>
+        <span class="stack-tech">Tailwind CSS (purple accent for L3)</span>
       </div>
     </div>
   </div>
@@ -5625,5 +6248,904 @@ Output: {`{
     .value-context {
       grid-template-columns: 1fr;
     }
+
+    .arch-split {
+      flex-direction: column;
+    }
+
+    .view-mockup-container {
+      flex-direction: column;
+    }
+
+    .models-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .vlan-row {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .vlan-edge {
+      display: none;
+    }
+  }
+
+  /* L2/L3 Toggle Deep Dive Styles */
+  .l2l3-architecture {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .arch-trigger {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .arch-trigger-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .arch-trigger-desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .arch-split {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .arch-branch {
+    flex: 1;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .arch-branch.l2 {
+    border-top: 3px solid #00bceb;
+  }
+
+  .arch-branch.l3 {
+    border-top: 3px solid #a78bfa;
+  }
+
+  .branch-header {
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .branch-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+  }
+
+  .branch-badge.l2 {
+    background: color-mix(in srgb, #00bceb 15%, transparent);
+    color: #00bceb;
+  }
+
+  .branch-badge.l3 {
+    background: color-mix(in srgb, #a78bfa 15%, transparent);
+    color: #a78bfa;
+  }
+
+  .branch-flow {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .branch-step {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .branch-step.api {
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+  }
+
+  .branch-arrow {
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .branch-creates {
+    width: 100%;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+  }
+
+  .creates-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+  }
+
+  .branch-creates ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.7rem;
+  }
+
+  .branch-creates li {
+    margin-bottom: 0.25rem;
+  }
+
+  .branch-result {
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 0.5rem;
+    opacity: 0.8;
+    font-style: italic;
+  }
+
+  /* View Mockups */
+  .view-mockup-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .view-mockup {
+    flex: 1;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .l2-mockup {
+    border-top: 3px solid #00bceb;
+  }
+
+  .l3-mockup {
+    border-top: 3px solid #a78bfa;
+  }
+
+  .mockup-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .mockup-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .mockup-theme {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .mockup-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .toggle-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    opacity: 0.6;
+  }
+
+  .toggle-btn.active.l2 {
+    background: color-mix(in srgb, #00bceb 20%, transparent);
+    color: #00bceb;
+    opacity: 1;
+  }
+
+  .toggle-btn.active.l3 {
+    background: color-mix(in srgb, #a78bfa 20%, transparent);
+    color: #a78bfa;
+    opacity: 1;
+  }
+
+  .mockup-spacer {
+    flex: 1;
+  }
+
+  .toolbar-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 3px;
+    opacity: 0.7;
+  }
+
+  .mockup-canvas {
+    padding: 1rem;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+  }
+
+  /* L2 Canvas Elements */
+  .l2-cluster {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    display: inline-block;
+  }
+
+  .cluster-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .cluster-devices {
+    font-size: 0.65rem;
+    opacity: 0.8;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .cluster-devices.collapsed {
+    font-style: italic;
+    opacity: 0.6;
+  }
+
+  .device-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.25rem;
+  }
+
+  .device-dot.up {
+    background: #10b981;
+  }
+
+  .device-dot.down {
+    background: #ef4444;
+  }
+
+  .l2-link {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    color: #00bceb;
+    padding: 0.1rem 0.3rem;
+    background: color-mix(in srgb, #00bceb 10%, transparent);
+    border-radius: 2px;
+    align-self: center;
+  }
+
+  .l2-external {
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .external-icon {
+    font-size: 1rem;
+  }
+
+  .wan-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    padding: 0.1rem 0.3rem;
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    color: #f59e0b;
+    border-radius: 2px;
+  }
+
+  .mockup-legend {
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .legend-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    opacity: 0.6;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  .legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .legend-item {
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .link-color {
+    width: 12px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .link-color.green { background: #10b981; }
+  .link-color.blue { background: #3b82f6; }
+  .link-color.yellow { background: #f59e0b; }
+  .link-color.red { background: #ef4444; }
+  .link-color.grey { background: #6b7280; }
+
+  /* L3 Canvas Elements */
+  .l3-canvas {
+    gap: 0.5rem;
+  }
+
+  .vlan-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .vlan-group {
+    flex: 1;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, #a78bfa 20%, transparent);
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .vlan-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .vlan-icon {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .vlan-id {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #a78bfa;
+  }
+
+  .gw-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
+    background: color-mix(in srgb, #a78bfa 20%, transparent);
+    color: #a78bfa;
+    border-radius: 2px;
+    margin-left: auto;
+  }
+
+  .vlan-name {
+    font-size: 0.6rem;
+    opacity: 0.6;
+    margin-bottom: 0.35rem;
+  }
+
+  .vlan-devices {
+    display: flex;
+    gap: 0.2rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .vlan-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .vlan-dot.up {
+    background: #10b981;
+  }
+
+  .vlan-dot.down {
+    background: #ef4444;
+  }
+
+  .vlan-count {
+    font-size: 0.55rem;
+    opacity: 0.6;
+  }
+
+  .vlan-edge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    color: #a78bfa;
+    padding: 0.15rem 0.35rem;
+    background: color-mix(in srgb, #a78bfa 10%, transparent);
+    border-radius: 2px;
+  }
+
+  .vlan-connectors {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 2rem;
+  }
+
+  .vlan-connector-line {
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, #a78bfa, color-mix(in srgb, #a78bfa 30%, transparent));
+  }
+
+  .vlan-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .filter-chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    padding: 0.15rem 0.35rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 2px;
+    opacity: 0.6;
+  }
+
+  .filter-chip.active {
+    background: color-mix(in srgb, #a78bfa 15%, transparent);
+    color: #a78bfa;
+    opacity: 1;
+  }
+
+  .filter-clear {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    color: #ef4444;
+    opacity: 0.7;
+  }
+
+  /* VlanGroupNode Mockup */
+  .vlan-node-mockup {
+    max-width: 280px;
+    margin: 0 auto 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, #a78bfa 25%, transparent);
+    border-top: 3px solid #a78bfa;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .vng-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .vng-icon {
+    font-size: 0.9rem;
+    color: #a78bfa;
+  }
+
+  .vng-id {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a78bfa;
+  }
+
+  .vng-gw {
+    margin-left: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    background: color-mix(in srgb, #a78bfa 20%, transparent);
+    color: #a78bfa;
+    border-radius: 3px;
+  }
+
+  .vng-name {
+    padding: 0 0.75rem;
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-top: 0.5rem;
+  }
+
+  .vng-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+    padding: 0.75rem;
+  }
+
+  .vng-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .vng-dot.up {
+    background: #10b981;
+  }
+
+  .vng-dot.down {
+    background: #ef4444;
+  }
+
+  .vng-dot.gw {
+    box-shadow: 0 0 0 2px #a78bfa;
+  }
+
+  .vng-dot.small {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .vng-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .vng-count {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .vng-status {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+  }
+
+  .vng-status.healthy {
+    color: #10b981;
+  }
+
+  .vng-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .vng-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+
+  /* Algorithm Blocks */
+  .algorithm-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .algo-step {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .algo-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: color-mix(in srgb, #a78bfa 20%, transparent);
+    color: #a78bfa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .algo-content {
+    flex: 1;
+  }
+
+  .algo-title {
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .algo-content code {
+    font-size: 0.7rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    display: block;
+  }
+
+  .algo-result {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    margin-top: 0.5rem;
+  }
+
+  .result-icon {
+    flex-shrink: 0;
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .result-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .result-item {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .result-check {
+    color: #10b981;
+  }
+
+  .algo-example {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .example-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #f59e0b;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .example-content {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+  }
+
+  .example-input {
+    font-size: 0.7rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .example-output {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: #10b981;
+  }
+
+  /* Models Grid */
+  .models-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .model-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .model-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .model-icon {
+    font-size: 1rem;
+  }
+
+  .model-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .model-code {
+    padding: 0.75rem;
+  }
+
+  .model-code pre {
+    margin: 0;
+    font-size: 0.65rem;
+    line-height: 1.5;
+  }
+
+  .model-code code {
+    background: none;
+    padding: 0;
+  }
+
+  /* Component Tree */
+  .component-tree {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .tree-root {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-children {
+    padding-left: 0.5rem;
+  }
+
+  .tree-branch {
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-connector {
+    opacity: 0.4;
+  }
+
+  .tree-name {
+    font-weight: 600;
+  }
+
+  .tree-sub {
+    padding-left: 0;
+  }
+
+  .tree-leaf {
+    opacity: 0.8;
+  }
+
+  .tree-note {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  /* UI States Table */
+  .ui-states-table {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .state-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .state-row:last-child {
+    border-bottom: none;
+  }
+
+  .state-row.header {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .state-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .state-display {
+    font-size: 0.75rem;
+    opacity: 0.85;
+  }
+
+  /* Tech Stack Table */
+  .tech-stack-table {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .stack-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .stack-row:last-child {
+    border-bottom: none;
+  }
+
+  .stack-layer {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
+  .stack-tech {
+    font-size: 0.75rem;
   }
 </style>
