@@ -25,14 +25,14 @@ const features = [
     desc: "Draggable network map with expandable clusters, device status indicators, and animated connection links",
     tech: "ReactFlow + Zustand + WebSocket",
     icon: "🗺️",
-    anchor: null
+    anchor: "topology-canvas"
   },
   {
     name: "Real-Time Updates",
     desc: "WebSocket pushes live device status, health metrics, and link changes without polling",
     tech: "FastAPI WebSocket + APScheduler",
     icon: "⚡",
-    anchor: "data-flow"
+    anchor: "websocket-updates"
   },
   {
     name: "L2/L3 View Toggle",
@@ -419,6 +419,1013 @@ const phases = [
       <div class="step-content">
         <span class="step-title">Re-render</span>
         <span class="step-desc">Device node color changes, alert count increments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: WebSocket Real-Time Updates -->
+  <div class="feature-deepdive" id="websocket-updates">
+    <h2>// Feature Deep Dive: WebSocket Real-Time Updates</h2>
+    <p class="deepdive-intro">
+      Bidirectional WebSocket connection that pushes device status changes, alert notifications, and speedtest
+      results from the backend to all connected dashboard clients without requiring page refreshes or polling.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">⚡</span>
+        <span class="usecase-title">Use Case: Instant Incident Detection</span>
+      </div>
+      <p class="usecase-desc">
+        NOC operators need immediate notification when device status changes. Instead of waiting 30-60 seconds for
+        the next poll cycle, the WebSocket pushes updates in real-time: a switch going down appears on the dashboard
+        within seconds. This enables faster incident response and reduces mean time to detection (MTTD).
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Architecture</h3>
+    <div class="ws-architecture">
+      <div class="ws-layer scheduler">
+        <div class="ws-layer-header">
+          <span class="ws-layer-icon">⏰</span>
+          <span class="ws-layer-title">POLLING SCHEDULER</span>
+        </div>
+        <div class="ws-pollers">
+          <div class="ws-poller">
+            <div class="poller-name">poll_devices()</div>
+            <div class="poller-interval">Every 30s</div>
+            <div class="poller-action">Fetch status from LibreNMS → Compare previous vs current → broadcast_status_changes()</div>
+          </div>
+          <div class="ws-poller">
+            <div class="poller-name">poll_alerts()</div>
+            <div class="poller-interval">Every 30s</div>
+            <div class="poller-action">Detect new/resolved alerts → broadcast_new_alerts() / broadcast_resolved_alerts()</div>
+          </div>
+          <div class="ws-poller">
+            <div class="poller-name">run_speedtest()</div>
+            <div class="poller-interval">Every 5m</div>
+            <div class="poller-action">Run speedtest CLI → broadcast_speedtest_result()</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-arrow-down">▼ broadcast()</div>
+
+      <div class="ws-layer manager">
+        <div class="ws-layer-header">
+          <span class="ws-layer-icon">🔌</span>
+          <span class="ws-layer-title">ConnectionManager (ws_manager)</span>
+        </div>
+        <div class="ws-manager-content">
+          <code>active_connections: list[WebSocket]</code>
+          <div class="ws-manager-flow">
+            <span>broadcast(message)</span>
+            <span class="ws-flow-arrow">→</span>
+            <span>For each connection: await connection.send_json(message)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-arrow-down">▼ send_json()</div>
+
+      <div class="ws-layer clients">
+        <div class="ws-layer-header">
+          <span class="ws-layer-icon">🖥️</span>
+          <span class="ws-layer-title">WEBSOCKET CLIENTS</span>
+        </div>
+        <div class="ws-clients-grid">
+          <div class="ws-client">Browser Tab 1</div>
+          <div class="ws-client">Browser Tab 2</div>
+          <div class="ws-client">Browser Tab 3</div>
+        </div>
+        <div class="ws-hook">
+          <div class="ws-hook-name">useWebSocket() hook</div>
+          <div class="ws-hook-handlers">
+            <div class="ws-handler">
+              <span class="handler-msg">device_status_change</span>
+              <span class="handler-arrow">→</span>
+              <span class="handler-action">updateDeviceStatus() → Canvas rerender</span>
+            </div>
+            <div class="ws-handler">
+              <span class="handler-msg">new_alerts</span>
+              <span class="handler-arrow">→</span>
+              <span class="handler-action">addAlert() → Toast + Bell badge</span>
+            </div>
+            <div class="ws-handler">
+              <span class="handler-msg">alerts_resolved</span>
+              <span class="handler-arrow">→</span>
+              <span class="handler-action">removeAlert() → Toast removed</span>
+            </div>
+            <div class="ws-handler">
+              <span class="handler-msg">speedtest_result</span>
+              <span class="handler-arrow">→</span>
+              <span class="handler-action">setSpeedtestStatus() → WAN link color</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Message Types: Server → Client</h3>
+    <div class="ws-messages-grid">
+      <div class="ws-message-card">
+        <div class="ws-msg-header">
+          <span class="ws-msg-type">connected</span>
+        </div>
+        <div class="ws-msg-desc">Sent immediately after WebSocket connection established</div>
+        <div class="ws-msg-payload">
+          <pre><code>{`{
+  "type": "connected",
+  "message": "Connected to Watchtower"
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="ws-message-card">
+        <div class="ws-msg-header">
+          <span class="ws-msg-type">device_status_change</span>
+        </div>
+        <div class="ws-msg-desc">Sent when device status changes (up ↔ down)</div>
+        <div class="ws-msg-payload">
+          <pre><code>{`{
+  "type": "device_status_change",
+  "timestamp": "2026-01-28T10:42:15.123Z",
+  "changes": [{
+    "device_id": 42,
+    "hostname": "cat-1.corp.local",
+    "old_status": "up",
+    "new_status": "down"
+  }]
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="ws-message-card">
+        <div class="ws-msg-header">
+          <span class="ws-msg-type">new_alerts</span>
+        </div>
+        <div class="ws-msg-desc">Sent when new LibreNMS alerts fire</div>
+        <div class="ws-msg-payload">
+          <pre><code>{`{
+  "type": "new_alerts",
+  "timestamp": "2026-01-28T10:42:15.123Z",
+  "alerts": [{
+    "id": 4521,
+    "device_id": 42,
+    "hostname": "cat-1.corp.local",
+    "severity": "critical",
+    "title": "Device unreachable"
+  }]
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="ws-message-card">
+        <div class="ws-msg-header">
+          <span class="ws-msg-type">alerts_resolved</span>
+        </div>
+        <div class="ws-msg-desc">Sent when alerts are cleared (device recovered)</div>
+        <div class="ws-msg-payload">
+          <pre><code>{`{
+  "type": "alerts_resolved",
+  "timestamp": "2026-01-28T10:45:30.456Z",
+  "alert_ids": [4521, 4522]
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="ws-message-card">
+        <div class="ws-msg-header">
+          <span class="ws-msg-type">speedtest_result</span>
+        </div>
+        <div class="ws-msg-desc">Sent after each speedtest completes</div>
+        <div class="ws-msg-payload">
+          <pre><code>{`{
+  "type": "speedtest_result",
+  "timestamp": "2026-01-28T10:45:00.000Z",
+  "result": {
+    "download_mbps": 245.5,
+    "upload_mbps": 125.3,
+    "ping_ms": 12.5,
+    "indicator": "normal"
+  }
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="ws-message-card keepalive">
+        <div class="ws-msg-header">
+          <span class="ws-msg-type">ping / pong</span>
+        </div>
+        <div class="ws-msg-desc">Keepalive messages (client sends ping every 30s)</div>
+        <div class="ws-msg-payload">
+          <pre><code>{`{ "type": "ping" }  // Client → Server
+{ "type": "pong" }  // Server → Client`}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Connection Lifecycle</h3>
+    <div class="ws-lifecycle">
+      <div class="lifecycle-row">
+        <div class="lifecycle-client">CLIENT</div>
+        <div class="lifecycle-arrow"></div>
+        <div class="lifecycle-server">SERVER</div>
+      </div>
+      <div class="lifecycle-event">
+        <div class="lifecycle-msg outgoing">new WebSocket('/ws/updates')</div>
+        <div class="lifecycle-action">ws_manager.connect(ws)<br/>active_connections.append(ws)</div>
+      </div>
+      <div class="lifecycle-event">
+        <div class="lifecycle-msg incoming">{`{"type": "connected", ...}`}</div>
+        <div class="lifecycle-action"></div>
+      </div>
+      <div class="lifecycle-event">
+        <div class="lifecycle-msg outgoing">{`{"type": "ping"}`}</div>
+        <div class="lifecycle-note">every 30s</div>
+      </div>
+      <div class="lifecycle-event">
+        <div class="lifecycle-msg incoming">{`{"type": "pong"}`}</div>
+        <div class="lifecycle-action"></div>
+      </div>
+      <div class="lifecycle-event">
+        <div class="lifecycle-msg incoming">{`{"type": "device_status_change", ...}`}</div>
+        <div class="lifecycle-action">poll_devices() detects change</div>
+      </div>
+      <div class="lifecycle-event disconnect">
+        <div class="lifecycle-msg">Connection lost / closed</div>
+        <div class="lifecycle-action">ws_manager.disconnect(ws)<br/>active_connections.remove(ws)</div>
+      </div>
+      <div class="lifecycle-reconnect">
+        <div class="reconnect-label">Exponential backoff reconnect</div>
+        <div class="reconnect-delays">1s → 2s → 4s → 8s → 16s → 30s max</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Reconnection Strategy</h3>
+    <div class="reconnect-flow">
+      <div class="reconnect-step trigger">
+        <span class="step-label">DISCONNECTION DETECTED</span>
+      </div>
+      <div class="reconnect-arrow">▼</div>
+      <div class="reconnect-step calc">
+        <span class="step-label">Calculate backoff delay</span>
+        <code>delay = min(1000 * 2^attempts, 30000)</code>
+      </div>
+      <div class="reconnect-delays-table">
+        <div class="delay-row"><span>attempt 0:</span><span>1000ms (1s)</span></div>
+        <div class="delay-row"><span>attempt 1:</span><span>2000ms (2s)</span></div>
+        <div class="delay-row"><span>attempt 2:</span><span>4000ms (4s)</span></div>
+        <div class="delay-row"><span>attempt 3:</span><span>8000ms (8s)</span></div>
+        <div class="delay-row"><span>attempt 4:</span><span>16000ms (16s)</span></div>
+        <div class="delay-row"><span>attempt 5+:</span><span>30000ms (30s max)</span></div>
+      </div>
+      <div class="reconnect-arrow">▼</div>
+      <div class="reconnect-step wait">
+        <span class="step-label">setTimeout(reconnect, delay)</span>
+      </div>
+      <div class="reconnect-arrow">▼</div>
+      <div class="reconnect-step attempt">
+        <span class="step-label">Attempt connection</span>
+        <div class="attempt-outcomes">
+          <span class="outcome success">SUCCESS → reconnectAttempts = 0</span>
+          <span class="outcome failure">FAILURE → goto "Calculate backoff"</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Device Hostname Matching</h3>
+    <div class="hostname-matching">
+      <div class="matching-problem">
+        <div class="problem-label">PROBLEM</div>
+        <div class="problem-content">
+          <div class="problem-row">
+            <span class="problem-source">LibreNMS sends:</span>
+            <code>"cat-1.corp.local"</code>
+          </div>
+          <div class="problem-row">
+            <span class="problem-source">Topology uses:</span>
+            <code>"cat-1"</code>
+          </div>
+        </div>
+      </div>
+      <div class="matching-algorithm">
+        <div class="algo-header">ALGORITHM: findTopologyDeviceId(hostname, devices)</div>
+        <div class="algo-steps">
+          <div class="algo-step">
+            <span class="step-num">1</span>
+            <div class="step-content">
+              <span class="step-name">IP Address Match</span>
+              <span class="step-logic">IF device.ip === hostname → RETURN device.id</span>
+            </div>
+          </div>
+          <div class="algo-step">
+            <span class="step-num">2</span>
+            <div class="step-content">
+              <span class="step-name">Fuzzy Hostname Match</span>
+              <span class="step-logic">IF hostname.toLowerCase().includes(device_id.toLowerCase()) → RETURN device.id</span>
+              <span class="step-example">Example: "cat-1.corp.local".includes("cat-1") → true</span>
+            </div>
+          </div>
+          <div class="algo-step">
+            <span class="step-num">3</span>
+            <div class="step-content">
+              <span class="step-name">No Match</span>
+              <span class="step-logic">RETURN null, log warning</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Component Structure</h3>
+    <div class="ws-component-split">
+      <div class="ws-component-col backend">
+        <div class="component-col-header">Backend (Python/FastAPI)</div>
+        <div class="component-tree">
+          <div class="tree-file">websocket.py
+            <div class="tree-contents">
+              <span>ConnectionManager</span>
+              <span class="tree-indent">├─ active_connections: list[WebSocket]</span>
+              <span class="tree-indent">├─ connect(ws) → add to list</span>
+              <span class="tree-indent">├─ disconnect(ws) → remove from list</span>
+              <span class="tree-indent">└─ broadcast(msg) → send to all</span>
+              <span>ws_manager (singleton)</span>
+              <span>websocket_endpoint(ws)</span>
+            </div>
+          </div>
+          <div class="tree-file">main.py
+            <div class="tree-contents">
+              <span>app.websocket("/ws/updates")</span>
+            </div>
+          </div>
+          <div class="tree-file">polling/scheduler.py
+            <div class="tree-contents">
+              <span>broadcast_status_changes()</span>
+              <span>broadcast_new_alerts()</span>
+              <span>broadcast_resolved_alerts()</span>
+              <span>broadcast_speedtest_result()</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-component-col frontend">
+        <div class="component-col-header">Frontend (React/TypeScript)</div>
+        <div class="component-tree">
+          <div class="tree-file">hooks/useWebSocket.ts
+            <div class="tree-contents">
+              <span>State: isConnected, wsRef, reconnectAttempts</span>
+              <span>handleMessage()</span>
+              <span class="tree-indent">├─ "connected" → console.log</span>
+              <span class="tree-indent">├─ "device_status_change" → updateDeviceStatus()</span>
+              <span class="tree-indent">├─ "new_alerts" → addAlert()</span>
+              <span class="tree-indent">├─ "alerts_resolved" → removeAlert()</span>
+              <span class="tree-indent">└─ "speedtest_result" → setSpeedtestStatus()</span>
+              <span>connect(), disconnect()</span>
+            </div>
+          </div>
+          <div class="tree-file">store/nocStore.ts
+            <div class="tree-contents">
+              <span>isConnected: boolean</span>
+              <span>updateDeviceStatus()</span>
+              <span>updateAlertCount()</span>
+              <span>setSpeedtestStatus()</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// URL Construction</h3>
+    <div class="url-construction">
+      <div class="url-code">
+        <pre><code>const WS_URL = `$&#123;
+  window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+&#125;//$&#123;window.location.host&#125;/ws/updates`</code></pre>
+      </div>
+      <div class="url-examples">
+        <div class="url-example">
+          <span class="url-input">http://watchtower.local:5173</span>
+          <span class="url-arrow">→</span>
+          <span class="url-output">ws://watchtower.local:5173/ws/updates</span>
+        </div>
+        <div class="url-example">
+          <span class="url-input">https://watchtower.example.com</span>
+          <span class="url-arrow">→</span>
+          <span class="url-output">wss://watchtower.example.com/ws/updates</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Debug Helper (Browser Console)</h3>
+    <div class="debug-helper">
+      <div class="debug-intro">Exposed via <code>window.watchtower</code> in App.tsx:</div>
+      <div class="debug-commands">
+        <div class="debug-cmd">
+          <code>window.watchtower.setDeviceDown('cat-1')</code>
+          <span class="debug-desc">Simulate device going down</span>
+        </div>
+        <div class="debug-cmd">
+          <code>window.watchtower.setDeviceUp('cat-1')</code>
+          <span class="debug-desc">Simulate device coming back up</span>
+        </div>
+        <div class="debug-cmd">
+          <code>window.watchtower.listDevices()</code>
+          <span class="debug-desc">List all devices and their status</span>
+        </div>
+        <div class="debug-cmd">
+          <code>window.watchtower.setSpeedtestDown()</code>
+          <span class="debug-desc">Red external links</span>
+        </div>
+        <div class="debug-cmd">
+          <code>window.watchtower.setSpeedtestDegraded()</code>
+          <span class="debug-desc">Yellow external links</span>
+        </div>
+        <div class="debug-cmd">
+          <code>window.watchtower.setSpeedtestNormal()</code>
+          <span class="debug-desc">Green external links</span>
+        </div>
+        <div class="debug-cmd">
+          <code>window.watchtower.getStore()</code>
+          <span class="debug-desc">Get full store state</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Implementation Details</h3>
+    <div class="tech-table">
+      <div class="tech-row header">
+        <span class="tech-label">Aspect</span>
+        <span class="tech-value">Implementation</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Protocol</span>
+        <span class="tech-value">WebSocket (RFC 6455)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Endpoint</span>
+        <span class="tech-value">/ws/updates</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Protocol auto-detect</span>
+        <span class="tech-value">ws:// for HTTP, wss:// for HTTPS</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Ping interval</span>
+        <span class="tech-value">30 seconds (client → server)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Reconnect delays</span>
+        <span class="tech-value">1s, 2s, 4s, 8s, 16s, 30s max</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Connection tracking</span>
+        <span class="tech-value">ws_manager.active_connections list</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Thread safety</span>
+        <span class="tech-value">asyncio.Lock() for connection list</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Message format</span>
+        <span class="tech-value">JSON (send_json / JSON.parse)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Device matching</span>
+        <span class="tech-value">Fuzzy hostname matching with IP fallback</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Interactive Topology Canvas -->
+  <div class="feature-deepdive" id="topology-canvas">
+    <h2>// Feature Deep Dive: Interactive Topology Canvas</h2>
+    <p class="deepdive-intro">
+      The core visualization engine that renders the physical network topology using ReactFlow. Features
+      expandable device clusters, automatic collision detection, drag-and-drop positioning with localStorage
+      persistence, and dynamic edge routing that adapts to expanded/collapsed states.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🗺️</span>
+        <span class="usecase-title">Use Case: At-a-Glance Network View with Drill-Down</span>
+      </div>
+      <p class="usecase-desc">
+        NOC operators need to see the entire network at a glance while being able to drill down into specific
+        clusters. The canvas provides an interactive map where clusters can be expanded to show individual devices,
+        nodes can be dragged to custom positions (persisted across sessions), and the layout automatically adjusts
+        to prevent overlapping nodes.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Architecture</h3>
+    <div class="topology-arch-flow">
+      <div class="arch-source">
+        <div class="arch-source-label">TOPOLOGY DATA (from WebSocket)</div>
+        <div class="arch-source-items">
+          <span>topology.clusters[]</span>
+          <span>topology.devices{}</span>
+          <span>topology.connections[]</span>
+          <span>topology.external_links[]</span>
+        </div>
+      </div>
+      <div class="arch-arrow-down">▼</div>
+
+      <div class="arch-processor">
+        <div class="proc-header">topologyToNodes()</div>
+        <div class="proc-logic">
+          <div class="proc-rule">
+            <span class="rule-condition">For each cluster:</span>
+            <span class="rule-if">IF expanded →</span>
+            <span class="rule-result">Create DeviceNode for each device (grid layout)</span>
+          </div>
+          <div class="proc-rule">
+            <span class="rule-condition"></span>
+            <span class="rule-if">ELSE →</span>
+            <span class="rule-result">Create ClusterNode (collapsed view)</span>
+          </div>
+          <div class="proc-rule">
+            <span class="rule-condition">For each external_link:</span>
+            <span class="rule-if">→</span>
+            <span class="rule-result">Create ExternalNode (WAN endpoints)</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow-down">▼</div>
+
+      <div class="arch-processor collision">
+        <div class="proc-header">resolveOverlaps()</div>
+        <div class="proc-steps">
+          <span class="proc-step">1. Calculate bounding boxes for all nodes</span>
+          <span class="proc-step">2. Check each pair for collision</span>
+          <span class="proc-step">3. Push overlapping nodes apart</span>
+          <span class="proc-step">4. Repeat until no overlaps (max 50 iterations)</span>
+        </div>
+      </div>
+      <div class="arch-arrow-down">▼</div>
+
+      <div class="arch-renderer">
+        <div class="renderer-header">ReactFlow Canvas</div>
+        <div class="renderer-controls">
+          <span class="control-item">Pan: Click + Drag background</span>
+          <span class="control-item">Zoom: Scroll wheel (0.2x - 2x)</span>
+          <span class="control-item">Select: Click node → sidebar details</span>
+          <span class="control-item">Expand: Double-click cluster → show devices</span>
+          <span class="control-item">Collapse: Double-click device → hide cluster</span>
+          <span class="control-item">Move: Drag node → position saved to localStorage</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Layout: Collapsed View</h3>
+    <p class="layout-desc">Default view shows clusters as single nodes with device status indicators:</p>
+
+    <div class="canvas-mockup collapsed-view">
+      <div class="canvas-toolbar">
+        <span class="toolbar-btn active">Physical (L2)</span>
+        <span class="toolbar-btn">Logical (L3)</span>
+        <span class="toolbar-spacer"></span>
+        <span class="toolbar-btn">Reset Layout</span>
+      </div>
+      <div class="canvas-area">
+        <div class="mock-cluster firewalls" style="--x: 10%; --y: 20%;">
+          <div class="cluster-icon">🛡️</div>
+          <div class="cluster-label">Firewalls</div>
+          <div class="cluster-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+          </div>
+          <div class="cluster-summary">2 devices | All healthy</div>
+        </div>
+
+        <div class="mock-edge h1" style="--x1: 22%; --y1: 28%; --x2: 38%; --y2: 28%;"></div>
+
+        <div class="mock-cluster core" style="--x: 40%; --y: 20%;">
+          <div class="cluster-icon">🔌</div>
+          <div class="cluster-label">Core Network</div>
+          <div class="cluster-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+          </div>
+          <div class="cluster-summary">3 devices | All healthy</div>
+        </div>
+
+        <div class="mock-edge h2" style="--x1: 60%; --y1: 28%; --x2: 78%; --y2: 28%;"></div>
+
+        <div class="mock-external" style="--x: 80%; --y: 20%;">
+          <div class="external-glow"></div>
+          <div class="external-content">
+            <span class="external-icon-lg">☁</span>
+            <span class="external-label">Internet</span>
+          </div>
+        </div>
+
+        <div class="mock-edge v1" style="--x1: 17%; --y1: 42%; --x2: 17%; --y2: 58%;"></div>
+        <div class="mock-edge v2" style="--x1: 52%; --y1: 42%; --x2: 52%; --y2: 58%;"></div>
+
+        <div class="mock-cluster servers" style="--x: 10%; --y: 60%;">
+          <div class="cluster-icon">🖥️</div>
+          <div class="cluster-label">Servers</div>
+          <div class="cluster-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+          </div>
+          <div class="cluster-summary">4 devices | All healthy</div>
+        </div>
+
+        <div class="mock-cluster access warning" style="--x: 40%; --y: 60%;">
+          <div class="cluster-icon">📡</div>
+          <div class="cluster-label">Access Layer</div>
+          <div class="cluster-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot down"></span>
+          </div>
+          <div class="cluster-summary">3 devices | 1 down</div>
+        </div>
+
+        <div class="canvas-hint">Double-click cluster to expand</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Layout: Expanded View</h3>
+    <p class="layout-desc">When a cluster is expanded, individual devices are shown in a grid layout:</p>
+
+    <div class="canvas-mockup expanded-view">
+      <div class="canvas-toolbar">
+        <span class="toolbar-btn active">Physical (L2)</span>
+        <span class="toolbar-btn">Logical (L3)</span>
+        <span class="toolbar-spacer"></span>
+        <span class="toolbar-btn">Reset Layout</span>
+      </div>
+      <div class="canvas-area">
+        <div class="mock-cluster firewalls small" style="--x: 5%; --y: 35%;">
+          <div class="cluster-label">Firewalls</div>
+          <div class="cluster-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+          </div>
+        </div>
+
+        <div class="mock-edge h-exp" style="--x1: 16%; --y1: 42%; --x2: 24%; --y2: 30%;"></div>
+
+        <div class="expanded-cluster-box" style="--x: 25%; --y: 10%;">
+          <div class="expanded-header">Core Network (expanded)</div>
+          <div class="expanded-devices">
+            <div class="mock-device">
+              <span class="device-status up"></span>
+              <span class="device-name">cat-1</span>
+              <span class="device-ip">10.2.10.1</span>
+            </div>
+            <div class="mock-device">
+              <span class="device-status up"></span>
+              <span class="device-name">cat-2</span>
+              <span class="device-ip">10.2.10.2</span>
+            </div>
+            <div class="mock-device">
+              <span class="device-status up"></span>
+              <span class="device-name">cat-3</span>
+              <span class="device-ip">10.2.10.3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mock-edge v-exp" style="--x1: 48%; --y1: 55%; --x2: 48%; --y2: 72%;"></div>
+
+        <div class="mock-cluster access small" style="--x: 35%; --y: 75%;">
+          <div class="cluster-label">Access Layer</div>
+          <div class="cluster-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot down"></span>
+          </div>
+        </div>
+
+        <div class="canvas-hint">Double-click device to collapse cluster</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Node Types</h3>
+    <div class="node-types-grid">
+      <div class="node-type-card">
+        <div class="node-type-header">ClusterNode (collapsed)</div>
+        <div class="node-type-mockup cluster-node-mock">
+          <div class="cnm-icon">🔌</div>
+          <div class="cnm-name">Core Network</div>
+          <div class="cnm-divider"></div>
+          <div class="cnm-dots">
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+            <span class="dot up"></span>
+          </div>
+          <div class="cnm-divider"></div>
+          <div class="cnm-summary">8 devices &nbsp;&nbsp; All healthy</div>
+          <div class="cnm-handles">
+            <span class="handle top"></span>
+            <span class="handle right"></span>
+            <span class="handle bottom"></span>
+            <span class="handle left"></span>
+          </div>
+        </div>
+        <div class="node-type-action">Double-click to expand</div>
+      </div>
+
+      <div class="node-type-card">
+        <div class="node-type-header">DeviceNode (expanded)</div>
+        <div class="node-type-mockup device-node-mock">
+          <div class="dnm-status up"></div>
+          <div class="dnm-info">
+            <span class="dnm-name">cat-1</span>
+            <span class="dnm-ip">10.2.10.1</span>
+          </div>
+          <div class="dnm-handles">
+            <span class="handle top"></span>
+            <span class="handle right"></span>
+            <span class="handle bottom"></span>
+            <span class="handle left"></span>
+          </div>
+        </div>
+        <div class="node-type-action">Double-click to collapse cluster</div>
+      </div>
+
+      <div class="node-type-card">
+        <div class="node-type-header">ExternalNode (WAN)</div>
+        <div class="node-type-mockup external-node-mock">
+          <div class="enm-glow"></div>
+          <div class="enm-icon">☁</div>
+          <div class="enm-label">Internet</div>
+        </div>
+        <div class="node-type-desc">Glowing border color reflects speedtest status</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Collision Detection Algorithm</h3>
+    <div class="algorithm-block">
+      <div class="algo-section">
+        <div class="algo-label">INPUT</div>
+        <div class="algo-content">nodes[] after position assignment</div>
+      </div>
+      <div class="algo-section">
+        <div class="algo-label">CONSTANTS</div>
+        <div class="algo-content">
+          <code>NODE_SIZES = {`{ cluster: 180×120, device: 160×80, external: 140×100 }`}</code><br/>
+          <code>PADDING = 40px</code>
+        </div>
+      </div>
+      <div class="algo-section">
+        <div class="algo-label">STEP 1</div>
+        <div class="algo-content">
+          Calculate bounding boxes for each node:<br/>
+          <code>box = {`{ x: node.x - PADDING, y: node.y - PADDING, width: size + PADDING*2, height: size + PADDING*2 }`}</code>
+        </div>
+      </div>
+      <div class="algo-section">
+        <div class="algo-label">STEP 2</div>
+        <div class="algo-content">
+          Check for overlaps:<br/>
+          <code>boxesOverlap(a, b) = !(a.right &lt; b.x || b.right &lt; a.x || a.bottom &lt; b.y || b.bottom &lt; a.y)</code>
+        </div>
+      </div>
+      <div class="algo-section">
+        <div class="algo-label">STEP 3</div>
+        <div class="algo-content">
+          Calculate push vector (push along shortest overlap axis):<br/>
+          <code>IF overlapX &lt; overlapY → push horizontally ELSE → push vertically</code>
+        </div>
+      </div>
+      <div class="algo-section">
+        <div class="algo-label">STEP 4</div>
+        <div class="algo-content">
+          Iterate until resolved:<br/>
+          <code>WHILE hasOverlap AND iteration &lt; 50: recalculate, check pairs, apply push</code>
+        </div>
+      </div>
+      <div class="algo-section">
+        <div class="algo-label">OUTPUT</div>
+        <div class="algo-content">nodes[] with non-overlapping positions</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Position Persistence</h3>
+    <div class="persistence-block">
+      <div class="persist-key">
+        <span class="persist-label">localStorage Key:</span>
+        <code>watchtower-node-positions</code>
+      </div>
+      <div class="persist-structure">
+        <div class="persist-header">Stored Structure:</div>
+        <pre><code>{`{
+  "cluster-core": { "x": 450, "y": 150 },
+  "cluster-servers": { "x": 450, "y": 450 },
+  "cat-1": { "x": 350, "y": 120 },
+  "cat-2": { "x": 550, "y": 120 },
+  "external-Internet": { "x": 80, "y": 150 }
+}`}</code></pre>
+      </div>
+      <div class="persist-triggers">
+        <div class="trigger-item">
+          <span class="trigger-event">Save:</span>
+          <span class="trigger-when">On drag end (when <code>dragging === false</code>)</span>
+        </div>
+        <div class="trigger-item">
+          <span class="trigger-event">Load:</span>
+          <span class="trigger-when">On component mount</span>
+        </div>
+        <div class="trigger-item">
+          <span class="trigger-event">Reset:</span>
+          <span class="trigger-when">Clear localStorage, regenerate auto-layout</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Event Handlers</h3>
+    <div class="tech-table">
+      <div class="tech-row header">
+        <span class="tech-label">Event</span>
+        <span class="tech-value">Action</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Single click device</span>
+        <span class="tech-value">selectDevice(id) → opens sidebar detail panel</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Single click cluster</span>
+        <span class="tech-value">No action (expands on double-click)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Double-click cluster</span>
+        <span class="tech-value">toggleClusterExpanded(id) → expand to show devices</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Double-click device</span>
+        <span class="tech-value">toggleClusterExpanded(clusterId) → collapse back</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Drag node</span>
+        <span class="tech-value">Update position, save to localStorage on drop</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Scroll wheel</span>
+        <span class="tech-value">Zoom in/out (0.2x - 2x range)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Click + drag background</span>
+        <span class="tech-value">Pan the canvas</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Grid Layout for Expanded Devices</h3>
+    <div class="grid-layout-block">
+      <div class="grid-algo">
+        <div class="grid-step">
+          <span class="step-num">1</span>
+          <span class="step-text">Determine grid: <code>cols = min(3, deviceCount)</code>, <code>rows = ceil(deviceCount / cols)</code></span>
+        </div>
+        <div class="grid-step">
+          <span class="step-num">2</span>
+          <span class="step-text">Spacing: <code>spacingX = 200px</code>, <code>spacingY = 120px</code></span>
+        </div>
+        <div class="grid-step">
+          <span class="step-num">3</span>
+          <span class="step-text">Center on cluster position: <code>startX = cluster.x - gridWidth / 2</code></span>
+        </div>
+        <div class="grid-step">
+          <span class="step-num">4</span>
+          <span class="step-text">Position each device: <code>x = startX + (i % cols) * spacingX</code></span>
+        </div>
+      </div>
+      <div class="grid-example">
+        <div class="grid-example-header">Example: 8 devices at cluster (450, 300)</div>
+        <div class="grid-visual">
+          <div class="grid-row">
+            <span class="grid-cell">[0]</span>
+            <span class="grid-dash">───</span>
+            <span class="grid-cell">[1]</span>
+            <span class="grid-dash">───</span>
+            <span class="grid-cell">[2]</span>
+          </div>
+          <div class="grid-vline">│ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │</div>
+          <div class="grid-row">
+            <span class="grid-cell">[3]</span>
+            <span class="grid-dash">───</span>
+            <span class="grid-cell">[4]</span>
+            <span class="grid-dash">───</span>
+            <span class="grid-cell">[5]</span>
+          </div>
+          <div class="grid-vline">│ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │</div>
+          <div class="grid-row">
+            <span class="grid-cell">[6]</span>
+            <span class="grid-dash">───</span>
+            <span class="grid-cell">[7]</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Edge Routing</h3>
+    <div class="edge-routing-block">
+      <p class="routing-intro">Edges dynamically connect based on cluster expansion state:</p>
+      <div class="routing-rules">
+        <div class="routing-rule">
+          <span class="rule-condition">Both expanded:</span>
+          <span class="rule-result">device → device</span>
+        </div>
+        <div class="routing-rule">
+          <span class="rule-condition">Source expanded, target collapsed:</span>
+          <span class="rule-result">device → cluster</span>
+        </div>
+        <div class="routing-rule">
+          <span class="rule-condition">Source collapsed, target expanded:</span>
+          <span class="rule-result">cluster → device</span>
+        </div>
+        <div class="routing-rule">
+          <span class="rule-condition">Both collapsed:</span>
+          <span class="rule-result">cluster → cluster</span>
+        </div>
+      </div>
+      <p class="routing-note">Edges are deduplicated: only one edge per node pair using sorted key.</p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Component Hierarchy</h3>
+    <div class="component-tree">
+      <div class="tree-node root">
+        <span class="tree-name">TopologyCanvas.tsx</span>
+        <span class="tree-desc">(wrapper with ReactFlowProvider)</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-node">
+          <span class="tree-name">TopologyCanvasInner</span>
+        </div>
+        <div class="tree-grandchildren">
+          <div class="tree-leaf">useNocStore (topology, expandedClusters, selectDevice)</div>
+          <div class="tree-leaf">savedPositionsRef (localStorage persistence)</div>
+          <div class="tree-leaf">processedNodes = useMemo(() => topologyToNodes → resolveOverlaps)</div>
+          <div class="tree-leaf">initialEdges = useMemo(() => topologyToEdges)</div>
+          <div class="tree-node nested">
+            <span class="tree-name">ReactFlow</span>
+          </div>
+          <div class="tree-deep">
+            <div class="tree-leaf">nodeTypes: {`{ cluster, device, external, vlanGroup }`}</div>
+            <div class="tree-leaf">edgeTypes: {`{ traffic, physical }`}</div>
+            <div class="tree-leaf">&lt;Background /&gt; (grid pattern)</div>
+            <div class="tree-leaf">&lt;Controls /&gt; (zoom buttons)</div>
+            <div class="tree-leaf">&lt;Panel position="top-right"&gt; (view toggle, reset)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Implementation Details</h3>
+    <div class="tech-table">
+      <div class="tech-row header">
+        <span class="tech-label">Aspect</span>
+        <span class="tech-value">Implementation</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">ReactFlow version</span>
+        <span class="tech-value">@xyflow/react (v12+)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Min/Max zoom</span>
+        <span class="tech-value">0.2x - 2x</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Collision padding</span>
+        <span class="tech-value">40px between nodes</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Max collision iterations</span>
+        <span class="tech-value">50</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Grid columns (expanded)</span>
+        <span class="tech-value">Max 3 devices per row</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Device spacing</span>
+        <span class="tech-value">200px × 120px</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Cluster spacing</span>
+        <span class="tech-value">450px × 350px</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Position save trigger</span>
+        <span class="tech-value">On drag end (dragging === false)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Fit view padding</span>
+        <span class="tech-value">0.2 (20%)</span>
       </div>
     </div>
   </div>
@@ -9834,5 +10841,1637 @@ interface AlertState {
   .roadmap-feature .feature-desc {
     font-size: 0.7rem;
     opacity: 0.75;
+  }
+
+  /* ===== Interactive Topology Canvas Deep Dive ===== */
+
+  .topology-arch-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .arch-source {
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 30%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .arch-source-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #3b82f6;
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-source-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+
+  .arch-arrow-down {
+    text-align: center;
+    color: #10b981;
+    font-size: 1.25rem;
+    padding: 0.25rem 0;
+  }
+
+  .arch-processor {
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .arch-processor.collision {
+    background: color-mix(in srgb, #f59e0b 8%, transparent);
+    border-color: color-mix(in srgb, #f59e0b 25%, transparent);
+  }
+
+  .proc-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #10b981;
+    margin-bottom: 0.75rem;
+  }
+
+  .arch-processor.collision .proc-header {
+    color: #f59e0b;
+  }
+
+  .proc-logic {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .proc-rule {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    align-items: baseline;
+  }
+
+  .rule-condition {
+    font-family: "IBM Plex Mono", monospace;
+    opacity: 0.7;
+  }
+
+  .rule-if {
+    font-family: "IBM Plex Mono", monospace;
+    color: #10b981;
+  }
+
+  .rule-result {
+    opacity: 0.9;
+  }
+
+  .proc-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .proc-step {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    padding-left: 0.5rem;
+    border-left: 2px solid color-mix(in srgb, #f59e0b 40%, transparent);
+  }
+
+  .arch-renderer {
+    background: color-mix(in srgb, #8b5cf6 8%, transparent);
+    border: 1px solid color-mix(in srgb, #8b5cf6 25%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .renderer-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    margin-bottom: 0.75rem;
+  }
+
+  .renderer-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.35rem;
+  }
+
+  .control-item {
+    font-size: 0.7rem;
+    opacity: 0.85;
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 3px;
+  }
+
+  .layout-desc {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+  }
+
+  /* Canvas Mockups */
+  .canvas-mockup {
+    margin: 1rem auto;
+    max-width: 600px;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .canvas-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .canvas-toolbar .toolbar-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .canvas-toolbar .toolbar-btn.active {
+    background: color-mix(in srgb, #10b981 20%, transparent);
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  .toolbar-spacer {
+    flex: 1;
+  }
+
+  .canvas-area {
+    position: relative;
+    height: 280px;
+    padding: 1rem;
+  }
+
+  .mock-cluster {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 120px;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 2px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  .mock-cluster.warning {
+    border-color: #ef4444;
+  }
+
+  .mock-cluster.small {
+    width: 90px;
+    padding: 0.35rem;
+  }
+
+  .mock-cluster .cluster-icon {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .mock-cluster .cluster-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+
+  .mock-cluster .cluster-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .mock-cluster .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .mock-cluster .dot.up {
+    background: #10b981;
+  }
+
+  .mock-cluster .dot.down {
+    background: #ef4444;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .mock-cluster .cluster-summary {
+    font-size: 0.55rem;
+    opacity: 0.7;
+  }
+
+  .mock-edge {
+    position: absolute;
+    left: var(--x1);
+    top: var(--y1);
+    width: calc(var(--x2) - var(--x1));
+    height: calc(var(--y2) - var(--y1));
+    border: 0;
+  }
+
+  .mock-edge.h1, .mock-edge.h2, .mock-edge.h-exp {
+    height: 2px;
+    background: color-mix(in srgb, #10b981 60%, transparent);
+    top: var(--y1);
+  }
+
+  .mock-edge.v1, .mock-edge.v2, .mock-edge.v-exp {
+    width: 2px;
+    background: color-mix(in srgb, #10b981 60%, transparent);
+    left: var(--x1);
+  }
+
+  .mock-external {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 80px;
+    text-align: center;
+  }
+
+  .mock-external .external-glow {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid #10b981;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+  }
+
+  .mock-external .external-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 2px dashed color-mix(in srgb, currentColor 30%, transparent);
+    border-radius: 50%;
+  }
+
+  .mock-external .external-icon-lg {
+    font-size: 1.25rem;
+  }
+
+  .mock-external .external-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+  }
+
+  .canvas-hint {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    opacity: 0.5;
+    font-style: italic;
+  }
+
+  /* Expanded View */
+  .expanded-cluster-box {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 280px;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 2px dashed color-mix(in srgb, #10b981 40%, transparent);
+    border-radius: 8px;
+  }
+
+  .expanded-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #10b981;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .expanded-devices {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .mock-device {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    min-width: 70px;
+  }
+
+  .mock-device .device-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-bottom: 0.2rem;
+  }
+
+  .mock-device .device-status.up {
+    background: #10b981;
+  }
+
+  .mock-device .device-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+
+  .mock-device .device-ip {
+    font-size: 0.55rem;
+    opacity: 0.6;
+  }
+
+  /* Node Types Grid */
+  .node-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .node-type-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .node-type-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #3b82f6;
+  }
+
+  .node-type-mockup {
+    margin: 0 auto 0.75rem;
+  }
+
+  .node-type-action, .node-type-desc {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* Cluster Node Mockup */
+  .cluster-node-mock {
+    position: relative;
+    width: 140px;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 2px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 6px;
+  }
+
+  .cnm-icon {
+    font-size: 1rem;
+  }
+
+  .cnm-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .cnm-divider {
+    height: 1px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    margin: 0.35rem 0;
+  }
+
+  .cnm-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    flex-wrap: wrap;
+  }
+
+  .cnm-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+  }
+
+  .cnm-summary {
+    font-size: 0.55rem;
+    opacity: 0.7;
+  }
+
+  .cnm-handles {
+    position: absolute;
+  }
+
+  .cnm-handles .handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: color-mix(in srgb, currentColor 30%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
+    border-radius: 50%;
+  }
+
+  .cnm-handles .handle.top { top: -4px; left: 50%; transform: translateX(-50%); }
+  .cnm-handles .handle.right { right: -4px; top: 50%; transform: translateY(-50%); }
+  .cnm-handles .handle.bottom { bottom: -4px; left: 50%; transform: translateX(-50%); }
+  .cnm-handles .handle.left { left: -4px; top: 50%; transform: translateY(-50%); }
+
+  /* Device Node Mockup */
+  .device-node-mock {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 120px;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 4px;
+  }
+
+  .dnm-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dnm-status.up {
+    background: #10b981;
+  }
+
+  .dnm-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .dnm-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .dnm-ip {
+    font-size: 0.55rem;
+    opacity: 0.6;
+  }
+
+  .dnm-handles {
+    position: absolute;
+  }
+
+  .dnm-handles .handle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: color-mix(in srgb, currentColor 30%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
+    border-radius: 50%;
+  }
+
+  .dnm-handles .handle.top { top: -3px; left: 50%; transform: translateX(-50%); }
+  .dnm-handles .handle.right { right: -3px; top: 50%; transform: translateY(-50%); }
+  .dnm-handles .handle.bottom { bottom: -3px; left: 50%; transform: translateX(-50%); }
+  .dnm-handles .handle.left { left: -3px; top: 50%; transform: translateY(-50%); }
+
+  /* External Node Mockup */
+  .external-node-mock {
+    position: relative;
+    width: 90px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 2px dashed color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 35px;
+  }
+
+  .enm-glow {
+    position: absolute;
+    inset: -3px;
+    border: 2px solid #10b981;
+    border-radius: 38px;
+    opacity: 0.4;
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  .enm-icon {
+    font-size: 1.25rem;
+  }
+
+  .enm-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+  }
+
+  /* Algorithm Block */
+  .algorithm-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .algo-section {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .algo-section:last-child {
+    border-bottom: none;
+  }
+
+  .algo-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    color: #f59e0b;
+  }
+
+  .algo-content {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .algo-content code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  /* Persistence Block */
+  .persistence-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .persist-key {
+    margin-bottom: 1rem;
+  }
+
+  .persist-label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-right: 0.5rem;
+  }
+
+  .persist-key code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+  }
+
+  .persist-structure {
+    margin-bottom: 1rem;
+  }
+
+  .persist-header {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .persist-structure pre {
+    margin: 0;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  .persist-structure code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .persist-triggers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .trigger-item {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .trigger-event {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: #3b82f6;
+    min-width: 50px;
+  }
+
+  .trigger-when code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  /* Grid Layout Block */
+  .grid-layout-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .grid-layout-block {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .grid-algo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .grid-step {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .grid-step .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .grid-step .step-text code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  .grid-example {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .grid-example-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 0.75rem;
+  }
+
+  .grid-visual {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .grid-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .grid-cell {
+    padding: 0.2rem 0.4rem;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 40%, transparent);
+    border-radius: 3px;
+  }
+
+  .grid-dash {
+    opacity: 0.4;
+  }
+
+  .grid-vline {
+    opacity: 0.4;
+    white-space: pre;
+  }
+
+  /* Edge Routing Block */
+  .edge-routing-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .routing-intro {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin-bottom: 0.75rem;
+  }
+
+  .routing-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .routing-rule {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .routing-rule .rule-condition {
+    font-family: "IBM Plex Mono", monospace;
+    min-width: 220px;
+    opacity: 0.8;
+  }
+
+  .routing-rule .rule-result {
+    font-family: "IBM Plex Mono", monospace;
+    color: #10b981;
+  }
+
+  .routing-note {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Component Tree */
+  .component-tree {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .tree-node {
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    margin-bottom: 0.25rem;
+  }
+
+  .tree-node.root {
+    background: color-mix(in srgb, #8b5cf6 10%, transparent);
+    border-color: color-mix(in srgb, #8b5cf6 30%, transparent);
+  }
+
+  .tree-node.nested {
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+    margin-top: 0.5rem;
+  }
+
+  .tree-name {
+    font-weight: 600;
+  }
+
+  .tree-desc {
+    opacity: 0.6;
+    margin-left: 0.5rem;
+  }
+
+  .tree-children {
+    margin-left: 1.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .tree-grandchildren {
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .tree-deep {
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .tree-leaf {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    padding: 0.25rem 0;
+  }
+
+  /* ===== WebSocket Real-Time Updates Deep Dive ===== */
+
+  .ws-architecture {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .ws-layer {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .ws-layer.scheduler {
+    border-color: color-mix(in srgb, #f59e0b 30%, transparent);
+  }
+
+  .ws-layer.manager {
+    border-color: color-mix(in srgb, #8b5cf6 30%, transparent);
+  }
+
+  .ws-layer.clients {
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+  }
+
+  .ws-layer-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .ws-layer.scheduler .ws-layer-header { background: color-mix(in srgb, #f59e0b 8%, transparent); }
+  .ws-layer.manager .ws-layer-header { background: color-mix(in srgb, #8b5cf6 8%, transparent); }
+  .ws-layer.clients .ws-layer-header { background: color-mix(in srgb, #3b82f6 8%, transparent); }
+
+  .ws-layer-icon {
+    font-size: 1rem;
+  }
+
+  .ws-layer-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .ws-layer.scheduler .ws-layer-title { color: #f59e0b; }
+  .ws-layer.manager .ws-layer-title { color: #8b5cf6; }
+  .ws-layer.clients .ws-layer-title { color: #3b82f6; }
+
+  .ws-pollers {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ws-poller {
+    display: grid;
+    grid-template-columns: 140px 70px 1fr;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    border-radius: 4px;
+    align-items: center;
+  }
+
+  .poller-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: #f59e0b;
+  }
+
+  .poller-interval {
+    font-family: "IBM Plex Mono", monospace;
+    opacity: 0.6;
+    font-size: 0.65rem;
+  }
+
+  .poller-action {
+    opacity: 0.85;
+  }
+
+  .ws-arrow-down {
+    text-align: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+    padding: 0.25rem 0;
+  }
+
+  .ws-manager-content {
+    padding: 0.75rem;
+  }
+
+  .ws-manager-content code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+  }
+
+  .ws-manager-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .ws-flow-arrow {
+    color: #8b5cf6;
+  }
+
+  .ws-clients-grid {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .ws-client {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 30%, transparent);
+    border-radius: 4px;
+  }
+
+  .ws-hook {
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .ws-hook-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .ws-hook-handlers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .ws-handler {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    border-radius: 3px;
+  }
+
+  .handler-msg {
+    font-family: "IBM Plex Mono", monospace;
+    color: #10b981;
+    min-width: 150px;
+  }
+
+  .handler-arrow {
+    opacity: 0.5;
+  }
+
+  .handler-action {
+    opacity: 0.85;
+  }
+
+  /* WebSocket Messages Grid */
+  .ws-messages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .ws-message-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .ws-message-card.keepalive {
+    border-style: dashed;
+    opacity: 0.8;
+  }
+
+  .ws-msg-header {
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .ws-msg-type {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .ws-msg-desc {
+    font-size: 0.7rem;
+    opacity: 0.75;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  .ws-msg-payload {
+    padding: 0.5rem;
+  }
+
+  .ws-msg-payload pre {
+    margin: 0;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    overflow-x: auto;
+  }
+
+  .ws-msg-payload code {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* Connection Lifecycle */
+  .ws-lifecycle {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .lifecycle-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .lifecycle-client { color: #3b82f6; }
+  .lifecycle-server { color: #10b981; }
+
+  .lifecycle-arrow {
+    position: relative;
+  }
+
+  .lifecycle-arrow::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .lifecycle-event {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .lifecycle-event.disconnect {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed color-mix(in srgb, #ef4444 40%, transparent);
+  }
+
+  .lifecycle-msg {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
+  .lifecycle-msg.outgoing {
+    text-align: right;
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+    margin-left: auto;
+  }
+
+  .lifecycle-msg.incoming {
+    text-align: left;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+  }
+
+  .lifecycle-note {
+    font-size: 0.6rem;
+    opacity: 0.5;
+    text-align: center;
+    align-self: center;
+  }
+
+  .lifecycle-action {
+    font-size: 0.65rem;
+    opacity: 0.75;
+    text-align: left;
+    padding-left: 0.5rem;
+  }
+
+  .lifecycle-reconnect {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, #f59e0b 8%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 25%, transparent);
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .reconnect-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #f59e0b;
+    margin-bottom: 0.25rem;
+  }
+
+  .reconnect-delays {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+
+  /* Reconnection Flow */
+  .reconnect-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 1rem 0;
+  }
+
+  .reconnect-step {
+    padding: 0.6rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  .reconnect-step.trigger {
+    background: color-mix(in srgb, #ef4444 10%, transparent);
+    border-color: color-mix(in srgb, #ef4444 30%, transparent);
+  }
+
+  .reconnect-step .step-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .reconnect-step.trigger .step-label {
+    color: #ef4444;
+  }
+
+  .reconnect-step code {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+  }
+
+  .reconnect-arrow {
+    color: #10b981;
+    font-size: 1rem;
+  }
+
+  .reconnect-delays-table {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+  }
+
+  .delay-row {
+    display: contents;
+  }
+
+  .delay-row span:first-child {
+    opacity: 0.6;
+    text-align: right;
+  }
+
+  .attempt-outcomes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .outcome {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .outcome.success {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    color: #10b981;
+  }
+
+  .outcome.failure {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+  }
+
+  /* Hostname Matching */
+  .hostname-matching {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .hostname-matching {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .matching-problem {
+    background: color-mix(in srgb, #ef4444 8%, transparent);
+    border: 1px solid color-mix(in srgb, #ef4444 25%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .problem-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #ef4444;
+    margin-bottom: 0.5rem;
+  }
+
+  .problem-row {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .problem-source {
+    opacity: 0.7;
+    min-width: 100px;
+  }
+
+  .problem-row code {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .matching-algorithm {
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .algo-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #10b981;
+    padding: 0.6rem 1rem;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, #10b981 15%, transparent);
+  }
+
+  .algo-steps {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .algo-step {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .algo-step .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .algo-step .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .algo-step .step-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+  }
+
+  .algo-step .step-logic {
+    font-size: 0.7rem;
+    opacity: 0.85;
+  }
+
+  .algo-step .step-example {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* Component Structure Split */
+  .ws-component-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .ws-component-split {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ws-component-col {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .ws-component-col.backend {
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+  }
+
+  .ws-component-col.frontend {
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+  }
+
+  .component-col-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .ws-component-col.backend .component-col-header {
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    color: #10b981;
+  }
+
+  .ws-component-col.frontend .component-col-header {
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+    color: #3b82f6;
+  }
+
+  .ws-component-col .component-tree {
+    padding: 0.75rem;
+  }
+
+  .tree-file {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .tree-file:last-child {
+    margin-bottom: 0;
+  }
+
+  .tree-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-weight: 400;
+    font-size: 0.65rem;
+    opacity: 0.85;
+    margin-top: 0.25rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .tree-indent {
+    padding-left: 0.5rem;
+    opacity: 0.75;
+  }
+
+  /* URL Construction */
+  .url-construction {
+    margin: 1rem 0;
+  }
+
+  .url-code {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .url-code pre {
+    margin: 0;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .url-code code {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .url-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .url-example {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .url-input {
+    opacity: 0.7;
+  }
+
+  .url-arrow {
+    color: #10b981;
+  }
+
+  .url-output {
+    color: #10b981;
+  }
+
+  /* Debug Helper */
+  .debug-helper {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .debug-intro {
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .debug-intro code {
+    font-family: "IBM Plex Mono", monospace;
+    color: #f59e0b;
+  }
+
+  .debug-commands {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .debug-cmd {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .debug-cmd code {
+    font-family: "IBM Plex Mono", monospace;
+    color: #f59e0b;
+  }
+
+  .debug-desc {
+    opacity: 0.6;
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    .ws-poller {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .poller-interval {
+      display: none;
+    }
+
+    .debug-cmd {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .debug-desc {
+      text-align: left;
+      font-size: 0.65rem;
+    }
   }
 </style>
