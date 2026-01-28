@@ -81,7 +81,7 @@ const features = [
     desc: "Export topology as Mermaid diagram for documentation with built-in viewer",
     tech: "Frontend Mermaid generator",
     icon: "📝",
-    anchor: null
+    anchor: "mermaid-export"
   },
   {
     name: "Alert System",
@@ -2886,6 +2886,612 @@ interface NocState {
       <div class="stack-row">
         <span class="stack-layer">Styling</span>
         <span class="stack-tech">Tailwind CSS (purple accent for L3)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Mermaid Export -->
+  <div class="feature-deepdive" id="mermaid-export">
+    <h2>// Feature Deep Dive: Mermaid Topology Export</h2>
+    <p class="deepdive-intro">
+      Generates a Mermaid flowchart diagram from the live network topology data, allowing users to either
+      view an interactive visualization in a modal or download a <code>.mmd</code> file for use in
+      documentation, wikis, or presentations.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">📝</span>
+        <span class="usecase-title">Use Case: Portable Network Documentation</span>
+      </div>
+      <p class="usecase-desc">
+        NOC operators and network engineers need to document or share the network topology without giving
+        direct dashboard access. The Mermaid export creates portable diagram code that renders in GitHub
+        READMEs, Confluence, Notion, Obsidian, and any Mermaid-compatible tool. The visualize modal
+        provides immediate in-app viewing with pan/zoom controls.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Architecture</h3>
+    <div class="mermaid-architecture">
+      <div class="arch-trigger">
+        <div class="arch-trigger-label">USER INTERACTION</div>
+        <div class="arch-trigger-desc">User clicks "Visualize" or "Export Mermaid"</div>
+      </div>
+
+      <div class="arch-split">
+        <div class="arch-branch mermaid-visualize">
+          <div class="branch-header">
+            <span class="branch-badge visualize">Visualize</span>
+          </div>
+          <div class="branch-flow">
+            <div class="branch-step">handleVisualizeMermaid()</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-creates">
+              <span class="creates-label">Steps:</span>
+              <ul>
+                <li>Get topology from store</li>
+                <li>generateMermaidDiagram(topology)</li>
+                <li>setMermaidDiagram(content)</li>
+                <li>setShowMermaidModal(true)</li>
+              </ul>
+            </div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step">MermaidModal.tsx</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-creates">
+              <span class="creates-label">Render:</span>
+              <ul>
+                <li>mermaid.render('mermaid-diagram', diagram)</li>
+                <li>Parse SVG output</li>
+                <li>Inject into container</li>
+                <li>Pan/zoom controls</li>
+              </ul>
+            </div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-result">Interactive SVG diagram with dark theme styling</div>
+          </div>
+        </div>
+
+        <div class="arch-branch mermaid-export-branch">
+          <div class="branch-header">
+            <span class="branch-badge export">Export</span>
+          </div>
+          <div class="branch-flow">
+            <div class="branch-step">handleExportMermaid()</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-creates">
+              <span class="creates-label">Steps:</span>
+              <ul>
+                <li>Get topology from store</li>
+                <li>generateMermaidDiagram(topology)</li>
+                <li>downloadFile(content, filename)</li>
+              </ul>
+            </div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-step">Browser Download API</div>
+            <div class="branch-arrow">↓</div>
+            <div class="branch-result">Downloads "topology-YYYY-MM-DD.mmd"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Layout</h3>
+
+    <div class="mermaid-modal-mockup">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="modal-icon">📊</span>
+          <span>Network Topology Diagram</span>
+        </div>
+        <div class="modal-controls">
+          <span class="zoom-btn">−</span>
+          <span class="zoom-level">100%</span>
+          <span class="zoom-btn">+</span>
+          <span class="zoom-btn reset">⤢</span>
+          <span class="zoom-btn close">✕</span>
+        </div>
+      </div>
+      <div class="modal-canvas">
+        <div class="mermaid-diagram-preview">
+          <div class="mermaid-subgraph core">
+            <div class="subgraph-label">Core Network</div>
+            <div class="mermaid-nodes">
+              <div class="mermaid-node hexagon">
+                <span class="node-name">cat-1</span>
+                <span class="node-ip">10.2.10.1</span>
+              </div>
+              <div class="mermaid-node hexagon">
+                <span class="node-name">cat-2</span>
+                <span class="node-ip">10.2.10.2</span>
+              </div>
+            </div>
+          </div>
+          <div class="mermaid-link labeled">Gi0/1 ↔ Gi0/2</div>
+          <div class="mermaid-subgraph firewall">
+            <div class="subgraph-label">Firewalls</div>
+            <div class="mermaid-nodes">
+              <div class="mermaid-node trapezoid">
+                <span class="node-name">pa-3410</span>
+                <span class="node-ip">10.2.60.3</span>
+              </div>
+            </div>
+          </div>
+          <div class="mermaid-link dashed">┆</div>
+          <div class="mermaid-external">
+            <span class="external-circle">(( Internet ))</span>
+          </div>
+        </div>
+        <div class="mermaid-legend">
+          <div class="legend-title">📋 Legend</div>
+          <div class="legend-section">
+            <div class="legend-label">Device Types</div>
+            <div class="legend-item"><span class="shape-hex">⬡</span> Switch</div>
+            <div class="legend-item"><span class="shape-trap">◢</span> Firewall</div>
+            <div class="legend-item"><span class="shape-rect">▭</span> Server</div>
+            <div class="legend-item"><span class="shape-circle">●</span> External</div>
+          </div>
+          <div class="legend-section">
+            <div class="legend-label">Connections</div>
+            <div class="legend-item"><span class="line-solid">──</span> Physical</div>
+            <div class="legend-item"><span class="line-dashed">┄┄</span> WAN/External</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span class="footer-hint">Drag to pan • Scroll to zoom • Press Esc to close</span>
+        <span class="footer-powered">Powered by Mermaid</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Mermaid Generation Algorithm</h3>
+    <div class="algorithm-block">
+      <div class="algo-input">
+        <span class="input-label">INPUT:</span>
+        <code>Topology object from store: {`{ clusters, devices, connections, external_links }`}</code>
+      </div>
+
+      <div class="algo-step">
+        <span class="algo-num">1</span>
+        <div class="algo-content">
+          <span class="algo-title">Initialize flowchart</span>
+          <code>lines = ['flowchart TB']</code>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <span class="algo-num">2</span>
+        <div class="algo-content">
+          <span class="algo-title">Create subgraphs for each cluster</span>
+          <div class="algo-detail">
+            <code>subgraph {`{clusterId}`}["{`{clusterName}`}"]</code>
+            <div class="algo-substeps">
+              <span>• sanitizedId = sanitizeMermaidId(deviceId)</span>
+              <span>• Shape based on device type (hexagon/trapezoid/rectangle)</span>
+              <span>• Label includes name + IP in &lt;small&gt; tag</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <span class="algo-num">3</span>
+        <div class="algo-content">
+          <span class="algo-title">Add external endpoint nodes</span>
+          <code>{`{externalId}`}(("{`{label}`}"))  // circle/stadium shape</code>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <span class="algo-num">4</span>
+        <div class="algo-content">
+          <span class="algo-title">Add internal connections</span>
+          <div class="algo-detail">
+            <span>• Deduplicate bidirectional links (sort endpoints, track in Set)</span>
+            <span>• With ports: <code>A ---|"Gi0/1 ↔ Gi0/2"| B</code></span>
+            <span>• Without ports: <code>A --- B</code></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <span class="algo-num">5</span>
+        <div class="algo-content">
+          <span class="algo-title">Add external link connections (dashed)</span>
+          <code>{`{sourceId}`} -.-> {`{targetId}`}  // dashed arrow</code>
+        </div>
+      </div>
+
+      <div class="algo-output">
+        <span class="output-label">OUTPUT:</span>
+        <code>lines.join('\\n')</code>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Generated Mermaid Syntax</h3>
+    <div class="code-output-block">
+      <div class="code-header">
+        <span class="code-lang">Mermaid</span>
+        <span class="code-desc">Example output</span>
+      </div>
+      <pre><code>{`flowchart TB
+    subgraph core_network["Core Network"]
+        cat_1{{"Core Switch 1<br/><small>10.2.10.1</small>"}}
+        cat_2{{"Core Switch 2<br/><small>10.2.10.2</small>"}}
+    end
+
+    subgraph firewalls["Firewalls"]
+        pa_3410[/"PA-3410<br/><small>10.2.60.3</small>"\\]
+    end
+
+    ext_Internet(("Internet"))
+
+    cat_1 ---|"Gi0/1 ↔ Gi0/1"| cat_2
+    cat_1 ---|"Te1/0/1 ↔ eth1"| pa_3410
+    pa_3410 -.-> ext_Internet`}</code></pre>
+    </div>
+
+    <h3 class="deepdive-subhead">// Device Shape Mapping</h3>
+    <div class="shape-mapping-table">
+      <div class="shape-row header">
+        <span class="shape-type">Device Type</span>
+        <span class="shape-name">Mermaid Shape</span>
+        <span class="shape-syntax">Syntax</span>
+        <span class="shape-visual">Visual</span>
+      </div>
+      <div class="shape-row">
+        <span class="shape-type">Switch</span>
+        <span class="shape-name">Hexagon</span>
+        <span class="shape-syntax"><code>{`{{"label"}}`}</code></span>
+        <span class="shape-visual hex">⬡</span>
+      </div>
+      <div class="shape-row">
+        <span class="shape-type">Firewall</span>
+        <span class="shape-name">Trapezoid</span>
+        <span class="shape-syntax"><code>{`[/"label"\\]`}</code></span>
+        <span class="shape-visual trap">◢</span>
+      </div>
+      <div class="shape-row">
+        <span class="shape-type">Server/Other</span>
+        <span class="shape-name">Rectangle</span>
+        <span class="shape-syntax"><code>["label"]</code></span>
+        <span class="shape-visual rect">▭</span>
+      </div>
+      <div class="shape-row">
+        <span class="shape-type">External</span>
+        <span class="shape-name">Stadium/Circle</span>
+        <span class="shape-syntax"><code>(("label"))</code></span>
+        <span class="shape-visual circle">●</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Connection Style Mapping</h3>
+    <div class="connection-mapping-table">
+      <div class="conn-row header">
+        <span class="conn-type">Connection Type</span>
+        <span class="conn-syntax">Mermaid Syntax</span>
+        <span class="conn-visual">Visual</span>
+      </div>
+      <div class="conn-row">
+        <span class="conn-type">Physical Link</span>
+        <span class="conn-syntax"><code>A --- B</code></span>
+        <span class="conn-visual"><span class="line-solid">──</span> (solid)</span>
+      </div>
+      <div class="conn-row">
+        <span class="conn-type">Physical + Ports</span>
+        <span class="conn-syntax"><code>A ---|"Gi0/1 ↔ Gi0/2"| B</code></span>
+        <span class="conn-visual"><span class="line-solid">──</span> with label</span>
+      </div>
+      <div class="conn-row">
+        <span class="conn-type">External/WAN</span>
+        <span class="conn-syntax"><code>A -.-> B</code></span>
+        <span class="conn-visual"><span class="line-dashed">┄┄</span> (dashed arrow)</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// ID Sanitization</h3>
+    <div class="code-block-inline">
+      <pre><code>{`function sanitizeMermaidId(id: string): string {
+  // Mermaid only allows alphanumeric and dashes
+  // Replace all other characters with underscore
+  return id.replace(/[^a-zA-Z0-9-]/g, '_')
+}
+
+// Examples:
+// "cat-1.corp.local" → "cat_1_corp_local"
+// "Core Switch #1"   → "Core_Switch__1"
+// "10.2.10.1"        → "10_2_10_1"`}</code></pre>
+    </div>
+
+    <h3 class="deepdive-subhead">// MermaidModal Component</h3>
+    <div class="component-tree">
+      <div class="tree-root">MermaidModal.tsx</div>
+      <div class="tree-children">
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">Mermaid Initialization (dark theme)</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">primaryColor: #3b82f6 (blue)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">background: #0d1117 (dark)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">clusterBkg: #161b22</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">fontFamily: monospace</span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">State</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">scale: number (0.1 - 20)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">position: {`{ x, y }`}</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">isDragging: boolean</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">error: string | null</span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">Render Flow</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">mermaid.render('mermaid-diagram', diagram)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">DOMParser.parseFromString(svg, 'text/html')</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf tree-note">NOTE: Uses 'text/html' not 'image/svg+xml' (Mermaid SVG contains HTML)</span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">Controls</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">Zoom: [ − ] [100%] [ + ]</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">Reset: [ ⤢ ]</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">Close: [ ✕ ] or Escape key</span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">└──</span>
+          <span class="tree-name">Interactions</span>
+          <div class="tree-sub">
+            <span class="tree-connector">   ├──</span>
+            <span class="tree-leaf">Drag to pan (left mouse button)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">   ├──</span>
+            <span class="tree-leaf">Scroll wheel to zoom</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">   └──</span>
+            <span class="tree-leaf">Escape key to close</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Download Function</h3>
+    <div class="code-block-inline">
+      <pre><code>{`function downloadFile(content: string, filename: string) {
+  // 1. Create Blob from content
+  const blob = new Blob([content], { type: 'text/plain' })
+
+  // 2. Create object URL
+  const url = URL.createObjectURL(blob)
+
+  // 3. Create temporary anchor element
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename  // e.g., "topology-2026-01-27.mmd"
+
+  // 4. Trigger download
+  document.body.appendChild(a)
+  a.click()
+
+  // 5. Cleanup
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}`}</code></pre>
+    </div>
+
+    <h3 class="deepdive-subhead">// Mermaid Theme Configuration</h3>
+    <div class="theme-config-block">
+      <div class="config-section">
+        <span class="config-label">Colors</span>
+        <div class="config-items">
+          <div class="config-item">
+            <span class="color-swatch" style="background: #3b82f6"></span>
+            <code>primaryColor: '#3b82f6'</code>
+            <span class="config-note">Nodes</span>
+          </div>
+          <div class="config-item">
+            <span class="color-swatch" style="background: #e5e7eb"></span>
+            <code>primaryTextColor: '#e5e7eb'</code>
+            <span class="config-note">Text</span>
+          </div>
+          <div class="config-item">
+            <span class="color-swatch" style="background: #6b7280"></span>
+            <code>lineColor: '#6b7280'</code>
+            <span class="config-note">Edges</span>
+          </div>
+        </div>
+      </div>
+      <div class="config-section">
+        <span class="config-label">Backgrounds</span>
+        <div class="config-items">
+          <div class="config-item">
+            <span class="color-swatch" style="background: #0d1117"></span>
+            <code>background: '#0d1117'</code>
+            <span class="config-note">GitHub dark</span>
+          </div>
+          <div class="config-item">
+            <span class="color-swatch" style="background: #161b22"></span>
+            <code>clusterBkg: '#161b22'</code>
+            <span class="config-note">Subgraphs</span>
+          </div>
+        </div>
+      </div>
+      <div class="config-section">
+        <span class="config-label">Flowchart Options</span>
+        <div class="config-items">
+          <div class="config-item"><code>htmlLabels: true</code> <span class="config-note">Allow &lt;br/&gt;, &lt;small&gt;</span></div>
+          <div class="config-item"><code>curve: 'basis'</code> <span class="config-note">Smooth edges</span></div>
+          <div class="config-item"><code>nodeSpacing: 50</code></div>
+          <div class="config-item"><code>rankSpacing: 80</code></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">Diagram type</span>
+        <span class="tech-value">flowchart TB (top-to-bottom)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Cluster rendering</span>
+        <span class="tech-value">Mermaid subgraph blocks</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Device labels</span>
+        <span class="tech-value">HTML with &lt;br/&gt; and &lt;small&gt; for IP</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">ID sanitization</span>
+        <span class="tech-value">Replace non-alphanumeric with underscore</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Deduplication</span>
+        <span class="tech-value">Sort endpoints, join with --, track in Set</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">SVG parsing</span>
+        <span class="tech-value">Use text/html parser (not XML) for HTML labels</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Zoom range</span>
+        <span class="tech-value">10% - 2000%</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Export filename</span>
+        <span class="tech-value">topology-{`{YYYY-MM-DD}`}.mmd</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Modal size</span>
+        <span class="tech-value">90vw × 85vh</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// UI States</h3>
+    <div class="ui-states-table">
+      <div class="state-row header">
+        <span class="state-name">State</span>
+        <span class="state-display">Display</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">L2 mode</span>
+        <span class="state-display">Visualize + Export buttons visible</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">L3 mode</span>
+        <span class="state-display">Buttons hidden (Mermaid only for L2)</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">Modal open</span>
+        <span class="state-display">Dark overlay, centered diagram</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">Rendering</span>
+        <span class="state-display">Mermaid processes diagram async</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">Error</span>
+        <span class="state-display">Red warning icon + error message</span>
+      </div>
+      <div class="state-row">
+        <span class="state-name">Dragging</span>
+        <span class="state-display">Cursor changes to grabbing</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Tech Stack</h3>
+    <div class="tech-stack-table">
+      <div class="stack-row">
+        <span class="stack-layer">Diagram Library</span>
+        <span class="stack-tech">Mermaid.js (v10+)</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">SVG Rendering</span>
+        <span class="stack-tech">Browser DOMParser</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Pan/Zoom</span>
+        <span class="stack-tech">React useState + CSS transform</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Download</span>
+        <span class="stack-tech">Blob API + Object URL</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Styling</span>
+        <span class="stack-tech">Tailwind CSS (dark theme)</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// File Output Format</h3>
+    <div class="file-output-block">
+      <div class="file-header">
+        <span class="file-icon">📄</span>
+        <span class="file-name">topology-2026-01-27.mmd</span>
+      </div>
+      <div class="file-content">
+        <pre><code>{`flowchart TB
+    subgraph core_network["Core Network"]
+        cat_1{{"Core Switch 1<br/><small>10.2.10.1</small>"}}
+        cat_2{{"Core Switch 2<br/><small>10.2.10.2</small>"}}
+    end
+
+    subgraph access_layer["Access Layer"]
+        sw_bldg1{{"Building 1 Switch<br/><small>10.2.20.1</small>"}}
+    end
+
+    ext_Internet(("Internet"))
+
+    cat_1 ---|"Te1/0/1 ↔ Te1/0/1"| cat_2
+    cat_1 --- sw_bldg1
+    cat_1 -.-> ext_Internet`}</code></pre>
+      </div>
+      <div class="file-footer">
+        <span class="file-note">Plain text Mermaid syntax; renders in GitHub, Confluence, Obsidian, etc.</span>
       </div>
     </div>
   </div>
@@ -7147,5 +7753,624 @@ interface NocState {
 
   .stack-tech {
     font-size: 0.75rem;
+  }
+
+  /* Mermaid Export Deep Dive Styles */
+  .mermaid-architecture {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .arch-branch.mermaid-visualize {
+    border-top: 3px solid #3b82f6;
+  }
+
+  .arch-branch.mermaid-export-branch {
+    border-top: 3px solid #10b981;
+  }
+
+  .branch-badge.visualize {
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    color: #3b82f6;
+  }
+
+  .branch-badge.export {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    color: #10b981;
+  }
+
+  /* Mermaid Modal Mockup */
+  .mermaid-modal-mockup {
+    max-width: 600px;
+    margin: 0 auto 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .modal-icon {
+    font-size: 1rem;
+  }
+
+  .modal-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .zoom-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .zoom-level {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0 0.5rem;
+    opacity: 0.7;
+  }
+
+  .zoom-btn.close {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+  }
+
+  .modal-canvas {
+    padding: 1rem;
+    min-height: 250px;
+    position: relative;
+  }
+
+  .mermaid-diagram-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 6px;
+  }
+
+  .mermaid-subgraph {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px dashed color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 6px;
+    padding: 0.75rem;
+    min-width: 200px;
+  }
+
+  .mermaid-subgraph.core {
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+  }
+
+  .mermaid-subgraph.firewall {
+    border-color: color-mix(in srgb, #f59e0b 30%, transparent);
+  }
+
+  .subgraph-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+  }
+
+  .mermaid-nodes {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .mermaid-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 30%, transparent);
+    border-radius: 4px;
+  }
+
+  .mermaid-node.hexagon {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    padding: 0.5rem 1rem;
+  }
+
+  .mermaid-node.trapezoid {
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    border-color: color-mix(in srgb, #f59e0b 30%, transparent);
+  }
+
+  .node-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .node-ip {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+
+  .mermaid-link {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    color: #6b7280;
+  }
+
+  .mermaid-link.labeled {
+    padding: 0.15rem 0.4rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 3px;
+  }
+
+  .mermaid-link.dashed {
+    letter-spacing: 2px;
+    opacity: 0.5;
+  }
+
+  .mermaid-external {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .external-circle {
+    color: #6b7280;
+  }
+
+  .mermaid-legend {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.65rem;
+  }
+
+  .mermaid-legend .legend-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .mermaid-legend .legend-section {
+    margin-bottom: 0.5rem;
+  }
+
+  .mermaid-legend .legend-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .mermaid-legend .legend-label {
+    font-weight: 600;
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+  }
+
+  .mermaid-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .shape-hex { color: #3b82f6; }
+  .shape-trap { color: #f59e0b; }
+  .shape-rect { color: #6b7280; }
+  .shape-circle { color: #8b5cf6; }
+
+  .line-solid {
+    display: inline-block;
+    width: 16px;
+    height: 2px;
+    background: currentColor;
+  }
+
+  .line-dashed {
+    display: inline-block;
+    width: 16px;
+    border-bottom: 2px dashed currentColor;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    font-size: 0.65rem;
+  }
+
+  .footer-hint {
+    opacity: 0.6;
+  }
+
+  .footer-powered {
+    opacity: 0.5;
+    font-style: italic;
+  }
+
+  /* Algorithm Enhancements for Mermaid */
+  .algo-input, .algo-output {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+
+  .input-label, .output-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #8b5cf6;
+  }
+
+  .algo-input code, .algo-output code {
+    font-size: 0.7rem;
+    background: none;
+    padding: 0;
+  }
+
+  .algo-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .algo-detail code {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .algo-substeps {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    padding-left: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  /* Code Output Block */
+  .code-output-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .code-output-block .code-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .code-output-block .code-lang {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #3b82f6;
+  }
+
+  .code-output-block .code-desc {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .code-output-block pre {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .code-output-block code {
+    background: none;
+    padding: 0;
+  }
+
+  /* Shape Mapping Table */
+  .shape-mapping-table {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .shape-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 0.5fr;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    align-items: center;
+  }
+
+  .shape-row:last-child {
+    border-bottom: none;
+  }
+
+  .shape-row.header {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .shape-type {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .shape-name {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .shape-syntax code {
+    font-size: 0.65rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .shape-visual {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .shape-visual.hex { color: #3b82f6; }
+  .shape-visual.trap { color: #f59e0b; }
+  .shape-visual.rect { color: #6b7280; }
+  .shape-visual.circle { color: #8b5cf6; }
+
+  /* Connection Mapping Table */
+  .connection-mapping-table {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .conn-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    align-items: center;
+  }
+
+  .conn-row:last-child {
+    border-bottom: none;
+  }
+
+  .conn-row.header {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .conn-type {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .conn-syntax code {
+    font-size: 0.65rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .conn-visual {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  /* Code Block Inline */
+  .code-block-inline {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .code-block-inline pre {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .code-block-inline code {
+    background: none;
+    padding: 0;
+  }
+
+  /* Theme Config Block */
+  .theme-config-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .config-section {
+    margin-bottom: 1rem;
+  }
+
+  .config-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .config-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+  }
+
+  .config-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-left: 0.5rem;
+  }
+
+  .config-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .color-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    flex-shrink: 0;
+  }
+
+  .config-item code {
+    font-size: 0.65rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .config-note {
+    opacity: 0.6;
+    font-size: 0.65rem;
+  }
+
+  /* File Output Block */
+  .file-output-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .file-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .file-icon {
+    font-size: 1rem;
+  }
+
+  .file-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .file-content pre {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .file-content code {
+    background: none;
+    padding: 0;
+  }
+
+  .file-footer {
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .file-note {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    font-style: italic;
+  }
+
+  /* Responsive adjustments for Mermaid section */
+  @media (max-width: 768px) {
+    .shape-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem;
+    }
+
+    .shape-row .shape-syntax,
+    .shape-row .shape-visual {
+      display: none;
+    }
+
+    .conn-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .conn-row .conn-visual {
+      display: none;
+    }
+
+    .mermaid-legend {
+      position: static;
+      margin-top: 1rem;
+    }
   }
 </style>
