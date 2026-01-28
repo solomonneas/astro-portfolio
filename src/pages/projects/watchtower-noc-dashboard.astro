@@ -88,7 +88,7 @@ const features = [
     desc: "Real-time alerts from device status changes with acknowledgment",
     tech: "Derived from device state",
     icon: "🔔",
-    anchor: null
+    anchor: "alert-system"
   },
 ];
 
@@ -114,6 +114,7 @@ const phases = [
   { phase: 6, name: "Export & Polish", status: "completed", items: ["Mermaid export", "CSV logging", "Collapsible widgets"] },
   { phase: 7, name: "Authentication", status: "pending", items: ["JWT auth", "User sessions", "Role-based access"] },
   { phase: 8, name: "Settings UI", status: "pending", items: ["Config editor", "Polling controls", "Theme options"] },
+  { phase: 9, name: "Remote Notifications", status: "pending", items: ["Discord webhooks", "Email alerts", "Escalation rules"] },
 ];
 ---
 
@@ -544,7 +545,7 @@ const phases = [
   "server_id": 12345,
   "server_name": "Spectrum",
   "server_location": "Tampa, FL",
-  "result_url": "https://www.speedtest.net/result/...",
+  "result_url": "https://www.speedtest.net/result/xxxxx",
   "status": "success",
   "indicator": "normal"    // Derived from thresholds
 }`}</code></pre>
@@ -1236,8 +1237,8 @@ const phases = [
       "ifAdminStatus": "up",
       "in_mbps": 0.12,
       "out_mbps": 0.45
-    },
-    ...
+    }
+    // (more results)
   ]
 }`}</code></pre>
         </div>
@@ -1448,15 +1449,14 @@ else → "{`{x}`}M"</code></pre>
           <span class="block-title">LIBRENMS API</span>
         </div>
         <div class="block-code">
-          <pre><code>GET /api/v0/devices/{`{id}`}/ports
+          <pre><code>{`GET /api/v0/devices/{id}/ports
 
 Returns array of interfaces:
 [
-  {`{ name: "Gi1/0/1", ifOperStatus: "up", ifSpeed: 1000000000, ... }`},
-  {`{ name: "Gi1/0/2", ifOperStatus: "down", ... }`},
-  {`{ name: "Te1/1/1", ifOperStatus: "up", ifSpeed: 10000000000, ... }`},
-  ...
-]</code></pre>
+  { name: "Gi1/0/1", ifOperStatus: "up", ifSpeed: 1000000000 },
+  { name: "Gi1/0/2", ifOperStatus: "down" },
+  { name: "Te1/1/1", ifOperStatus: "up", ifSpeed: 10000000000 }
+]`}</code></pre>
         </div>
       </div>
 
@@ -1523,13 +1523,13 @@ Output: {`{
       moduleId: 0,
       label: "Slot 0",
       banks: [
-        { label: "1-24", oddPorts: [...12], evenPorts: [...12] },
-        { label: "25-48", oddPorts: [...12], evenPorts: [...12] }
+        { label: "1-24", oddPorts: [12 ports], evenPorts: [12 ports] },
+        { label: "25-48", oddPorts: [12 ports], evenPorts: [12 ports] }
       ]
     }
   ],
-  uplinks: [...GridPort],   // 10G+ SFP ports
-  other: [...Interface]     // VLANs, mgmt, loopback
+  uplinks: [GridPort array],   // 10G+ SFP ports
+  other: [Interface array]     // VLANs, mgmt, loopback
 }`}</code></pre>
         </div>
       </div>
@@ -3492,6 +3492,620 @@ interface NocState {
       </div>
       <div class="file-footer">
         <span class="file-note">Plain text Mermaid syntax; renders in GitHub, Confluence, Obsidian, etc.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Alert System -->
+  <div class="feature-deepdive" id="alert-system">
+    <h2>// Feature Deep Dive: Alert System</h2>
+    <p class="deepdive-intro">
+      Real-time alerting system that derives alerts from device status and LibreNMS monitoring data.
+      Features a multi-tier notification approach: bell icon with count badge, toast notifications,
+      and full-screen critical overlay for urgent incidents requiring immediate attention.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🔔</span>
+        <span class="usecase-title">Use Case: Escalating Notification Levels</span>
+      </div>
+      <p class="usecase-desc">
+        NOC operators need immediate visibility when network devices go down. The alert system provides
+        escalating notification levels: a subtle count badge for awareness, toast popups for new events,
+        and an unmissable full-screen overlay with audio for critical outages. Alerts auto-clear when
+        devices recover, with optional acknowledgment to track incident response.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Architecture</h3>
+    <div class="alert-architecture">
+      <div class="arch-sources">
+        <div class="source-header">DATA SOURCES</div>
+        <div class="source-items">
+          <div class="source-item">
+            <span class="source-icon">📊</span>
+            <div class="source-content">
+              <span class="source-name">Device Status</span>
+              <span class="source-desc">status === 'down' → Alert</span>
+            </div>
+          </div>
+          <div class="source-item">
+            <span class="source-icon">📡</span>
+            <div class="source-content">
+              <span class="source-name">LibreNMS Alerts</span>
+              <span class="source-desc">Cached alert rules → Alert</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-arrow-down">▼</div>
+
+      <div class="arch-backend">
+        <div class="backend-header">
+          <span class="backend-icon">🐍</span>
+          <span class="backend-title">BACKEND (alerts.py)</span>
+        </div>
+        <div class="backend-content">
+          <div class="backend-functions">
+            <code>_get_device_down_alerts()</code>
+            <code>_get_librenms_alerts()</code>
+          </div>
+          <div class="backend-combine">Combine + Sort by timestamp</div>
+          <div class="backend-ack">
+            <span class="ack-label">In-memory tracking:</span>
+            <code>_acknowledged_alerts: set[str]</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-arrow-down">▼</div>
+      <div class="api-call-label">GET /api/alerts</div>
+      <div class="arch-arrow-down">▼</div>
+
+      <div class="arch-frontend">
+        <div class="frontend-header">FRONTEND</div>
+        <div class="frontend-flow">
+          <div class="frontend-hook">useAlerts() hook</div>
+          <div class="frontend-stores">
+            <span>alertStore.ts</span>
+            <span>settingsStore.ts</span>
+          </div>
+        </div>
+        <div class="frontend-components">
+          <div class="frontend-comp">
+            <span class="comp-icon">🔔</span>
+            <span class="comp-name">Header.tsx</span>
+            <span class="comp-desc">Bell Icon + Badge</span>
+          </div>
+          <div class="frontend-comp">
+            <span class="comp-icon">📋</span>
+            <span class="comp-name">ToastContainer</span>
+            <span class="comp-desc">Toast Stack (max 5)</span>
+          </div>
+          <div class="frontend-comp">
+            <span class="comp-icon">🚨</span>
+            <span class="comp-name">CriticalOverlay</span>
+            <span class="comp-desc">Full Screen + Audio</span>
+          </div>
+          <div class="frontend-comp">
+            <span class="comp-icon">⚙️</span>
+            <span class="comp-name">Settings</span>
+            <span class="comp-desc">Sound/Volume</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Layout</h3>
+
+    <div class="alert-mockups">
+      <!-- Header Bell -->
+      <div class="alert-mockup bell-mockup">
+        <div class="mockup-label">Header Bell Icon</div>
+        <div class="bell-header-preview">
+          <span class="brand">WATCHTOWER</span>
+          <div class="bell-area">
+            <span class="bell-icon">🔔</span>
+            <span class="bell-badge critical">3</span>
+          </div>
+          <span class="header-icons">⚙️ ☰</span>
+        </div>
+        <div class="mockup-note">Red pulsing badge = critical alerts</div>
+      </div>
+
+      <!-- Toast Stack -->
+      <div class="alert-mockup toast-mockup">
+        <div class="mockup-label">Toast Notifications (top-right)</div>
+        <div class="toast-stack-preview">
+          <div class="toast-item critical">
+            <span class="toast-icon">⚠️</span>
+            <div class="toast-content">
+              <div class="toast-header">
+                <span class="status-dot critical"></span>
+                <span class="toast-device">core-sw-1</span>
+              </div>
+              <span class="toast-message">Device unreachable</span>
+              <div class="toast-footer">
+                <span class="toast-time">2m ago</span>
+                <div class="toast-actions">
+                  <span class="toast-btn ack">Ack</span>
+                  <span class="toast-btn">Dismiss</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="toast-item warning">
+            <span class="toast-icon">⚠️</span>
+            <div class="toast-content">
+              <div class="toast-header">
+                <span class="status-dot warning"></span>
+                <span class="toast-device">firewall-1</span>
+              </div>
+              <span class="toast-message">High CPU utilization</span>
+              <div class="toast-footer">
+                <span class="toast-time">5m ago</span>
+                <div class="toast-actions">
+                  <span class="toast-btn">Dismiss</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="toast-item recovery">
+            <span class="toast-icon">✓</span>
+            <div class="toast-content">
+              <div class="toast-header">
+                <span class="status-dot recovery"></span>
+                <span class="toast-device">ap-lobby</span>
+              </div>
+              <span class="toast-message">Device recovered</span>
+              <div class="toast-footer">
+                <span class="toast-time">1m ago</span>
+                <div class="toast-actions">
+                  <span class="toast-btn">Dismiss</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="toast-more">+2 more alerts</div>
+        </div>
+      </div>
+
+      <!-- Critical Overlay -->
+      <div class="alert-mockup overlay-mockup">
+        <div class="mockup-label">Critical Overlay (full-screen)</div>
+        <div class="overlay-preview">
+          <div class="overlay-backdrop">
+            <div class="overlay-card">
+              <span class="overlay-icon">⚠️</span>
+              <span class="overlay-title">CRITICAL ALERT</span>
+              <span class="overlay-device">core-sw-1</span>
+              <span class="overlay-message">Device unreachable</span>
+              <span class="overlay-time">10:42:15 AM</span>
+              <div class="overlay-buttons">
+                <span class="overlay-btn primary">Acknowledge</span>
+                <span class="overlay-btn">View Device</span>
+              </div>
+            </div>
+          </div>
+          <div class="overlay-effects">
+            <span>🔴 Browser tab flashing</span>
+            <span>🔊 Alert sound plays</span>
+            <span>📢 Browser notification (if hidden)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Models</h3>
+    <div class="models-grid">
+      <div class="model-block">
+        <div class="model-header">
+          <span class="model-icon">🐍</span>
+          <span class="model-title">Backend Models (alert.py)</span>
+        </div>
+        <div class="model-code">
+          <pre><code>{`class AlertSeverity(str, Enum):
+    CRITICAL = "critical"   # Device down
+    WARNING = "warning"     # Degraded
+    INFO = "info"           # Informational
+    RECOVERY = "recovery"   # Device back up
+
+class AlertStatus(str, Enum):
+    ACTIVE = "active"
+    ACKNOWLEDGED = "acknowledged"
+    RESOLVED = "resolved"
+
+class Alert(BaseModel):
+    id: str              # "device-down-core-sw-1"
+    device_id: str       # Topology device ID
+    severity: AlertSeverity
+    message: str
+    details: str | None
+    status: AlertStatus
+    timestamp: datetime
+    acknowledged_at: datetime | None
+    acknowledged_by: str | None`}</code></pre>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-header">
+          <span class="model-icon">📘</span>
+          <span class="model-title">Frontend Types</span>
+        </div>
+        <div class="model-code">
+          <pre><code>{`interface Alert {
+  id: string
+  device_id: string
+  severity: 'critical' | 'warning' | 'info' | 'recovery'
+  message: string
+  timestamp: string
+  status: 'active' | 'acknowledged' | 'resolved'
+}
+
+interface Toast {
+  id: string        // "toast-{alertId}-{timestamp}"
+  alert: Alert
+  dismissed: boolean
+}
+
+// alertStore.ts
+interface AlertState {
+  alerts: Alert[]
+  toasts: Toast[]
+  criticalOverlay: Alert | null
+  // + action methods
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Alert Generation Flow</h3>
+    <div class="deepdive-flow">
+      <div class="flow-block config">
+        <div class="block-header">
+          <span class="block-icon">⏱️</span>
+          <span class="block-title">POLLING (every 30s)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Check device status from topology</div>
+          <div class="backend-step"><span class="step-num">2</span> Load LibreNMS alerts from cache</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🔍</span>
+          <span class="block-title">ALERT DETECTION</span>
+        </div>
+        <div class="block-steps">
+          <div class="detection-rule">
+            <span class="rule-condition">device.status === 'down'</span>
+            <span class="rule-arrow">→</span>
+            <span class="rule-result">Generate CRITICAL alert</span>
+          </div>
+          <div class="detection-example">
+            <code>id: "device-down-{`{device_id}`}"</code>
+            <code>message: "Device unreachable: {`{name}`}"</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">🔄</span>
+          <span class="block-title">COMBINE & DEDUPLICATE</span>
+        </div>
+        <div class="block-steps">
+          <span class="step-desc">Sort by timestamp (newest first)</span>
+          <span class="step-desc">Return to frontend via /api/alerts</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Acknowledgment System</h3>
+    <div class="ack-flow">
+      <div class="ack-step">
+        <span class="ack-side">Frontend</span>
+        <div class="ack-action">POST /api/alert/{`{id}`}/acknowledge</div>
+        <span class="ack-arrow">→</span>
+      </div>
+      <div class="ack-step">
+        <span class="ack-side">Backend</span>
+        <div class="ack-action">_acknowledged_alerts.add(alert_id)</div>
+      </div>
+      <div class="ack-step">
+        <span class="ack-side">Response</span>
+        <div class="ack-action">{`{"status": "acknowledged"}`}</div>
+        <span class="ack-arrow">←</span>
+      </div>
+      <div class="ack-step">
+        <span class="ack-side">Store</span>
+        <div class="ack-action">alertStore.acknowledgeAlert(id)</div>
+      </div>
+      <div class="ack-note">
+        <span class="note-icon">ℹ️</span>
+        <span>Acknowledgments stored in memory; reset on service restart. Auto-clears when device recovers.</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Component Hierarchy</h3>
+    <div class="component-tree">
+      <div class="tree-root">Layout.tsx</div>
+      <div class="tree-children">
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">Header.tsx → Bell Icon Button</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">SVG bell icon</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">Badge (count + color): <span class="tree-note">Red+pulse=critical, Amber=warnings</span></span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">├──</span>
+          <span class="tree-name">ToastContainer.tsx → Toast[] (max 5)</span>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">Severity icon (⚠️ ✓ ℹ️)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">StatusDot (pulsing if critical)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  ├──</span>
+            <span class="tree-leaf">Device ID + Message + Time</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">│  └──</span>
+            <span class="tree-leaf">Actions: [Acknowledge] [Dismiss]</span>
+          </div>
+        </div>
+        <div class="tree-branch">
+          <span class="tree-connector">└──</span>
+          <span class="tree-name">CriticalOverlay.tsx</span>
+          <div class="tree-sub">
+            <span class="tree-connector">   ├──</span>
+            <span class="tree-leaf">Dark backdrop (blur + red glow)</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">   ├──</span>
+            <span class="tree-leaf">Modal: icon, header, device, buttons</span>
+          </div>
+          <div class="tree-sub">
+            <span class="tree-connector">   └──</span>
+            <span class="tree-leaf">Effects: playAlertSound(), flash title, browser notification</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Alert Lifecycle</h3>
+    <div class="lifecycle-diagram">
+      <div class="lifecycle-step">
+        <span class="lifecycle-event trigger">DEVICE GOES DOWN</span>
+        <span class="lifecycle-arrow">↓</span>
+      </div>
+      <div class="lifecycle-step">
+        <span class="lifecycle-state">Alert: status=ACTIVE</span>
+        <div class="lifecycle-effects">
+          <span>→ Bell badge count increases</span>
+          <span>→ Toast appears (top-right)</span>
+          <span>→ Critical overlay (if enabled)</span>
+        </div>
+      </div>
+      <div class="lifecycle-step">
+        <span class="lifecycle-action">User clicks [Acknowledge]</span>
+        <span class="lifecycle-arrow">↓</span>
+      </div>
+      <div class="lifecycle-step">
+        <span class="lifecycle-state">status=ACKNOWLEDGED</span>
+        <div class="lifecycle-effects">
+          <span>→ Badge remains (still active)</span>
+          <span>→ Toast can be dismissed</span>
+          <span>→ Overlay closes</span>
+        </div>
+      </div>
+      <div class="lifecycle-step">
+        <span class="lifecycle-action">Device recovers (status → 'up')</span>
+        <span class="lifecycle-arrow">↓</span>
+      </div>
+      <div class="lifecycle-step">
+        <span class="lifecycle-state final">Alert removed from list</span>
+        <div class="lifecycle-effects">
+          <span>→ Badge count decreases (or disappears)</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Severity Styling</h3>
+    <div class="severity-table">
+      <div class="severity-row header">
+        <span class="sev-level">Severity</span>
+        <span class="sev-color">Color</span>
+        <span class="sev-icon">Icon</span>
+        <span class="sev-badge">Badge</span>
+      </div>
+      <div class="severity-row">
+        <span class="sev-level critical">Critical</span>
+        <span class="sev-color"><span class="color-dot critical"></span> #f85149</span>
+        <span class="sev-icon">⚠️ Triangle</span>
+        <span class="sev-badge">Red + pulse</span>
+      </div>
+      <div class="severity-row">
+        <span class="sev-level warning">Warning</span>
+        <span class="sev-color"><span class="color-dot warning"></span> #d29922</span>
+        <span class="sev-icon">⚠️ Triangle</span>
+        <span class="sev-badge">Amber</span>
+      </div>
+      <div class="severity-row">
+        <span class="sev-level info">Info</span>
+        <span class="sev-color"><span class="color-dot info"></span> #58a6ff</span>
+        <span class="sev-icon">ℹ️ Circle</span>
+        <span class="sev-badge">-</span>
+      </div>
+      <div class="severity-row">
+        <span class="sev-level recovery">Recovery</span>
+        <span class="sev-color"><span class="color-dot recovery"></span> #3fb950</span>
+        <span class="sev-icon">✓ Check</span>
+        <span class="sev-badge">-</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Critical Overlay Features</h3>
+    <div class="overlay-features">
+      <div class="feature-row">
+        <span class="feature-name">Backdrop</span>
+        <code>bg-black/80 backdrop-blur-sm</code>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Red glow</span>
+        <code>box-shadow: inset 0 0 100px 20px rgba(248,81,73,0.3)</code>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Pulsing</span>
+        <code>animation: pulse 2s ease-in-out infinite</code>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Audio</span>
+        <code>new Audio('/alert-sound.mp3').play()</code>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Title flash</span>
+        <code>Toggle 🔴 CRITICAL — prefix every 1s</code>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Notification</span>
+        <code>{`new Notification('Watchtower Critical Alert', {options})`}</code>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// API Endpoints</h3>
+    <div class="api-endpoints-list">
+      <div class="api-endpoint">
+        <code>GET /api/alerts</code>
+        <span>List all alerts (sorted by time)</span>
+      </div>
+      <div class="api-endpoint">
+        <code>GET /api/alerts?status=active</code>
+        <span>Filter by status</span>
+      </div>
+      <div class="api-endpoint">
+        <code>GET /api/alert/{`{id}`}</code>
+        <span>Get single alert details</span>
+      </div>
+      <div class="api-endpoint">
+        <code>POST /api/alert/{`{id}`}/acknowledge</code>
+        <span>Mark as acknowledged</span>
+      </div>
+      <div class="api-endpoint">
+        <code>POST /api/alert/{`{id}`}/resolve</code>
+        <span>Mark as resolved</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">Polling interval</span>
+        <span class="tech-value">30s (alerts refresh)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Max toasts</span>
+        <span class="tech-value">5 visible (+N more indicator)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Toast animation</span>
+        <span class="tech-value">300ms slide + fade</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Auto-dismiss</span>
+        <span class="tech-value">Configurable per-severity</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Device down ID</span>
+        <span class="tech-value">device-down-{`{device_id}`}</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">LibreNMS ID</span>
+        <span class="tech-value">librenms-{`{alert_id}`}</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Auto-clear</span>
+        <span class="tech-value">When device status returns to 'up'</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Roadmap: Remote Notifications</h3>
+    <div class="roadmap-callout">
+      <div class="roadmap-header">
+        <span class="roadmap-icon">🚀</span>
+        <span class="roadmap-title">Planned: Phase 9</span>
+      </div>
+      <p class="roadmap-desc">
+        Remote notification support to alert operators even when away from the dashboard.
+        Critical alerts will trigger notifications through multiple channels for redundancy.
+      </p>
+      <div class="roadmap-features">
+        <div class="roadmap-feature">
+          <span class="feature-icon">💬</span>
+          <div class="feature-content">
+            <span class="feature-title">Discord Webhooks</span>
+            <span class="feature-desc">Post alerts to dedicated NOC channel with severity-based formatting</span>
+          </div>
+        </div>
+        <div class="roadmap-feature">
+          <span class="feature-icon">📧</span>
+          <div class="feature-content">
+            <span class="feature-title">Email Alerts</span>
+            <span class="feature-desc">SMTP integration for critical alerts with device details and quick links</span>
+          </div>
+        </div>
+        <div class="roadmap-feature">
+          <span class="feature-icon">📈</span>
+          <div class="feature-content">
+            <span class="feature-title">Escalation Rules</span>
+            <span class="feature-desc">Time-based escalation if alerts remain unacknowledged</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Tech Stack</h3>
+    <div class="tech-stack-table">
+      <div class="stack-row">
+        <span class="stack-layer">Backend</span>
+        <span class="stack-tech">FastAPI, Pydantic models</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Alert Sources</span>
+        <span class="stack-tech">Device status + LibreNMS cache</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Acknowledgment</span>
+        <span class="stack-tech">In-memory set (service lifetime)</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Frontend State</span>
+        <span class="stack-tech">Zustand (alertStore, settingsStore)</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Notifications</span>
+        <span class="stack-tech">Browser Notification API, Web Audio API</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-layer">Styling</span>
+        <span class="stack-tech">Tailwind CSS (status colors)</span>
       </div>
     </div>
   </div>
@@ -8372,5 +8986,853 @@ interface NocState {
       position: static;
       margin-top: 1rem;
     }
+
+    .alert-mockups {
+      flex-direction: column;
+    }
+
+    .severity-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .severity-row .sev-icon,
+    .severity-row .sev-badge {
+      display: none;
+    }
+  }
+
+  /* Alert System Deep Dive Styles */
+  .alert-architecture {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .arch-sources {
+    width: 100%;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .source-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .source-items {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .source-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .source-icon {
+    font-size: 1.25rem;
+  }
+
+  .source-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .source-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .source-desc {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .arch-arrow-down {
+    font-size: 1rem;
+    opacity: 0.5;
+  }
+
+  .arch-backend {
+    width: 100%;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-top: 3px solid #10b981;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .backend-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .backend-icon {
+    font-size: 1rem;
+  }
+
+  .backend-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .backend-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .backend-functions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .backend-functions code {
+    font-size: 0.7rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .backend-combine {
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+  }
+
+  .backend-ack {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .ack-label {
+    opacity: 0.7;
+  }
+
+  .arch-frontend {
+    width: 100%;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-top: 3px solid #3b82f6;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .frontend-header {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .frontend-flow {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .frontend-hook {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border-radius: 3px;
+    color: #3b82f6;
+  }
+
+  .frontend-stores {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .frontend-components {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .frontend-comp {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .comp-icon {
+    font-size: 1rem;
+  }
+
+  .comp-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .comp-desc {
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+
+  /* Alert Mockups */
+  .alert-mockups {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .alert-mockup {
+    flex: 1;
+    min-width: 250px;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .mockup-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .mockup-note {
+    font-size: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    opacity: 0.6;
+    font-style: italic;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  /* Bell Header Preview */
+  .bell-header-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  .brand {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .bell-area {
+    position: relative;
+  }
+
+  .bell-icon {
+    font-size: 1.25rem;
+  }
+
+  .bell-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.1rem 0.35rem;
+    border-radius: 8px;
+    color: white;
+  }
+
+  .bell-badge.critical {
+    background: #f85149;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .header-icons {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+
+  /* Toast Stack Preview */
+  .toast-stack-preview {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toast-item {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    border-left: 3px solid;
+  }
+
+  .toast-item.critical {
+    border-left-color: #f85149;
+  }
+
+  .toast-item.warning {
+    border-left-color: #d29922;
+  }
+
+  .toast-item.recovery {
+    border-left-color: #3fb950;
+  }
+
+  .toast-icon {
+    font-size: 0.9rem;
+  }
+
+  .toast-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .toast-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-dot.critical {
+    background: #f85149;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .status-dot.warning {
+    background: #d29922;
+  }
+
+  .status-dot.recovery {
+    background: #3fb950;
+  }
+
+  .toast-device {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .toast-message {
+    font-size: 0.65rem;
+    opacity: 0.8;
+  }
+
+  .toast-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.25rem;
+  }
+
+  .toast-time {
+    font-size: 0.6rem;
+    opacity: 0.5;
+  }
+
+  .toast-actions {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .toast-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    padding: 0.15rem 0.35rem;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .toast-btn.ack {
+    background: color-mix(in srgb, #f85149 20%, transparent);
+    color: #f85149;
+  }
+
+  .toast-more {
+    font-size: 0.6rem;
+    text-align: center;
+    opacity: 0.6;
+    padding: 0.25rem;
+  }
+
+  /* Overlay Preview */
+  .overlay-preview {
+    padding: 0.75rem;
+  }
+
+  .overlay-backdrop {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 6px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    box-shadow: inset 0 0 50px 10px rgba(248, 81, 73, 0.2);
+  }
+
+  .overlay-card {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border: 1px solid color-mix(in srgb, #f85149 30%, transparent);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .overlay-icon {
+    font-size: 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .overlay-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #f85149;
+  }
+
+  .overlay-device {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .overlay-message {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .overlay-time {
+    font-size: 0.65rem;
+    opacity: 0.5;
+  }
+
+  .overlay-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .overlay-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .overlay-btn.primary {
+    background: #f85149;
+    color: white;
+  }
+
+  .overlay-btn:not(.primary) {
+    background: color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .overlay-effects {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+
+  /* Acknowledgment Flow */
+  .ack-flow {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ack-step {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .ack-side {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    width: 70px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .ack-action {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    flex: 1;
+  }
+
+  .ack-action code {
+    font-size: 0.7rem;
+  }
+
+  .ack-arrow {
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .ack-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+
+  .note-icon {
+    flex-shrink: 0;
+  }
+
+  /* Detection Rule */
+  .detection-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .rule-condition {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, #f85149 15%, transparent);
+    border-radius: 3px;
+    color: #f85149;
+  }
+
+  .rule-arrow {
+    opacity: 0.5;
+  }
+
+  .rule-result {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .detection-example {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detection-example code {
+    font-size: 0.65rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  /* Lifecycle Diagram */
+  .lifecycle-diagram {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .lifecycle-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .lifecycle-event {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+  }
+
+  .lifecycle-event.trigger {
+    background: color-mix(in srgb, #f85149 15%, transparent);
+    color: #f85149;
+  }
+
+  .lifecycle-state {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .lifecycle-state.final {
+    background: color-mix(in srgb, #3fb950 15%, transparent);
+    color: #3fb950;
+  }
+
+  .lifecycle-action {
+    font-size: 0.7rem;
+    font-style: italic;
+    opacity: 0.8;
+  }
+
+  .lifecycle-arrow {
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .lifecycle-effects {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: 0.65rem;
+    opacity: 0.7;
+    padding-left: 1rem;
+  }
+
+  /* Severity Table */
+  .severity-table {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .severity-row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    align-items: center;
+  }
+
+  .severity-row:last-child {
+    border-bottom: none;
+  }
+
+  .severity-row.header {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .sev-level {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .sev-level.critical { color: #f85149; }
+  .sev-level.warning { color: #d29922; }
+  .sev-level.info { color: #58a6ff; }
+  .sev-level.recovery { color: #3fb950; }
+
+  .sev-color {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+  }
+
+  .color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .color-dot.critical { background: #f85149; }
+  .color-dot.warning { background: #d29922; }
+  .color-dot.info { background: #58a6ff; }
+  .color-dot.recovery { background: #3fb950; }
+
+  .sev-icon {
+    font-size: 0.75rem;
+  }
+
+  .sev-badge {
+    font-size: 0.7rem;
+  }
+
+  /* Overlay Features */
+  .overlay-features {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .feature-row:last-child {
+    border-bottom: none;
+  }
+
+  .feature-row .feature-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .feature-row code {
+    font-size: 0.65rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  /* Roadmap Callout */
+  .roadmap-callout {
+    background: color-mix(in srgb, #8b5cf6 5%, transparent);
+    border: 1px solid color-mix(in srgb, #8b5cf6 20%, transparent);
+    border-left: 4px solid #8b5cf6;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .roadmap-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .roadmap-icon {
+    font-size: 1rem;
+  }
+
+  .roadmap-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b5cf6;
+  }
+
+  .roadmap-desc {
+    font-size: 0.8rem;
+    margin: 0 0 1rem 0;
+    opacity: 0.85;
+    line-height: 1.5;
+  }
+
+  .roadmap-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .roadmap-feature {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .roadmap-feature .feature-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .roadmap-feature .feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .roadmap-feature .feature-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .roadmap-feature .feature-desc {
+    font-size: 0.7rem;
+    opacity: 0.75;
   }
 </style>
