@@ -564,6 +564,12 @@ const skills = [
     <a href="https://github.com/solomonneas/portgrid" target="_blank" rel="noopener noreferrer" class="repo-link">
       <span class="prompt">$</span> git clone https://github.com/solomonneas/portgrid.git
     </a>
+    <a href="https://github.com/solomonneas/portgrid/commits" target="_blank" rel="noopener noreferrer" class="commits-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+        <path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"/>
+      </svg>
+      <span>32 commits</span>
+    </a>
   </div>
 
   <!-- Status -->
@@ -1387,6 +1393,31 @@ const skills = [
   .repo-link .prompt {
     color: #10b981;
     font-weight: 600;
+  }
+
+  .commits-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: #10b981;
+    text-decoration: none;
+    padding: 0.4rem 0.75rem;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .commits-badge:hover {
+    background: color-mix(in srgb, #10b981 25%, transparent);
+    border-color: #10b981;
+  }
+
+  .commits-badge svg {
+    flex-shrink: 0;
   }
 
   /* Status Block */
