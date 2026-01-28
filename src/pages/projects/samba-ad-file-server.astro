@@ -1,0 +1,1004 @@
+---
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+
+const frontmatter = {
+  title: "Samba AD File Server",
+  status: "Completed",
+  statusType: "completed",
+  origin: "Enterprise Infrastructure",
+  date: "2026.01",
+  techStack: ["Ubuntu 24.04", "Samba", "Active Directory", "Proxmox VE", "SNMP", "XFS"],
+};
+
+// Security hardening items
+const securityHardening = [
+  {
+    setting: "server signing = mandatory",
+    purpose: "All packets must be signed (prevents tampering)"
+  },
+  {
+    setting: "server min protocol = SMB3",
+    purpose: "Blocks legacy SMB1/SMB2 (security risks)"
+  },
+  {
+    setting: "smb encrypt = desired",
+    purpose: "Encrypts traffic when client supports it"
+  },
+];
+
+// SNMP OIDs
+const snmpOids = [
+  { metric: "System Info", oid: "1.3.6.1.2.1.1" },
+  { metric: "CPU Load", oid: "1.3.6.1.4.1.2021.10" },
+  { metric: "Memory", oid: "1.3.6.1.4.1.2021.4" },
+  { metric: "Disk", oid: "1.3.6.1.4.1.2021.9" },
+  { metric: "Network Interfaces", oid: "1.3.6.1.2.1.2" },
+];
+
+// Audit events
+const auditEvents = [
+  { event: "connect/disconnect", description: "User session tracking" },
+  { event: "mkdir/rmdir", description: "Directory creation and deletion" },
+  { event: "unlink", description: "File deletions" },
+  { event: "rename", description: "File and folder renames" },
+  { event: "write/pwrite failures", description: "Failed write attempts" },
+];
+
+// Toolkit features
+const toolkitFeatures = [
+  {
+    icon: "📦",
+    title: "VM Creation",
+    desc: "Proxmox VM with cloud-init, Ubuntu 24.04, thin-provisioned data disk"
+  },
+  {
+    icon: "🔐",
+    title: "AD Domain Join",
+    desc: "Samba + Winbind integration, Kerberos auth, domain user resolution"
+  },
+  {
+    icon: "📁",
+    title: "Share Configuration",
+    desc: "SMB share with AD permissions, accessible via UNC path"
+  },
+  {
+    icon: "🔄",
+    title: "Data Migration",
+    desc: "Robocopy script preserving permissions and timestamps"
+  },
+];
+
+// Technical challenges
+const challenges = [
+  {
+    label: "Cloud-init Password Auth",
+    solution: "Custom user-data with quoted password hash (the $6$ prefix breaks YAML parsing)"
+  },
+  {
+    label: "APT Lock Race Condition",
+    solution: "Added cloud-init status --wait before package operations"
+  },
+  {
+    label: "DFS Namespace Cutover",
+    solution: "Update DFS targets instead of GPOs for seamless client migration"
+  },
+];
+---
+
+<ProjectLayout frontmatter={frontmatter}>
+  <!-- Overview -->
+  <h2>// Overview</h2>
+  <p>
+    Built a production Ubuntu 24.04 Samba file server joined to Active Directory, replacing a legacy
+    "split-brain" configuration where files were scattered across multiple Windows 10 machines with
+    inconsistent permissions and no proper backup strategy. The server runs as a DFS namespace member
+    on Proxmox 9.1.2 with 4TB XFS storage.
+  </p>
+
+  <div class="server-specs">
+    <div class="spec-item">
+      <span class="spec-label">OS</span>
+      <span class="spec-value">Ubuntu 24.04 LTS</span>
+    </div>
+    <div class="spec-item">
+      <span class="spec-label">Storage</span>
+      <span class="spec-value">4TB XFS at /srv/fileshare</span>
+    </div>
+    <div class="spec-item">
+      <span class="spec-label">Role</span>
+      <span class="spec-value">AD member file server with DFS namespace</span>
+    </div>
+    <div class="spec-item">
+      <span class="spec-label">Hypervisor</span>
+      <span class="spec-value">Proxmox VE 9.1.2</span>
+    </div>
+  </div>
+
+  <!-- GitHub Callout -->
+  <div class="github-callout">
+    <div class="github-content">
+      <div class="github-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+      </div>
+      <div class="github-text">
+        <span class="github-label">Open Source</span>
+        <p class="github-desc">This automation toolkit is open source. Check out the code, fork it, or give it a star if you find it useful.</p>
+      </div>
+    </div>
+    <div class="github-actions">
+      <a href="https://github.com/solomonneas/samba-ad-migration" target="_blank" class="github-btn repo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+        <span>View Repository</span>
+      </a>
+      <a href="https://github.com/solomonneas/samba-ad-migration/stargazers" target="_blank" class="github-btn star">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+        </svg>
+        <span>Star on GitHub</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Automation Toolkit -->
+  <div class="toolkit-section">
+    <h2>// Automation Toolkit</h2>
+    <p>
+      I built an open-source automation toolkit that handles the entire deployment: VM provisioning,
+      domain join, and share configuration with a single command.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <span class="code-desc">One-Liner Install (run on Proxmox host)</span>
+      </div>
+      <pre><code>bash -c "$(wget -qLO - https://raw.githubusercontent.com/solomonneas/samba-ad-migration/main/samba-ad.sh)"</code></pre>
+    </div>
+
+    <div class="feature-grid">
+      {toolkitFeatures.map((feature) => (
+        <div class="feature-item">
+          <span class="feature-icon">{feature.icon}</span>
+          <div class="feature-content">
+            <span class="feature-title">{feature.title}</span>
+            <span class="feature-desc">{feature.desc}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- SMB3 Security Hardening -->
+  <div class="security-section">
+    <h2>// SMB3 Security Hardening</h2>
+
+    <div class="warning-box">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-content">
+        <span class="warning-title">Why This Matters</span>
+        <p>Without signing/encryption, SMB traffic can be intercepted or modified (man-in-the-middle attacks).</p>
+      </div>
+    </div>
+
+    <p>Added to <code>/etc/samba/smb.conf</code> <code>[global]</code> section:</p>
+
+    <div class="hardening-table">
+      <div class="hardening-header">
+        <span>Setting</span>
+        <span>Purpose</span>
+      </div>
+      {securityHardening.map((item) => (
+        <div class="hardening-row">
+          <code class="hardening-setting">{item.setting}</code>
+          <span class="hardening-purpose">{item.purpose}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡</span>
+      <div class="tip-content">
+        <span class="tip-title">Compatibility</span>
+        <p>All modern Windows (8+), macOS (10.12+), and Linux clients support SMB3. Only breaks ancient XP machines or old network scanners.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SNMP Monitoring -->
+  <div class="snmp-section">
+    <h2>// SNMP Monitoring Setup</h2>
+    <p>
+      Enabled remote monitoring of CPU, memory, disk, and network stats via SNMP v2c for integration
+      with network monitoring systems.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">ini</span>
+        <span class="code-desc">/etc/snmp/snmpd.conf</span>
+      </div>
+      <pre><code>agentAddress udp:161,udp6:[::1]:161
+rocommunity public default
+sysLocation    Proxmox 9.1.2 VM
+sysContact     Administrator
+
+view all included .1
+includeAllDisks 10%
+load 12 10 5
+
+extend cpu /bin/cat /proc/stat
+extend memory /bin/cat /proc/meminfo</code></pre>
+    </div>
+
+    <h3>Useful OIDs</h3>
+    <div class="oid-table">
+      <div class="oid-header">
+        <span>Metric</span>
+        <span>OID</span>
+      </div>
+      {snmpOids.map((item) => (
+        <div class="oid-row">
+          <span class="oid-metric">{item.metric}</span>
+          <code class="oid-value">{item.oid}</code>
+        </div>
+      ))}
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <span class="code-desc">Test SNMP connectivity</span>
+      </div>
+      <pre><code>snmpwalk -v2c -c public fileserv.domain.local 1.3.6.1.2.1.1</code></pre>
+    </div>
+  </div>
+
+  <!-- Audit Logging -->
+  <div class="audit-section">
+    <h2>// Audit Logging</h2>
+    <p>
+      File operations on the Samba share are logged for compliance and forensics, tracking who did what
+      and when.
+    </p>
+
+    <h3>Events Logged</h3>
+    <div class="audit-events">
+      {auditEvents.map((item) => (
+        <div class="audit-event">
+          <code class="event-name">{item.event}</code>
+          <span class="event-desc">{item.description}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">ini</span>
+        <span class="code-desc">Samba audit config (/etc/samba/smb.conf)</span>
+      </div>
+      <pre><code>vfs objects = acl_xattr full_audit
+full_audit:prefix = %u|%I|%S
+full_audit:failure = connect disconnect mkdir rmdir rename unlink write pwrite
+full_audit:success = connect disconnect mkdir rmdir rename unlink
+full_audit:facility = local5
+full_audit:priority = notice</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">ini</span>
+        <span class="code-desc">Rsyslog config (/etc/rsyslog.d/samba-audit.conf)</span>
+      </div>
+      <pre><code>local5.notice /var/log/samba/audit.log</code></pre>
+    </div>
+
+    <h3>Log Format</h3>
+    <div class="log-format">
+      <code>username|IP_address|share_name|action|result|file_path</code>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Log</span>
+        <span class="code-desc">Example audit entry</span>
+      </div>
+      <pre><code>jsmith|10.2.66.59|Shared|unlink|ok|Students files/old_doc.docx</code></pre>
+    </div>
+
+    <h3>Useful Commands</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <span class="code-desc">Audit log queries</span>
+      </div>
+      <pre><code># Watch live activity
+sudo tail -f /var/log/samba/audit.log
+
+# Find who deleted a file
+sudo grep "unlink" /var/log/samba/audit.log | grep "filename"
+
+# Find all actions by a user
+sudo grep "jsmith|" /var/log/samba/audit.log</code></pre>
+    </div>
+  </div>
+
+  <!-- Swap Configuration -->
+  <div class="swap-section">
+    <h2>// Swap Configuration</h2>
+    <p>
+      Even with 8GB RAM, swap provides a safety net for memory spikes and prevents the OOM killer
+      from terminating services during high load.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <span class="code-desc">Create 4GB swap file</span>
+      </div>
+      <pre><code># Create swap file
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Make persistent
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# Verify
+free -h  # Should show: Swap: 4.0Gi</code></pre>
+    </div>
+  </div>
+
+  <!-- Final Configuration -->
+  <div class="config-section">
+    <h2>// Final Samba Configuration</h2>
+    <div class="code-block full-config">
+      <div class="code-header">
+        <span class="code-lang">ini</span>
+        <span class="code-desc">/etc/samba/smb.conf</span>
+      </div>
+      <pre><code>[global]
+   workgroup = CORP
+   realm = CORP.LOCAL
+   security = ads
+
+   server signing = mandatory
+   server min protocol = SMB3
+   smb encrypt = desired
+
+   idmap config * : backend = tdb
+   idmap config * : range = 3000-7999
+   idmap config CORP : backend = rid
+   idmap config CORP : range = 10000-999999
+
+   winbind use default domain = yes
+   winbind enum users = yes
+   winbind enum groups = yes
+   template shell = /bin/bash
+   template homedir = /home/%U
+
+   vfs objects = acl_xattr full_audit
+   map acl inherit = yes
+   store dos attributes = yes
+
+   full_audit:prefix = %u|%I|%S
+   full_audit:failure = connect disconnect mkdir rmdir rename unlink write pwrite
+   full_audit:success = connect disconnect mkdir rmdir rename unlink
+   full_audit:facility = local5
+   full_audit:priority = notice
+
+[Shared]
+   path = /srv/fileshare
+   read only = no
+   guest ok = no
+   valid users = "@CORP\Domain Users"
+   admin users = "@CORP\Domain Admins"
+   create mask = 0770
+   directory mask = 0770
+   force group = "CORP\Domain Users"</code></pre>
+    </div>
+  </div>
+
+  <!-- Technical Challenges -->
+  <div class="challenges-section">
+    <h2>// Technical Challenges Solved</h2>
+    <div class="challenge-list">
+      {challenges.map((item) => (
+        <div class="challenge-item">
+          <span class="challenge-label">{item.label}</span>
+          <span class="challenge-solution">{item.solution}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- DFS Cutover -->
+  <div class="cutover-section">
+    <h2>// Migration Cutover: DFS Namespace</h2>
+    <p>Instead of modifying GPO drive mappings, I updated DFS targets for a seamless cutover:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">PowerShell</span>
+        <span class="code-desc">DFS Namespace Update</span>
+      </div>
+      <pre><code># Add new Linux server as DFS target
+New-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" -TargetPath "\\fileserv\Shared"
+
+# Set old Windows server offline (keeps for rollback)
+Set-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" `
+  -TargetPath "\\oldserver\share" -State Offline</code></pre>
+    </div>
+  </div>
+
+  <!-- Service Commands -->
+  <div class="commands-section">
+    <h2>// Service Commands</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <span class="code-desc">Common operations</span>
+      </div>
+      <pre><code># Restart after config changes
+sudo systemctl restart smbd nmbd
+
+# Check AD join status
+sudo net ads testjoin
+
+# Test config syntax
+testparm -s</code></pre>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-section">
+    <div class="result-box">
+      <span class="result-icon">✓</span>
+      <div class="result-content">
+        <span class="result-title">Result</span>
+        <p>File server now has SNMP monitoring, enforced SMB3 security, 4GB swap safety net, and audit logging for compliance/forensics.</p>
+      </div>
+    </div>
+  </div>
+</ProjectLayout>
+
+<style>
+  /* Server Specs */
+  .server-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .spec-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+  }
+
+  .spec-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.6;
+    text-transform: uppercase;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .spec-value {
+    font-size: 0.85rem;
+  }
+
+  /* GitHub Callout */
+  .github-callout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid #6e5494;
+    border-radius: 6px;
+  }
+
+  .github-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .github-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: color-mix(in srgb, #6e5494 15%, transparent);
+    border-radius: 6px;
+    color: #6e5494;
+  }
+
+  .github-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .github-text {
+    flex: 1;
+  }
+
+  .github-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6e5494;
+  }
+
+  .github-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0.25rem 0 0 0;
+    line-height: 1.5;
+  }
+
+  .github-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .github-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .github-btn.repo {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    color: currentColor;
+  }
+
+  .github-btn.repo:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  .github-btn.star {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+    color: #f59e0b;
+  }
+
+  .github-btn.star:hover {
+    background: color-mix(in srgb, #f59e0b 25%, transparent);
+    border-color: #f59e0b;
+  }
+
+  .github-btn svg {
+    flex-shrink: 0;
+  }
+
+  /* Toolkit Section */
+  .toolkit-section {
+    margin: 2.5rem 0;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .feature-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 4px;
+  }
+
+  .feature-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .feature-title {
+    font-weight: 600;
+    font-size: 0.8rem;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .feature-desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  /* Security Section */
+  .security-section {
+    margin: 2.5rem 0;
+  }
+
+  .warning-box {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: color-mix(in srgb, #f59e0b 8%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 25%, transparent);
+    border-radius: 6px;
+  }
+
+  .warning-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .warning-content {
+    flex: 1;
+  }
+
+  .warning-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #f59e0b;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .warning-content p {
+    font-size: 0.8rem;
+    margin: 0;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+
+  .tip-box {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 6px;
+  }
+
+  .tip-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .tip-content {
+    flex: 1;
+  }
+
+  .tip-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #10b981;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .tip-content p {
+    font-size: 0.8rem;
+    margin: 0;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+
+  .hardening-table,
+  .oid-table {
+    margin: 1rem 0;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .hardening-header,
+  .oid-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    font-weight: 600;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .hardening-row,
+  .oid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 5%, transparent);
+    align-items: center;
+  }
+
+  .hardening-row:last-child,
+  .oid-row:last-child {
+    border-bottom: none;
+  }
+
+  .hardening-setting {
+    color: #10b981;
+    font-size: 0.8rem;
+  }
+
+  .hardening-purpose,
+  .oid-metric {
+    opacity: 0.85;
+  }
+
+  .oid-value {
+    color: #3b82f6;
+    font-size: 0.8rem;
+  }
+
+  /* SNMP Section */
+  .snmp-section {
+    margin: 2.5rem 0;
+  }
+
+  .snmp-section h3 {
+    font-size: 0.9rem;
+    margin: 1.5rem 0 0.75rem 0;
+    opacity: 0.8;
+  }
+
+  /* Audit Section */
+  .audit-section {
+    margin: 2.5rem 0;
+  }
+
+  .audit-section h3 {
+    font-size: 0.9rem;
+    margin: 1.5rem 0 0.75rem 0;
+    opacity: 0.8;
+  }
+
+  .audit-events {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .audit-event {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    align-items: center;
+  }
+
+  .event-name {
+    font-size: 0.8rem;
+    color: #8b5cf6;
+    min-width: 140px;
+  }
+
+  .event-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+
+  .log-format {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    margin: 1rem 0;
+  }
+
+  .log-format code {
+    font-size: 0.85rem;
+    color: #10b981;
+  }
+
+  /* Swap Section */
+  .swap-section {
+    margin: 2.5rem 0;
+  }
+
+  /* Config Section */
+  .config-section {
+    margin: 2.5rem 0;
+  }
+
+  .full-config pre {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  /* Challenges Section */
+  .challenges-section {
+    margin: 2.5rem 0;
+  }
+
+  .challenge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .challenge-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 4px;
+  }
+
+  .challenge-label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #f59e0b;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .challenge-solution {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    line-height: 1.5;
+  }
+
+  /* Cutover Section */
+  .cutover-section {
+    margin: 2.5rem 0;
+  }
+
+  /* Commands Section */
+  .commands-section {
+    margin: 2.5rem 0;
+  }
+
+  /* Result Section */
+  .result-section {
+    margin: 2.5rem 0;
+  }
+
+  .result-box {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 6px;
+  }
+
+  .result-icon {
+    font-size: 1.5rem;
+    color: #10b981;
+    flex-shrink: 0;
+  }
+
+  .result-content {
+    flex: 1;
+  }
+
+  .result-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #10b981;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .result-content p {
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Code Block */
+  .code-block {
+    margin: 1rem 0;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .code-lang {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    background: color-mix(in srgb, #3b82f6 20%, transparent);
+    color: #3b82f6;
+    border-radius: 3px;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .code-desc {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .code-block pre {
+    margin: 0;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    overflow-x: auto;
+  }
+
+  .code-block code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* Inline code */
+  p code {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .server-specs {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hardening-header,
+    .hardening-row,
+    .oid-header,
+    .oid-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .audit-event {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .event-name {
+      min-width: auto;
+    }
+  }
+</style>

@@ -1,0 +1,5629 @@
+---
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+
+const frontmatter = {
+  title: "Watchtower NOC Dashboard",
+  status: "In Progress",
+  statusType: "ongoing",
+  origin: "Polk State College",
+  date: "2026.01",
+  techStack: ["FastAPI", "React", "TypeScript", "Redis", "WebSocket", "ReactFlow", "Zustand", "TailwindCSS", "Proxmox API", "LibreNMS API"],
+};
+
+// Data sources
+const dataSources = [
+  { name: "LibreNMS", type: "SNMP Metrics", provides: "Device status, interfaces, port traffic, CDP/LLDP neighbors", color: "#10b981" },
+  { name: "Netdisco", type: "L2 Discovery", provides: "MAC tables, device inventory, switch port mappings", color: "#3b82f6" },
+  { name: "Proxmox", type: "Virtualization", provides: "VM/container lists, CPU/memory, storage pools", color: "#f59e0b" },
+  { name: "Speedtest CLI", type: "WAN Health", provides: "Download/upload speeds, latency, jitter", color: "#8b5cf6" },
+];
+
+// Features list
+const features = [
+  {
+    name: "Interactive Topology Canvas",
+    desc: "Draggable network map with expandable clusters, device status indicators, and animated connection links",
+    tech: "ReactFlow + Zustand + WebSocket",
+    icon: "🗺️",
+    anchor: null
+  },
+  {
+    name: "Real-Time Updates",
+    desc: "WebSocket pushes live device status, health metrics, and link changes without polling",
+    tech: "FastAPI WebSocket + APScheduler",
+    icon: "⚡",
+    anchor: "data-flow"
+  },
+  {
+    name: "L2/L3 View Toggle",
+    desc: "Switch between Physical (cable connections) and Logical (VLAN relationships) topology views",
+    tech: "ReactFlow layout transforms",
+    icon: "🔀",
+    anchor: null
+  },
+  {
+    name: "Cisco-Style Port Grid",
+    desc: "Visual switch port layout with real-time status colors and hover tooltips",
+    tech: "Custom React components",
+    icon: "🔌",
+    anchor: "port-grid"
+  },
+  {
+    name: "Proxmox Panel",
+    desc: "Live dashboard of VMs, containers, and storage pools for selected hypervisor nodes",
+    tech: "Proxmox API integration",
+    icon: "🖥️",
+    anchor: "proxmox-panel"
+  },
+  {
+    name: "Speedtest Widget",
+    desc: "Scheduled WAN health tests with CSV history and external link coloring",
+    tech: "Ookla CLI + Redis cache",
+    icon: "📶",
+    anchor: "speedtest"
+  },
+  {
+    name: "Port Group Monitoring",
+    desc: "Aggregate traffic across ports matching a pattern (e.g., all lab ports)",
+    tech: "SNMP ifOctets aggregation",
+    icon: "📊",
+    anchor: "port-groups"
+  },
+  {
+    name: "Port Search",
+    desc: "Find switch ports by searching SNMP descriptions (ifAlias)",
+    tech: "LibreNMS API query",
+    icon: "🔍",
+    anchor: "port-search"
+  },
+  {
+    name: "Mermaid Export",
+    desc: "Export topology as Mermaid diagram for documentation with built-in viewer",
+    tech: "Frontend Mermaid generator",
+    icon: "📝",
+    anchor: null
+  },
+  {
+    name: "Alert System",
+    desc: "Real-time alerts from device status changes with acknowledgment",
+    tech: "Derived from device state",
+    icon: "🔔",
+    anchor: null
+  },
+];
+
+// Tech decisions
+const techDecisions = [
+  { decision: "WebSocket over polling", reason: "Reduces latency and server load for real-time updates" },
+  { decision: "Redis caching", reason: "Fast in-memory access for frequently-read topology data" },
+  { decision: "Multi-source aggregation", reason: "No single monitoring tool has complete network visibility" },
+  { decision: "ReactFlow for topology", reason: "Handles complex graph layouts with built-in pan/zoom/interactions" },
+  { decision: "Zustand over Redux", reason: "Simpler state management for medium complexity app" },
+  { decision: "APScheduler", reason: "Reliable job scheduling with configurable intervals per data type" },
+  { decision: "YAML configuration", reason: "Human-readable, easy to version control (minus secrets)" },
+  { decision: "TypeScript throughout", reason: "Type safety for complex nested data models" },
+];
+
+// Development phases
+const phases = [
+  { phase: 1, name: "Core Dashboard", status: "completed", items: ["FastAPI backend", "React frontend", "Basic topology"] },
+  { phase: 2, name: "Dual-View Topology", status: "completed", items: ["L2/L3 toggle", "VLAN filtering", "Cluster nodes"] },
+  { phase: 3, name: "Integrations", status: "completed", items: ["LibreNMS polling", "Proxmox panel", "Netdisco data"] },
+  { phase: 4, name: "Auto-Discovery", status: "completed", items: ["CDP/LLDP links", "Dynamic topology", "Collision detection"] },
+  { phase: 5, name: "Monitoring Widgets", status: "completed", items: ["Speedtest", "Port groups", "Port search"] },
+  { phase: 6, name: "Export & Polish", status: "completed", items: ["Mermaid export", "CSV logging", "Collapsible widgets"] },
+  { phase: 7, name: "Authentication", status: "pending", items: ["JWT auth", "User sessions", "Role-based access"] },
+  { phase: 8, name: "Settings UI", status: "pending", items: ["Config editor", "Polling controls", "Theme options"] },
+];
+---
+
+<ProjectLayout frontmatter={frontmatter}>
+  <!-- Overview -->
+  <h2>// Overview</h2>
+  <p>
+    Watchtower is a self-hosted Network Operations Center dashboard that provides unified visibility into
+    network infrastructure, virtualization platforms, and system health. It aggregates data from multiple
+    monitoring systems into a single interactive topology visualization with live status updates via WebSocket.
+  </p>
+
+  <!-- GitHub Link -->
+  <div class="github-callout">
+    <div class="github-content">
+      <div class="github-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+      </div>
+      <div class="github-text">
+        <span class="github-label">Open Source</span>
+        <p class="github-desc">50+ commits, TypeScript 52% / Python 43%</p>
+      </div>
+    </div>
+    <div class="github-actions">
+      <a href="https://github.com/solomonneas/watchtower" target="_blank" class="github-btn repo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+        <span>View Repository</span>
+      </a>
+      <a href="https://github.com/solomonneas/watchtower/stargazers" target="_blank" class="github-btn star">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+        </svg>
+        <span>Star on GitHub</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Cost Savings -->
+  <h2>// The Numbers: Cost Avoidance</h2>
+  <p class="section-intro">
+    Enterprise monitoring platforms carry significant licensing costs. For a 200-endpoint departmental network, here's what commercial alternatives would cost:
+  </p>
+
+  <div class="cost-comparison">
+    <div class="cost-card solarwinds">
+      <div class="cost-header">
+        <span class="cost-icon">💸</span>
+        <span class="cost-label">SolarWinds (200 nodes)</span>
+      </div>
+      <div class="cost-body">
+        <div class="cost-row">
+          <span class="cost-key">Annual License</span>
+          <span class="cost-value bad">$29,448</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-key">Implementation + Training</span>
+          <span class="cost-value bad">$5,000–$13,000</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-key">3-Year TCO</span>
+          <span class="cost-value bad">$110K–$150K</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-key">Per Endpoint</span>
+          <span class="cost-value bad">$147–$177/year</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cost-arrow">
+      <div class="arrow-savings">
+        <span class="savings-label">3-YEAR SAVINGS</span>
+        <span class="savings-value">$110K–$150K</span>
+      </div>
+    </div>
+
+    <div class="cost-card watchtower-card">
+      <div class="cost-header">
+        <span class="cost-icon">✓</span>
+        <span class="cost-label">Watchtower</span>
+      </div>
+      <div class="cost-body">
+        <div class="cost-row">
+          <span class="cost-key">Annual License</span>
+          <span class="cost-value good">$0</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-key">Implementation</span>
+          <span class="cost-value good">$0</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-key">3-Year TCO</span>
+          <span class="cost-value good">$0</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-key">Per Endpoint</span>
+          <span class="cost-value good">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="savings-highlight">
+    <div class="highlight-stat">
+      <span class="stat-value">100% cost reduction</span>
+      <span class="stat-label">200+ endpoints monitored at zero additional cost</span>
+    </div>
+  </div>
+
+  <div class="value-context">
+    <div class="context-item">
+      <span class="context-icon">🏛️</span>
+      <div class="context-content">
+        <span class="context-title">State College Spending</span>
+        <span class="context-desc">Montgomery College: <a href="https://www.montgomerycountymd.gov/OMB/Resources/Files/omb/pdfs/fy27/ciprec/P076619.pdf" target="_blank">$4.1M/year</a> on NOC. UNC System: <a href="https://www.northcarolina.edu/apps/bog/doc.php?id=67354&code=bog" target="_blank">$5.35M/year</a> on network monitoring. <a href="https://campustechnology.com/articles/2019/07/08/number-of-institutions-with-it-networking-budgets-exceeding.aspx" target="_blank">48% of colleges</a> spend $750K–$2.5M annually.</span>
+      </div>
+    </div>
+    <div class="context-item">
+      <span class="context-icon">📊</span>
+      <div class="context-content">
+        <span class="context-title">Market Context</span>
+        <span class="context-desc"><a href="https://www.dirsec.com/insights/the-hidden-threat-why-83-of-universities-without-siem-and-identity-tools-are-vulnerable/" target="_blank">83% of universities</a> lack effective SIEM. Custom NOC development costs <a href="https://www.inoc.com/blog/costs-of-building-noc" target="_blank">$100K–$500K</a>. Average IT outage costs <a href="https://thenetworkinstallers.com/blog/cost-of-it-downtime-statistics/" target="_blank">$14,056/minute</a>.</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="cost-sources">
+    SolarWinds pricing: <a href="https://www.vendr.com/buyer-guides/solarwinds" target="_blank">Vendr</a> · <a href="https://www.netdata.cloud/blog/solarwinds-price-increases-2025/" target="_blank">Netdata</a> · <a href="https://www.manageengine.com/blog/itom/solarwinds-is-now-forcing-3year-subscription-heres-what-it-means-for-your-it-stack.html" target="_blank">ManageEngine</a>
+  </p>
+
+  <!-- Architecture -->
+  <h2>// Architecture</h2>
+  <div class="architecture">
+    <!-- Data Sources Layer -->
+    <div class="arch-layer sources">
+      <span class="layer-label">DATA SOURCES</span>
+      <div class="source-grid">
+        {dataSources.map((src) => (
+          <div class="source-card" style={`--accent: ${src.color}`}>
+            <span class="source-name">{src.name}</span>
+            <span class="source-type">{src.type}</span>
+            <span class="source-provides">{src.provides}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="arch-connector">
+      <div class="connector-arrows">
+        <span>▼</span><span>▼</span><span>▼</span><span>▼</span>
+      </div>
+      <span class="connector-label">Async Polling (httpx)</span>
+    </div>
+
+    <!-- Backend Layer -->
+    <div class="arch-layer backend">
+      <span class="layer-label">BACKEND</span>
+      <div class="backend-flow">
+        <div class="backend-box scheduler">
+          <span class="box-title">APScheduler</span>
+          <span class="box-desc">Polling jobs at 30s-300s intervals</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="backend-box aggregator">
+          <span class="box-title">Aggregator</span>
+          <span class="box-desc">Merges sources into unified model</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="backend-box redis">
+          <span class="box-title">Redis</span>
+          <span class="box-desc">In-memory cache</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="backend-box api">
+          <span class="box-title">FastAPI</span>
+          <span class="box-desc">REST + WebSocket</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector">
+      <div class="connector-arrows">
+        <span>▼</span>
+      </div>
+      <span class="connector-label">WebSocket Push</span>
+    </div>
+
+    <!-- Frontend Layer -->
+    <div class="arch-layer frontend">
+      <span class="layer-label">FRONTEND</span>
+      <div class="frontend-grid">
+        <div class="frontend-box main">
+          <span class="box-title">TopologyCanvas</span>
+          <span class="box-desc">ReactFlow interactive map</span>
+          <ul class="box-features">
+            <li>Cluster nodes (expand/collapse)</li>
+            <li>Device status indicators</li>
+            <li>Animated link edges</li>
+            <li>L2/L3 view toggle</li>
+          </ul>
+        </div>
+        <div class="frontend-box sidebar">
+          <span class="box-title">Sidebar Widgets</span>
+          <span class="box-desc">Collapsible panels</span>
+          <ul class="box-features">
+            <li>Network Summary</li>
+            <li>Speedtest Widget</li>
+            <li>Port Groups</li>
+            <li>Device Card + Port Grid</li>
+          </ul>
+        </div>
+        <div class="frontend-box state">
+          <span class="box-title">Zustand Store</span>
+          <span class="box-desc">Global state + WS subscription</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <h2>// Features</h2>
+  <div class="features-grid">
+    {features.map((feat) => (
+      feat.anchor ? (
+        <a href={`#${feat.anchor}`} class="feature-card clickable">
+          <div class="feature-header">
+            <span class="feature-icon">{feat.icon}</span>
+            <span class="feature-name">{feat.name}</span>
+          </div>
+          <p class="feature-desc">{feat.desc}</p>
+          <span class="feature-tech">{feat.tech}</span>
+        </a>
+      ) : (
+        <div class="feature-card">
+          <div class="feature-header">
+            <span class="feature-icon">{feat.icon}</span>
+            <span class="feature-name">{feat.name}</span>
+          </div>
+          <p class="feature-desc">{feat.desc}</p>
+          <span class="feature-tech">{feat.tech}</span>
+        </div>
+      )
+    ))}
+  </div>
+
+  <!-- Data Flow Example -->
+  <h2 id="data-flow">// Data Flow Example</h2>
+  <p class="section-intro">How a device status change propagates through the system:</p>
+
+  <div class="dataflow">
+    <div class="flow-step" style="--step: 1">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <span class="step-title">Detection</span>
+        <span class="step-desc">APScheduler polls LibreNMS API at 30s interval</span>
+      </div>
+    </div>
+    <div class="flow-connector"><div class="connector-pulse"></div></div>
+
+    <div class="flow-step" style="--step: 2">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <span class="step-title">Aggregation</span>
+        <span class="step-desc">Device status change detected, Pydantic model updated</span>
+      </div>
+    </div>
+    <div class="flow-connector"><div class="connector-pulse"></div></div>
+
+    <div class="flow-step" style="--step: 3">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <span class="step-title">Cache Update</span>
+        <span class="step-desc">Redis CACHE_TOPOLOGY key updated with new state</span>
+      </div>
+    </div>
+    <div class="flow-connector"><div class="connector-pulse"></div></div>
+
+    <div class="flow-step" style="--step: 4">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <span class="step-title">Broadcast</span>
+        <span class="step-desc">WebSocket pushes delta to all connected clients</span>
+      </div>
+    </div>
+    <div class="flow-connector"><div class="connector-pulse"></div></div>
+
+    <div class="flow-step" style="--step: 5">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <span class="step-title">State Update</span>
+        <span class="step-desc">Zustand store receives message, updates React state</span>
+      </div>
+    </div>
+    <div class="flow-connector"><div class="connector-pulse"></div></div>
+
+    <div class="flow-step" style="--step: 6">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <span class="step-title">Re-render</span>
+        <span class="step-desc">Device node color changes, alert count increments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Speedtest Widget -->
+  <div class="feature-deepdive" id="speedtest">
+    <h2>// Feature Deep Dive: Speedtest Widget</h2>
+    <p class="deepdive-intro">
+      This feature monitors internet connectivity health by running periodic Ookla speed tests and displaying
+      results in a real-time dashboard widget. It also affects the visual status of external WAN links on the
+      topology map.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🌐</span>
+        <span class="usecase-title">Use Case: WAN Health Monitoring</span>
+      </div>
+      <p class="usecase-desc">
+        Provides at-a-glance WAN health visibility for NOC operators. Instead of manually running speed tests
+        when users report "slow internet," the dashboard continuously monitors and logs connection quality.
+        Historical CSV data enables capacity planning and ISP SLA verification.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// How It Works</h3>
+
+    <div class="deepdive-flow">
+      <!-- Config -->
+      <div class="flow-block config">
+        <div class="block-header">
+          <span class="block-icon">⚙️</span>
+          <span class="block-title">CONFIG (config.yaml)</span>
+        </div>
+        <div class="block-code">
+          <pre><code>speedtest:
+  enabled: true
+  interval_minutes: 5           # Run test every 5 minutes
+  server_id: null               # null = auto-select closest
+  interface: "eth0"             # Specific NIC (optional)
+  thresholds:
+    degraded_download_mbps: 200 # Yellow if below
+    degraded_ping_ms: 50        # Yellow if above
+    down_download_mbps: 10      # Red if below
+  logging:
+    enabled: true
+    path: "/opt/watchtower/data/speedtest.csv"</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Scheduler -->
+      <div class="flow-block scheduler-block">
+        <div class="block-header">
+          <span class="block-icon">⏱️</span>
+          <span class="block-title">SCHEDULER (APScheduler)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><code>poll_speedtest()</code> job runs at configured interval</div>
+          <div class="backend-step">Calls <code>run_speedtest()</code> async function</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Backend -->
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🐍</span>
+          <span class="block-title">BACKEND (speedtest.py)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Build command: <code>/usr/local/bin/speedtest --format=json --accept-license --accept-gdpr</code></div>
+          <div class="backend-step"><span class="step-num">2</span> Execute via asyncio subprocess (no shell) with 2-minute timeout</div>
+          <div class="backend-step"><span class="step-num">3</span> Parse JSON: download/upload bandwidth (bytes/sec → Mbps), ping, jitter, packet loss, server info</div>
+          <div class="backend-step"><span class="step-num">4</span> Create SpeedtestResult dataclass</div>
+          <div class="backend-step"><span class="step-num">5</span> Cache result in Redis (1 hour TTL)</div>
+          <div class="backend-step"><span class="step-num">6</span> Append to CSV file for historical logging</div>
+          <div class="backend-step"><span class="step-num">7</span> Broadcast via WebSocket to all connected clients</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- API Endpoints -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📡</span>
+          <span class="block-title">API ENDPOINTS</span>
+        </div>
+        <div class="api-endpoints-list">
+          <div class="endpoint-item">
+            <code>GET /api/speedtest</code>
+            <span class="endpoint-desc">Returns cached result with status indicator</span>
+          </div>
+          <div class="endpoint-item">
+            <code>POST /api/speedtest/trigger</code>
+            <span class="endpoint-desc">Manual test trigger (60-second cooldown enforced)</span>
+          </div>
+          <div class="endpoint-item">
+            <code>GET /api/speedtest/export</code>
+            <span class="endpoint-desc">Download CSV history file</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- API Response -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📋</span>
+          <span class="block-title">API RESPONSE (GET /api/speedtest)</span>
+        </div>
+        <div class="block-code">
+          <pre><code>{`{
+  "timestamp": "2026-01-27T14:30:00Z",
+  "download_mbps": 487.23,
+  "upload_mbps": 52.41,
+  "ping_ms": 12.3,
+  "jitter_ms": 2.1,
+  "packet_loss_pct": 0,
+  "server_id": 12345,
+  "server_name": "Spectrum",
+  "server_location": "Tampa, FL",
+  "result_url": "https://www.speedtest.net/result/...",
+  "status": "success",
+  "indicator": "normal"    // Derived from thresholds
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Frontend Widget -->
+      <div class="flow-block widget">
+        <div class="block-header">
+          <span class="block-icon">📊</span>
+          <span class="block-title">FRONTEND (SpeedtestWidget.tsx)</span>
+        </div>
+        <div class="speedtest-widget-mockup">
+          <div class="mockup-header">
+            <span class="mockup-icon">🌐</span>
+            <span class="mockup-title">Internet Speed</span>
+            <span class="mockup-status ok">●</span>
+            <span class="mockup-collapse">▼</span>
+          </div>
+          <div class="mockup-body">
+            <div class="speedtest-stats">
+              <div class="speed-stat">
+                <span class="speed-arrow down">↓</span>
+                <span class="speed-value">487.2</span>
+                <span class="speed-unit">Mbps Down</span>
+              </div>
+              <div class="speed-stat">
+                <span class="speed-arrow up">↑</span>
+                <span class="speed-value">52.4</span>
+                <span class="speed-unit">Mbps Up</span>
+              </div>
+            </div>
+            <div class="speedtest-latency">
+              <span>12.3ms ping</span>
+              <span class="latency-sep">|</span>
+              <span>2.1ms jitter</span>
+            </div>
+            <div class="speedtest-server">Spectrum (Tampa, FL)</div>
+            <div class="speedtest-time">Last test: 3m ago</div>
+            <div class="speedtest-actions">
+              <button class="speedtest-btn run">Run Test</button>
+              <button class="speedtest-btn export">📥</button>
+            </div>
+            <div class="speedtest-link">View detailed result ↗</div>
+          </div>
+        </div>
+        <div class="widget-states">
+          <span class="widget-state"><strong>loading</strong> → Skeleton placeholder</span>
+          <span class="widget-state"><strong>no_data</strong> → "Run Test" button only</span>
+          <span class="widget-state"><strong>testing</strong> → Spinner animation</span>
+          <span class="widget-state"><strong>ready</strong> → Full result display</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Status Indicator Logic</h3>
+    <p class="section-desc">The widget displays a colored status dot based on configurable thresholds:</p>
+
+    <div class="status-table">
+      <div class="status-row header">
+        <span class="status-col">Status</span>
+        <span class="status-col">Color</span>
+        <span class="status-col">Condition</span>
+      </div>
+      <div class="status-row normal">
+        <span class="status-col"><code>normal</code></span>
+        <span class="status-col"><span class="status-dot green">●</span> Green</span>
+        <span class="status-col">Download ≥ 200 Mbps AND ping ≤ 50ms</span>
+      </div>
+      <div class="status-row degraded">
+        <span class="status-col"><code>degraded</code></span>
+        <span class="status-col"><span class="status-dot yellow">●</span> Yellow</span>
+        <span class="status-col">Download &lt; 200 Mbps OR ping &gt; 50ms</span>
+      </div>
+      <div class="status-row down">
+        <span class="status-col"><code>down</code></span>
+        <span class="status-col"><span class="status-dot red">●</span> Red</span>
+        <span class="status-col">Download &lt; 10 Mbps OR test error</span>
+      </div>
+    </div>
+
+    <div class="code-snippet">
+      <span class="snippet-label">Status Logic (Python)</span>
+      <pre><code>def get_status(result, thresholds):
+    if result.status.startswith("error"):
+        return "down"
+
+    if download &lt; 10:                    # Critical threshold
+        return "down"
+    if download &lt; 200 or ping &gt; 50:      # Warning thresholds
+        return "degraded"
+    return "normal"</code></pre>
+    </div>
+
+    <h3 class="deepdive-subhead">// External Link Coloring</h3>
+    <p class="section-desc">The speedtest status also affects the topology visualization:</p>
+
+    <div class="topology-example">
+      <div class="topo-header">Topology Canvas</div>
+      <div class="topo-visual">
+        <div class="topo-node firewall">Firewall</div>
+        <div class="topo-link">
+          <div class="link-line"></div>
+          <span class="link-label">WAN Link</span>
+        </div>
+        <div class="topo-node isp">ISP Router</div>
+      </div>
+      <div class="topo-legend">
+        <div class="legend-item"><span class="legend-line green"></span> normal → Green animated link</div>
+        <div class="legend-item"><span class="legend-line yellow"></span> degraded → Yellow animated link</div>
+        <div class="legend-item"><span class="legend-line red"></span> down → Red static link</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Flow</h3>
+    <div class="numbered-flow">
+      <div class="flow-item">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <span class="flow-title">Scheduled Test (every 5 minutes)</span>
+          <span class="flow-desc">APScheduler triggers poll_speedtest() → Runs Ookla CLI → Parses output → Caches in Redis → Logs to CSV → Broadcasts via WebSocket</span>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <span class="flow-title">Manual Test (user-triggered)</span>
+          <span class="flow-desc">Frontend POSTs to /api/speedtest/trigger → Backend checks 60s cooldown → Runs test in background → Result arrives via WebSocket</span>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <span class="flow-title">Page Load</span>
+          <span class="flow-desc">Frontend fetches GET /api/speedtest for cached result → Displays immediately → Subscribes to WebSocket for live updates</span>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <span class="flow-title">CSV Export</span>
+          <span class="flow-desc">User clicks export → Backend returns FileResponse → Filename: speedtest_history_2026-01-27.csv</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// CSV Log Format</h3>
+    <div class="csv-block">
+      <span class="csv-label">speedtest.csv</span>
+      <pre><code>timestamp,download_mbps,upload_mbps,ping_ms,jitter_ms,packet_loss_pct,server_id,server_name,server_location,result_url,status
+2026-01-27T14:30:00Z,487.23,52.41,12.3,2.1,0,12345,Spectrum,"Tampa, FL",https://speedtest.net/result/...,success
+2026-01-27T14:35:00Z,491.87,51.22,11.8,1.9,0,12345,Spectrum,"Tampa, FL",https://speedtest.net/result/...,success</code></pre>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">CLI tool</span>
+        <span class="tech-value">Ookla Speedtest CLI (/usr/local/bin/speedtest)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Execution</span>
+        <span class="tech-value">asyncio subprocess - no shell injection risk</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Timeout</span>
+        <span class="tech-value">2 minutes (handles hung tests)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Output format</span>
+        <span class="tech-value">JSON (--format=json)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Conversion</span>
+        <span class="tech-value">(bytes/sec × 8) / 1,000,000 = Mbps</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Cache TTL</span>
+        <span class="tech-value">1 hour in Redis</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Cooldown</span>
+        <span class="tech-value">60 seconds between manual triggers</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Interface binding</span>
+        <span class="tech-value">Optional --interface flag for multi-NIC hosts</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Why This Approach</h3>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <span class="approach-icon">🏆</span>
+        <div class="approach-content">
+          <span class="approach-title">Ookla CLI</span>
+          <span class="approach-desc">Industry standard, trusted by ISPs, consistent results</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">⚡</span>
+        <div class="approach-content">
+          <span class="approach-title">Async subprocess</span>
+          <span class="approach-desc">Non-blocking, doesn't tie up web server threads</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📡</span>
+        <div class="approach-content">
+          <span class="approach-title">WebSocket push</span>
+          <span class="approach-desc">Instant updates without polling overhead</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🛡️</span>
+        <div class="approach-content">
+          <span class="approach-title">Cooldown enforcement</span>
+          <span class="approach-desc">Prevents API abuse and bandwidth waste</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📊</span>
+        <div class="approach-content">
+          <span class="approach-title">CSV logging</span>
+          <span class="approach-desc">Long-term trending without database complexity</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🎛️</span>
+        <div class="approach-content">
+          <span class="approach-title">Configurable thresholds</span>
+          <span class="approach-desc">Adapts to different connection speeds (fiber vs cable vs DSL)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Port Group Monitoring -->
+  <div class="feature-deepdive" id="port-groups">
+    <h2>// Feature Deep Dive: Port Group Monitoring</h2>
+    <p class="deepdive-intro">
+      This feature aggregates real-time traffic across multiple switch ports that share a common SNMP description pattern.
+      Built to monitor computer labs where dozens of workstations connect through various switches but need to be
+      viewed as a single logical group.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🎬</span>
+        <span class="usecase-title">Use Case: Digital Media Labs</span>
+      </div>
+      <p class="usecase-desc">
+        The Digital Media Mac Pro Lab has ~140 workstation ports spread across multiple access switches. Each port
+        has an SNMP description (ifAlias) containing "digital-media" (the department identifier). Instead of monitoring
+        140 individual ports, this feature sums all their traffic into a single dashboard widget showing aggregate
+        bandwidth consumption.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// How It Works</h3>
+
+    <div class="deepdive-flow">
+      <!-- Config -->
+      <div class="flow-block config">
+        <div class="block-header">
+          <span class="block-icon">⚙️</span>
+          <span class="block-title">CONFIG (config.yaml)</span>
+        </div>
+        <div class="block-code">
+          <pre><code>port_groups:
+  - name: "Digital Media Labs"
+    description: "Digital Media Mac Pro Lab"
+    match_alias: "digital-media"  # Pattern to match
+    thresholds:
+      warning_mbps: 500         # Yellow threshold
+      critical_mbps: 800        # Red threshold
+    logging:
+      enabled: true
+      path: "/opt/watchtower/data/port_groups.csv"</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Backend -->
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🐍</span>
+          <span class="block-title">BACKEND (portgroups.py)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Fetch ALL ports from LibreNMS API</div>
+          <div class="backend-step"><span class="step-num">2</span> Filter ports where ifAlias contains "digital-media" (case-insensitive) → ~140 ports</div>
+          <div class="backend-step"><span class="step-num">3</span> Filter to only "up" ports (ifOperStatus == "up")</div>
+          <div class="backend-step"><span class="step-num">4</span> Sum traffic rates: ifInOctets_rate + ifOutOctets_rate (bytes/sec)</div>
+          <div class="backend-step"><span class="step-num">5</span> Convert: (bytes/sec × 8) / 1,000,000 = Mbps</div>
+          <div class="backend-step"><span class="step-num">6</span> Determine status vs thresholds: &lt;500 = ok, ≥500 = warning, ≥800 = critical</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- API Response -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📡</span>
+          <span class="block-title">API RESPONSE (GET /api/port-groups)</span>
+        </div>
+        <div class="block-code">
+          <pre><code>{`{
+  "name": "Digital Media Labs",
+  "description": "Digital Media Mac Pro Lab",
+  "port_count": 140,           // Total matching ports
+  "active_port_count": 87,     // Ports currently up
+  "in_mbps": 360.0,            // Inbound Mbps
+  "out_mbps": 96.0,            // Outbound Mbps
+  "total_mbps": 456.0,         // Combined
+  "status": "ok",              // Based on thresholds
+  "thresholds": { "warning_mbps": 500, "critical_mbps": 800 }
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Frontend Widget -->
+      <div class="flow-block widget">
+        <div class="block-header">
+          <span class="block-icon">📊</span>
+          <span class="block-title">FRONTEND (PortGroupWidget.tsx)</span>
+        </div>
+        <div class="widget-mockup">
+          <div class="mockup-header">
+            <span class="mockup-icon">🔲</span>
+            <span class="mockup-title">Digital Media Labs</span>
+            <span class="mockup-status ok">●</span>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-desc">Digital Media Mac Pro Lab</div>
+            <div class="mockup-stats">
+              <div class="mockup-stat">
+                <span class="stat-arrow down">↓</span>
+                <span class="stat-value">360.0</span>
+                <span class="stat-unit">Mbps In</span>
+              </div>
+              <div class="mockup-stat">
+                <span class="stat-arrow up">↑</span>
+                <span class="stat-value">96.0</span>
+                <span class="stat-unit">Mbps Out</span>
+              </div>
+            </div>
+            <div class="mockup-total">Total: 456.0 Mbps <span class="mockup-pct">57%</span></div>
+            <div class="mockup-bar">
+              <div class="bar-fill" style="width: 57%"></div>
+              <div class="bar-markers">
+                <span class="marker" style="left: 0">0</span>
+                <span class="marker warning" style="left: 62.5%">500</span>
+                <span class="marker critical" style="left: 100%">800</span>
+              </div>
+            </div>
+            <div class="mockup-ports">87 of 140 ports active</div>
+            <div class="mockup-export">📥 Export CSV</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">Pattern matching</span>
+        <span class="tech-value">Case-insensitive substring match on ifAlias field</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Traffic source</span>
+        <span class="tech-value">LibreNMS ifInOctets_rate / ifOutOctets_rate (SNMP counters)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Only active ports</span>
+        <span class="tech-value">Filters ifOperStatus == "up" before summing</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Conversion</span>
+        <span class="tech-value">(bytes/sec × 8) / 1,000,000 = Mbps</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Polling interval</span>
+        <span class="tech-value">Widget fetches every 60s (matches LibreNMS interface polling)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Thresholds</span>
+        <span class="tech-value">Configurable per-group warning/critical values in Mbps</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Persistence</span>
+        <span class="tech-value">CSV logging for historical analysis and capacity planning</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Why This Approach</h3>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <span class="approach-icon">📡</span>
+        <div class="approach-content">
+          <span class="approach-title">SNMP-based</span>
+          <span class="approach-desc">Uses existing LibreNMS infrastructure, no agent installation needed</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🔤</span>
+        <div class="approach-content">
+          <span class="approach-title">Pattern matching</span>
+          <span class="approach-desc">Network admins already use naming conventions in port descriptions</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">⚡</span>
+        <div class="approach-content">
+          <span class="approach-title">Real-time</span>
+          <span class="approach-desc">60-second granularity matches SNMP polling cycle</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📈</span>
+        <div class="approach-content">
+          <span class="approach-title">Scalable</span>
+          <span class="approach-desc">Works whether a lab has 10 ports or 500 ports</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📊</span>
+        <div class="approach-content">
+          <span class="approach-title">Exportable</span>
+          <span class="approach-desc">CSV export enables capacity planning spreadsheets and reports</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: ISP vs Network Bottleneck -->
+  <div class="feature-deepdive">
+    <h2>// Feature Deep Dive: Diagnosing Slowdowns</h2>
+    <p class="deepdive-intro">
+      When users report "the internet is slow," the question is: is it the ISP or something internal?
+      Both the Speedtest Widget and Port Group Monitoring export CSV logs. Comparing these two data sources
+      pinpoints whether the bottleneck is upstream (ISP) or within the campus network.
+    </p>
+
+    <h3 class="deepdive-subhead">// The Diagnostic Question</h3>
+    <div class="diagnostic-scenarios">
+      <div class="scenario-card isp">
+        <div class="scenario-header">
+          <span class="scenario-icon">🌐</span>
+          <span class="scenario-label">ISP Problem</span>
+        </div>
+        <div class="scenario-indicators">
+          <div class="indicator bad">
+            <span class="indicator-icon">📶</span>
+            <span class="indicator-metric">Speedtest</span>
+            <span class="indicator-value">Slow</span>
+          </div>
+          <div class="indicator good">
+            <span class="indicator-icon">📊</span>
+            <span class="indicator-metric">Lab Traffic</span>
+            <span class="indicator-value">Normal/Low</span>
+          </div>
+        </div>
+        <p class="scenario-conclusion">
+          WAN link is degraded but internal network has capacity. Problem is with the upstream provider.
+        </p>
+      </div>
+
+      <div class="scenario-card internal">
+        <div class="scenario-header">
+          <span class="scenario-icon">🔀</span>
+          <span class="scenario-label">Internal Bottleneck</span>
+        </div>
+        <div class="scenario-indicators">
+          <div class="indicator good">
+            <span class="indicator-icon">📶</span>
+            <span class="indicator-metric">Speedtest</span>
+            <span class="indicator-value">Normal</span>
+          </div>
+          <div class="indicator bad">
+            <span class="indicator-icon">📊</span>
+            <span class="indicator-metric">Lab Traffic</span>
+            <span class="indicator-value">Near Threshold</span>
+          </div>
+        </div>
+        <p class="scenario-conclusion">
+          ISP link is healthy but lab ports are saturated. Congestion is on the access or distribution layer.
+        </p>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// How It Works</h3>
+    <div class="correlation-flow">
+      <div class="corr-step">
+        <div class="corr-num">1</div>
+        <div class="corr-content">
+          <span class="corr-title">Collect Speedtest CSV</span>
+          <span class="corr-desc">Scheduled tests (every 5-15 min) log timestamp, download Mbps, upload Mbps, latency</span>
+          <code class="corr-path">/opt/watchtower/data/speedtest.csv</code>
+        </div>
+      </div>
+      <div class="corr-step">
+        <div class="corr-num">2</div>
+        <div class="corr-content">
+          <span class="corr-title">Collect Port Group CSV</span>
+          <span class="corr-desc">Polled traffic (every 60s) logs timestamp, group name, active ports, in/out Mbps</span>
+          <code class="corr-path">/opt/watchtower/data/port_groups.csv</code>
+        </div>
+      </div>
+      <div class="corr-step">
+        <div class="corr-num">3</div>
+        <div class="corr-content">
+          <span class="corr-title">Correlate by Timestamp</span>
+          <span class="corr-desc">Join both CSVs on timestamp (within tolerance) to see WAN health alongside lab traffic</span>
+        </div>
+      </div>
+      <div class="corr-step">
+        <div class="corr-num">4</div>
+        <div class="corr-content">
+          <span class="corr-title">Identify Pattern</span>
+          <span class="corr-desc">Slowdowns with low internal traffic → ISP. Slowdowns with high internal traffic → congestion.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Example Analysis</h3>
+    <div class="csv-example">
+      <div class="csv-block">
+        <span class="csv-label">speedtest.csv</span>
+        <pre><code>timestamp,download_mbps,upload_mbps,latency_ms
+2026-01-27T14:00:00,850.2,410.5,12
+2026-01-27T14:15:00,180.4,95.2,45    ← degraded
+2026-01-27T14:30:00,175.8,88.1,52    ← degraded
+2026-01-27T14:45:00,820.1,405.3,14</code></pre>
+      </div>
+      <div class="csv-block">
+        <span class="csv-label">port_groups.csv (Digital Media Labs)</span>
+        <pre><code>timestamp,group,active_ports,in_mbps,out_mbps,total_mbps
+2026-01-27T14:00:00,Digital Media Labs,87,360.0,96.0,456.0
+2026-01-27T14:15:00,Digital Media Labs,85,340.2,88.4,428.6
+2026-01-27T14:30:00,Digital Media Labs,82,310.5,82.1,392.6
+2026-01-27T14:45:00,Digital Media Labs,88,375.2,102.3,477.5</code></pre>
+      </div>
+      <div class="analysis-box">
+        <span class="analysis-icon">🔍</span>
+        <div class="analysis-content">
+          <span class="analysis-title">Conclusion: ISP Issue</span>
+          <p class="analysis-desc">
+            At 14:15 and 14:30, speedtest dropped from ~850 Mbps to ~180 Mbps while lab traffic stayed
+            consistent around 400-430 Mbps. The labs weren't saturating anything; the WAN link was degraded.
+            Time to call the ISP.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Why This Matters</h3>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <span class="approach-icon">🎯</span>
+        <div class="approach-content">
+          <span class="approach-title">Accurate Diagnosis</span>
+          <span class="approach-desc">Eliminates guesswork about where the problem actually is</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📞</span>
+        <div class="approach-content">
+          <span class="approach-title">ISP Accountability</span>
+          <span class="approach-desc">CSV logs provide evidence when escalating to the provider</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📈</span>
+        <div class="approach-content">
+          <span class="approach-title">Capacity Planning</span>
+          <span class="approach-desc">Historical data shows when internal upgrades are actually needed</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">⏱️</span>
+        <div class="approach-content">
+          <span class="approach-title">Faster Resolution</span>
+          <span class="approach-desc">Skip the "have you tried rebooting" phase with concrete data</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Port Search -->
+  <div class="feature-deepdive" id="port-search">
+    <h2>// Feature Deep Dive: Port Search</h2>
+    <p class="deepdive-intro">
+      This feature allows NOC operators to quickly find switch ports across the entire network by searching
+      SNMP port descriptions. Instead of logging into individual switches, users can search for devices like
+      "printer", "podium", or "voip" and instantly see all matching ports with their status and traffic.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🔍</span>
+        <span class="usecase-title">Use Case: Device Location</span>
+      </div>
+      <p class="usecase-desc">
+        Network admins label switch ports with descriptions (SNMP ifAlias) like "Conference Room Podium" or
+        "Break Room Printer". When troubleshooting, they need to quickly find which switch and port a device
+        is connected to. This feature searches all ports across all managed switches in seconds.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// How It Works</h3>
+
+    <div class="deepdive-flow">
+      <!-- Frontend Input -->
+      <div class="flow-block widget">
+        <div class="block-header">
+          <span class="block-icon">🔍</span>
+          <span class="block-title">FRONTEND (PortSearchWidget.tsx)</span>
+        </div>
+        <div class="port-search-mockup">
+          <div class="search-header">
+            <span class="search-icon">🔍</span>
+            <span class="search-title">Port Search</span>
+            <span class="mockup-collapse">▼</span>
+          </div>
+          <div class="search-body">
+            <div class="search-input-row">
+              <input type="text" class="search-input" placeholder="printer" readonly />
+              <button class="search-btn">Search</button>
+            </div>
+            <div class="status-filters">
+              <button class="filter-btn active">All</button>
+              <button class="filter-btn">Up</button>
+              <button class="filter-btn">Down</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+      <div class="api-call-label">GET /api/ports/search?q=printer&status=all&limit=100</div>
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Backend -->
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🐍</span>
+          <span class="block-title">BACKEND (ports.py)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Fetch ALL ports from LibreNMS API (~2000+ ports across all switches)</div>
+          <div class="backend-step"><span class="step-num">2</span> Fetch ALL devices from LibreNMS API → Build device_id → hostname lookup map</div>
+          <div class="backend-step"><span class="step-num">3</span> For each port, check if search term matches ifAlias (primary) or ifDescr (fallback) via case-insensitive substring match</div>
+          <div class="backend-step"><span class="step-num">4</span> Apply status filter: "up", "down", or "all"</div>
+          <div class="backend-step"><span class="step-num">5</span> Build result with device context: attach hostname, convert traffic rates to Mbps</div>
+          <div class="backend-step"><span class="step-num">6</span> Sort results by device hostname, then port name</div>
+          <div class="backend-step"><span class="step-num">7</span> Limit to 100 results (configurable, max 500)</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- API Response -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📋</span>
+          <span class="block-title">API RESPONSE</span>
+        </div>
+        <div class="block-code">
+          <pre><code>{`{
+  "query": "printer",
+  "total": 12,
+  "ports": [
+    {
+      "port_id": 4521,
+      "device_id": 15,
+      "device_hostname": "sw-bldg1-fl2",
+      "ifName": "Gi1/0/24",
+      "ifAlias": "Front Office Printer",
+      "ifDescr": "GigabitEthernet1/0/24",
+      "ifSpeed": 1000000000,
+      "ifOperStatus": "up",
+      "ifAdminStatus": "up",
+      "in_mbps": 0.12,
+      "out_mbps": 0.45
+    },
+    ...
+  ]
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Results Display -->
+      <div class="flow-block widget">
+        <div class="block-header">
+          <span class="block-icon">📊</span>
+          <span class="block-title">FRONTEND (Results Display)</span>
+        </div>
+        <div class="search-results-mockup">
+          <div class="results-header">Found 12 ports matching "printer"</div>
+          <div class="results-list">
+            <div class="port-result">
+              <div class="port-result-header">
+                <span class="port-device">sw-bldg1-fl2</span>
+                <span class="port-status up">up</span>
+              </div>
+              <div class="port-result-info">
+                <span class="port-name">Gi1/0/24</span>
+                <span class="port-speed">1G</span>
+              </div>
+              <div class="port-alias">Front Office Printer</div>
+              <div class="port-traffic">
+                <span class="traffic-in">↓ 0.12 Mbps</span>
+                <span class="traffic-out">↑ 0.45 Mbps</span>
+              </div>
+            </div>
+            <div class="port-result">
+              <div class="port-result-header">
+                <span class="port-device">sw-bldg2-fl1</span>
+                <span class="port-status down">down</span>
+              </div>
+              <div class="port-result-info">
+                <span class="port-name">Gi2/0/12</span>
+                <span class="port-speed">100M</span>
+              </div>
+              <div class="port-alias">Break Room Printer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Bonus: Alias Discovery</h3>
+    <p class="section-desc">
+      The <code>/api/ports/aliases</code> endpoint helps users discover what search terms exist in the network:
+    </p>
+
+    <div class="alias-discovery">
+      <div class="alias-request">
+        <code>GET /api/ports/aliases</code>
+      </div>
+      <div class="alias-response">
+        <div class="alias-item"><span class="alias-term">printer</span><span class="alias-count">42 ports</span></div>
+        <div class="alias-item"><span class="alias-term">voip</span><span class="alias-count">87 ports</span></div>
+        <div class="alias-item"><span class="alias-term">podium</span><span class="alias-count">24 ports</span></div>
+        <div class="alias-item"><span class="alias-term">wap</span><span class="alias-count">156 ports</span></div>
+        <div class="alias-item"><span class="alias-term">digital-media</span><span class="alias-count">140 ports</span></div>
+        <div class="alias-item"><span class="alias-term">server</span><span class="alias-count">23 ports</span></div>
+      </div>
+      <p class="alias-desc">
+        Extracts words from all ifAlias fields, counts frequency (skips words &lt;3 chars and pure numbers),
+        returns top 50 sorted by count. Helps users discover what types of devices are labeled without guessing.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">Search fields</span>
+        <span class="tech-value">ifAlias (primary), ifDescr (fallback)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Match type</span>
+        <span class="tech-value">Case-insensitive substring</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Data source</span>
+        <span class="tech-value">LibreNMS API (/api/v0/ports + /api/v0/devices)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Default limit</span>
+        <span class="tech-value">100 results (max 500)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Traffic conversion</span>
+        <span class="tech-value">(bytes/sec × 8) / 1,000,000 = Mbps</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Sort order</span>
+        <span class="tech-value">Device hostname → Port name (alphabetical)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Status filter</span>
+        <span class="tech-value">ifOperStatus field (up/down)</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// UI States</h3>
+    <div class="ui-states-grid">
+      <div class="ui-state">
+        <span class="state-name">idle</span>
+        <span class="state-desc">Search input with placeholder text</span>
+      </div>
+      <div class="ui-state">
+        <span class="state-name">loading</span>
+        <span class="state-desc">Search button shows "..."</span>
+      </div>
+      <div class="ui-state">
+        <span class="state-name">results</span>
+        <span class="state-desc">Count + scrollable port list</span>
+      </div>
+      <div class="ui-state">
+        <span class="state-name">error</span>
+        <span class="state-desc">"Search failed. Try again." message</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Speed Formatting</h3>
+    <div class="code-snippet">
+      <span class="snippet-label">formatSpeed(bps)</span>
+      <pre><code>10G+ → "10G"
+1G   → "1G"
+100M → "100M"
+10M  → "10M"
+else → "{`{x}`}M"</code></pre>
+    </div>
+
+    <h3 class="deepdive-subhead">// Why This Approach</h3>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <span class="approach-icon">⚡</span>
+        <div class="approach-content">
+          <span class="approach-title">Real-time data</span>
+          <span class="approach-desc">Queries LibreNMS directly, always current</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🔄</span>
+        <div class="approach-content">
+          <span class="approach-title">No local index</span>
+          <span class="approach-desc">Avoids sync complexity, uses LibreNMS as source of truth</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🔤</span>
+        <div class="approach-content">
+          <span class="approach-title">Substring match</span>
+          <span class="approach-desc">More flexible than exact match (finds "HP Printer" when searching "printer")</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🖥️</span>
+        <div class="approach-content">
+          <span class="approach-title">Device context</span>
+          <span class="approach-desc">Shows hostname so user knows which switch to access</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📊</span>
+        <div class="approach-content">
+          <span class="approach-title">Traffic included</span>
+          <span class="approach-desc">Helps verify device is actually active, not just link-up</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🔘</span>
+        <div class="approach-content">
+          <span class="approach-title">Status filter</span>
+          <span class="approach-desc">Quickly find disconnected devices for troubleshooting</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Cisco Port Grid -->
+  <div class="feature-deepdive" id="port-grid">
+    <h2>// Feature Deep Dive: Cisco Port Grid</h2>
+    <p class="deepdive-intro">
+      This feature renders a visual representation of physical switch ports that mirrors the actual front panel
+      of a Cisco Catalyst switch: odd ports (1, 3, 5...) on top and even ports (2, 4, 6...) on the bottom,
+      grouped into banks of 24 and organized by line card/module.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🔌</span>
+        <span class="usecase-title">Use Case: Physical Correlation</span>
+      </div>
+      <p class="usecase-desc">
+        Network engineers standing at a rack can immediately correlate dashboard status with physical ports.
+        Port 23 is always top-right of a bank, port 48 is always bottom-right. This layout matches what
+        they see on the actual Cisco Catalyst hardware, eliminating mental translation.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Flow</h3>
+
+    <div class="deepdive-flow">
+      <!-- Data Source -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📡</span>
+          <span class="block-title">LIBRENMS API</span>
+        </div>
+        <div class="block-code">
+          <pre><code>GET /api/v0/devices/{`{id}`}/ports
+
+Returns array of interfaces:
+[
+  {`{ name: "Gi1/0/1", ifOperStatus: "up", ifSpeed: 1000000000, ... }`},
+  {`{ name: "Gi1/0/2", ifOperStatus: "down", ... }`},
+  {`{ name: "Te1/1/1", ifOperStatus: "up", ifSpeed: 10000000000, ... }`},
+  ...
+]</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+      <div class="api-call-label">Backend Aggregator → Topology → WebSocket → Frontend Store</div>
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Parser -->
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🔧</span>
+          <span class="block-title">INTERFACE NAME PARSING (portUtils.ts)</span>
+        </div>
+        <div class="block-code parsing-example">
+          <pre><code>Input: "Gi1/0/24"
+        ││ │ │ └── Port number (24)
+        ││ │ └──── Module/slot (0)
+        ││ └────── Stack number (1)
+        │└──────── Type prefix (Gi = Gigabit)
+        └───────── Interface type
+
+Output: {`{
+  type: 'gigabit',
+  typePrefix: 'Gi',
+  stack: 1,
+  module: 0,
+  port: 24,
+  sortKey: 10024,    // (1 × 10000) + (0 × 100) + 24
+  isUplink: false,
+  original: 'Gi1/0/24'
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Organization Algorithm -->
+      <div class="flow-block config">
+        <div class="block-header">
+          <span class="block-icon">📊</span>
+          <span class="block-title">PORT ORGANIZATION (organizePortsForGrid)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Parse each interface name → GridPort object (failures → "other" array)</div>
+          <div class="backend-step"><span class="step-num">2</span> Separate uplinks (10G+: Te*, Fo*, Hu*, Twe*) from access ports (Gi*, Fa*)</div>
+          <div class="backend-step"><span class="step-num">3</span> Group access ports by module (line card): Module 0, Module 1, etc.</div>
+          <div class="backend-step"><span class="step-num">4</span> Within each module, create banks of 24 ports: Bank 0 (1-24), Bank 1 (25-48)</div>
+          <div class="backend-step"><span class="step-num">5</span> Within each bank, split by odd/even for physical row layout</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Output Structure -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📋</span>
+          <span class="block-title">GRID DATA STRUCTURE</span>
+        </div>
+        <div class="block-code">
+          <pre><code>{`{
+  modules: [
+    {
+      moduleId: 0,
+      label: "Slot 0",
+      banks: [
+        { label: "1-24", oddPorts: [...12], evenPorts: [...12] },
+        { label: "25-48", oddPorts: [...12], evenPorts: [...12] }
+      ]
+    }
+  ],
+  uplinks: [...GridPort],   // 10G+ SFP ports
+  other: [...Interface]     // VLANs, mgmt, loopback
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Interface Type Support</h3>
+    <div class="interface-types-table">
+      <div class="intf-header">
+        <span>Prefix</span>
+        <span>Full Name</span>
+        <span>Speed</span>
+        <span>Uplink?</span>
+      </div>
+      <div class="intf-row">
+        <code>Hu</code>
+        <span>HundredGigabitEthernet</span>
+        <span>100G</span>
+        <span class="uplink-yes">Yes</span>
+      </div>
+      <div class="intf-row">
+        <code>Fo</code>
+        <span>FortyGigabitEthernet</span>
+        <span>40G</span>
+        <span class="uplink-yes">Yes</span>
+      </div>
+      <div class="intf-row">
+        <code>Twe</code>
+        <span>TwentyFiveGigE</span>
+        <span>25G</span>
+        <span class="uplink-yes">Yes</span>
+      </div>
+      <div class="intf-row">
+        <code>Te</code>
+        <span>TenGigabitEthernet</span>
+        <span>10G</span>
+        <span class="uplink-yes">Yes</span>
+      </div>
+      <div class="intf-row">
+        <code>Gi</code>
+        <span>GigabitEthernet</span>
+        <span>1G</span>
+        <span class="uplink-no">No</span>
+      </div>
+      <div class="intf-row">
+        <code>Fa</code>
+        <span>FastEthernet</span>
+        <span>100M</span>
+        <span class="uplink-no">No</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Rendering</h3>
+    <div class="portgrid-mockup">
+      <div class="cisco-chassis">
+        <div class="chassis-bezel top">
+          <span class="cisco-brand">CISCO</span>
+          <span class="chassis-hostname">sw-core-01.network.local</span>
+        </div>
+
+        <div class="uplink-module">
+          <span class="uplink-label">10G</span>
+          <div class="uplink-ports">
+            <div class="sfp-port up"></div>
+            <div class="sfp-port up"></div>
+            <div class="sfp-port down"></div>
+            <div class="sfp-port disabled"></div>
+          </div>
+          <span class="uplink-range">Te1/1/1-4</span>
+        </div>
+
+        <div class="port-module">
+          <span class="module-label">Slot 0</span>
+          <div class="port-bank">
+            <div class="port-labels top">
+              <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span>
+              <span>13</span><span>15</span><span>17</span><span>19</span><span>21</span><span>23</span>
+            </div>
+            <div class="port-row odd">
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port warning"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+            </div>
+            <div class="port-row even">
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port down"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+            </div>
+            <div class="port-labels bottom">
+              <span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span>
+              <span>14</span><span>16</span><span>18</span><span>20</span><span>22</span><span>24</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-module">
+          <span class="module-label">Slot 1</span>
+          <div class="port-bank">
+            <div class="port-labels top">
+              <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span>
+              <span>13</span><span>15</span><span>17</span><span>19</span><span>21</span><span>23</span>
+            </div>
+            <div class="port-row odd">
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port down"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port warning"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+            </div>
+            <div class="port-row even">
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port down"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+            </div>
+            <div class="port-labels bottom">
+              <span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span>
+              <span>14</span><span>16</span><span>18</span><span>20</span><span>22</span><span>24</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-module">
+          <span class="module-label">Slot 2</span>
+          <div class="port-bank">
+            <div class="port-labels top">
+              <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span>
+              <span>13</span><span>15</span><span>17</span><span>19</span><span>21</span><span>23</span>
+            </div>
+            <div class="port-row odd">
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+            </div>
+            <div class="port-row even">
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port down"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port up"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+              <div class="rj45-port disabled"></div>
+            </div>
+            <div class="port-labels bottom">
+              <span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span>
+              <span>14</span><span>16</span><span>18</span><span>20</span><span>22</span><span>24</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chassis-bezel bottom">
+          <div class="status-legend">
+            <span class="legend-item"><span class="led up"></span> 58 up</span>
+            <span class="legend-item"><span class="led down"></span> 4 down</span>
+            <span class="legend-item"><span class="led disabled"></span> 10 disabled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="led-legend">
+      <div class="led-legend-title">LED Status Colors</div>
+      <div class="led-legend-grid">
+        <div class="led-legend-item">
+          <span class="led-sample up"></span>
+          <span class="led-desc">Green: Port up, normal operation</span>
+        </div>
+        <div class="led-legend-item">
+          <span class="led-sample down"></span>
+          <span class="led-desc">Red: Port down, link failure</span>
+        </div>
+        <div class="led-legend-item">
+          <span class="led-sample warning"></span>
+          <span class="led-desc">Amber: Up but &gt;80% utilization</span>
+        </div>
+        <div class="led-legend-item">
+          <span class="led-sample disabled"></span>
+          <span class="led-desc">Grey: Admin disabled</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Port Detail Panel</h3>
+    <p class="section-desc">Clicking a port opens an expanded detail view:</p>
+    <div class="port-detail-mockup">
+      <div class="detail-header">
+        <span class="detail-back">← Back</span>
+        <span class="detail-port"><span class="detail-led up"></span> Gi1/0/24</span>
+      </div>
+      <div class="detail-body">
+        <div class="detail-alias">Office HP LaserJet</div>
+        <div class="detail-row">
+          <div class="detail-stat">
+            <span class="stat-label">Status</span>
+            <span class="stat-value up">● up</span>
+          </div>
+          <div class="detail-stat">
+            <span class="stat-label">Speed</span>
+            <span class="stat-value">1G</span>
+          </div>
+        </div>
+        <div class="detail-section">
+          <span class="section-label">Utilization</span>
+          <div class="util-bar">
+            <div class="util-fill" style="width: 45%"></div>
+          </div>
+          <span class="util-pct">45%</span>
+        </div>
+        <div class="detail-section">
+          <span class="section-label">Traffic</span>
+          <div class="traffic-stats">
+            <div class="traffic-box">
+              <span class="traffic-dir">In</span>
+              <span class="traffic-value">12.5</span>
+              <span class="traffic-unit">Mbps</span>
+            </div>
+            <div class="traffic-box">
+              <span class="traffic-dir">Out</span>
+              <span class="traffic-value">2.3</span>
+              <span class="traffic-unit">Mbps</span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-badges">
+          <span class="badge trunk">Trunk</span>
+          <span class="badge poe">PoE: 12.5W</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Component Hierarchy</h3>
+    <div class="component-tree">
+      <div class="tree-node root">PortGrid.tsx</div>
+      <div class="tree-children">
+        <div class="tree-node">Chassis Container (dark metallic styling)</div>
+        <div class="tree-children">
+          <div class="tree-node">Bezel Top: "CISCO" brand + device name</div>
+          <div class="tree-node">Uplink Module: PortSquare[] (variant="sfp")</div>
+          <div class="tree-node">Port Modules (for each line card)</div>
+          <div class="tree-children">
+            <div class="tree-node">PortBankDisplay (for each bank of 24)</div>
+            <div class="tree-children">
+              <div class="tree-node">Port number labels (1, 3, 5...)</div>
+              <div class="tree-node">Top row: PortSquare[] (odd ports)</div>
+              <div class="tree-node">Bottom row: PortSquare[] (even ports)</div>
+            </div>
+          </div>
+          <div class="tree-node">Bezel Bottom: Status legend</div>
+        </div>
+        <div class="tree-node">Other Interfaces (VLANs, mgmt, loopback)</div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">Data source</span>
+        <span class="tech-value">LibreNMS /api/v0/devices/{`{id}`}/ports</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Parsing</span>
+        <span class="tech-value">Regex matching for Cisco naming conventions</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Layout</span>
+        <span class="tech-value">CSS Flexbox, 12 ports per row</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Port sizing</span>
+        <span class="tech-value">RJ45: 18×14px, SFP: 24×20px</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">State</span>
+        <span class="tech-value">React useState for selected port, hover tooltip</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Interactivity</span>
+        <span class="tech-value">Click → detail panel, hover → tooltip</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Responsiveness</span>
+        <span class="tech-value">Wraps naturally, banks stack vertically</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Why This Layout</h3>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <span class="approach-icon">🔌</span>
+        <div class="approach-content">
+          <span class="approach-title">Physical accuracy</span>
+          <span class="approach-desc">Odd ports top, even bottom; matches actual Cisco Catalyst hardware</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">📦</span>
+        <div class="approach-content">
+          <span class="approach-title">Banks of 24</span>
+          <span class="approach-desc">Matches line card groupings on physical switches</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">⬆️</span>
+        <div class="approach-content">
+          <span class="approach-title">SFP+ at top</span>
+          <span class="approach-desc">Mirrors physical uplink placement on switch chassis</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">🏷️</span>
+        <div class="approach-content">
+          <span class="approach-title">Module labels</span>
+          <span class="approach-desc">For modular switches (4506, etc.) with multiple line cards</span>
+        </div>
+      </div>
+      <div class="approach-item">
+        <span class="approach-icon">👁️</span>
+        <div class="approach-content">
+          <span class="approach-title">Rack correlation</span>
+          <span class="approach-desc">Engineers can match dashboard to physical port at a glance</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Deep Dive: Proxmox Panel -->
+  <div class="feature-deepdive" id="proxmox-panel">
+    <h2>// Feature Deep Dive: Proxmox Panel</h2>
+    <p class="deepdive-intro">
+      When clicking a Proxmox hypervisor node in the topology, this panel displays a detailed dashboard
+      showing the node's health, all VMs and containers with live CPU/RAM metrics, and storage pool
+      utilization with color-coded capacity warnings.
+    </p>
+
+    <div class="usecase-block">
+      <div class="usecase-header">
+        <span class="usecase-icon">🖥️</span>
+        <span class="usecase-title">Use Case: At-a-Glance Hypervisor Health</span>
+      </div>
+      <p class="usecase-desc">
+        NOC operators need quick visibility into what's running on each Proxmox node without logging into
+        the Proxmox web UI. This panel shows running/stopped VMs, resource consumption, and storage capacity
+        in the same sidebar used for network device details.
+      </p>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Flow</h3>
+
+    <div class="deepdive-flow">
+      <!-- User Action -->
+      <div class="flow-block widget">
+        <div class="block-header">
+          <span class="block-icon">🖱️</span>
+          <span class="block-title">USER ACTION</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> User clicks Proxmox node in topology (e.g., "proxmox1")</div>
+          <div class="backend-step"><span class="step-num">2</span> DeviceCard.tsx detects device_type === 'hypervisor'</div>
+          <div class="backend-step"><span class="step-num">3</span> ProxmoxPanel.tsx renders with nodeName prop</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+      <div class="api-call-label">GET /api/vms/node/{`{nodeName}`}</div>
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- Backend -->
+      <div class="flow-block backend">
+        <div class="block-header">
+          <span class="block-icon">🐍</span>
+          <span class="block-title">BACKEND (vms.py)</span>
+        </div>
+        <div class="block-steps">
+          <div class="backend-step"><span class="step-num">1</span> Look up node in Redis cache (match by name, instance, or normalized input)</div>
+          <div class="backend-step"><span class="step-num">2</span> Filter VMs/LXCs from cache, separate into QEMU and LXC lists</div>
+          <div class="backend-step"><span class="step-num">3</span> Fetch storage pools from Proxmox API (on-demand, not cached)</div>
+          <div class="backend-step"><span class="step-num">4</span> Calculate running/total counts for summary badges</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">▼</div>
+
+      <!-- API Response -->
+      <div class="flow-block api">
+        <div class="block-header">
+          <span class="block-icon">📋</span>
+          <span class="block-title">API RESPONSE</span>
+        </div>
+        <div class="block-code">
+          <pre><code>{`{
+  "node": {
+    "node": "proxmox1", "status": "online",
+    "cpu": 23.5, "memory": 67.2,
+    "maxcpu": 32, "maxmem": 137438953472
+  },
+  "vms": [
+    { "vmid": 100, "name": "dc1", "status": "running",
+      "cpu": 2.3, "memory": 45.0 }
+  ],
+  "lxcs": [
+    { "vmid": 200, "name": "librenms", "status": "running",
+      "cpu": 5.1, "memory": 32.0 }
+  ],
+  "storage": [
+    { "storage": "local-zfs", "type": "zfspool",
+      "used": 500000000000, "total": 2000000000000,
+      "used_percent": 25.0 }
+  ],
+  "vms_running": 8, "vms_total": 10,
+  "lxcs_running": 12, "lxcs_total": 12
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Visual Layout</h3>
+    <div class="proxmox-panel-mockup">
+      <div class="pve-section">
+        <div class="pve-section-header">
+          <span class="pve-section-icon">🖥️</span>
+          <span class="pve-section-title">NODE</span>
+          <span class="pve-section-count">1 / 1</span>
+        </div>
+        <div class="pve-section-body">
+          <div class="pve-columns">
+            <span class="pve-col-name">Name</span>
+            <span class="pve-col-cpu">CPU</span>
+            <span class="pve-col-ram">RAM</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">proxmox1</span>
+            <span class="pve-cpu">23.5%</span>
+            <span class="pve-ram">67.2%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pve-section">
+        <div class="pve-section-header">
+          <span class="pve-section-icon">💻</span>
+          <span class="pve-section-title">VMS</span>
+          <span class="pve-section-count">8 / 10</span>
+        </div>
+        <div class="pve-section-body">
+          <div class="pve-columns">
+            <span class="pve-col-name">Name</span>
+            <span class="pve-col-cpu">CPU</span>
+            <span class="pve-col-ram">RAM</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">dc1</span>
+            <span class="pve-cpu">2.3%</span>
+            <span class="pve-ram">45.0%</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">wazuh-manager</span>
+            <span class="pve-cpu">12.5%</span>
+            <span class="pve-ram">78.3%</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status stopped"></span>
+            <span class="pve-name">template-win11</span>
+            <span class="pve-cpu">0.0%</span>
+            <span class="pve-ram">0.0%</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">thehive</span>
+            <span class="pve-cpu">8.2%</span>
+            <span class="pve-ram">65.4%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pve-section">
+        <div class="pve-section-header">
+          <span class="pve-section-icon">📦</span>
+          <span class="pve-section-title">LXCS</span>
+          <span class="pve-section-count">12 / 12</span>
+        </div>
+        <div class="pve-section-body">
+          <div class="pve-columns">
+            <span class="pve-col-name">Name</span>
+            <span class="pve-col-cpu">CPU</span>
+            <span class="pve-col-ram">RAM</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">librenms</span>
+            <span class="pve-cpu">5.1%</span>
+            <span class="pve-ram">32.0%</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">netdisco</span>
+            <span class="pve-cpu">1.2%</span>
+            <span class="pve-ram">18.5%</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">watchtower</span>
+            <span class="pve-cpu">3.4%</span>
+            <span class="pve-ram">24.2%</span>
+          </div>
+          <div class="pve-row">
+            <span class="pve-status running"></span>
+            <span class="pve-name">wazuh-indexer</span>
+            <span class="pve-cpu">15.2%</span>
+            <span class="pve-ram">85.3%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pve-section">
+        <div class="pve-section-header">
+          <span class="pve-section-icon">💾</span>
+          <span class="pve-section-title">STORAGE</span>
+          <span class="pve-section-count">3 / 3</span>
+        </div>
+        <div class="pve-section-body storage">
+          <div class="storage-item">
+            <div class="storage-header">
+              <span class="storage-name">local-zfs</span>
+              <span class="storage-type">zfspool</span>
+            </div>
+            <div class="storage-bar-container">
+              <div class="storage-bar normal" style="width: 25%"></div>
+            </div>
+            <div class="storage-stats">
+              <span class="storage-used">500 GB / 2.0 TB</span>
+              <span class="storage-pct">25.0%</span>
+            </div>
+          </div>
+          <div class="storage-item">
+            <div class="storage-header">
+              <span class="storage-name">ceph-pool</span>
+              <span class="storage-type">rbd</span>
+            </div>
+            <div class="storage-bar-container">
+              <div class="storage-bar normal" style="width: 64%"></div>
+            </div>
+            <div class="storage-stats">
+              <span class="storage-used">3.2 TB / 5.0 TB</span>
+              <span class="storage-pct">64.0%</span>
+            </div>
+          </div>
+          <div class="storage-item">
+            <div class="storage-header">
+              <span class="storage-name">backup-nfs</span>
+              <span class="storage-type warning">nfs</span>
+            </div>
+            <div class="storage-bar-container">
+              <div class="storage-bar warning" style="width: 85%"></div>
+            </div>
+            <div class="storage-stats">
+              <span class="storage-used">8.5 TB / 10.0 TB</span>
+              <span class="storage-pct warning">85.0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pve-legend">
+      <div class="pve-legend-title">Legend</div>
+      <div class="pve-legend-grid">
+        <div class="pve-legend-item">
+          <span class="pve-legend-dot running"></span>
+          <span>Running / Online</span>
+        </div>
+        <div class="pve-legend-item">
+          <span class="pve-legend-dot stopped"></span>
+          <span>Stopped</span>
+        </div>
+        <div class="pve-legend-item">
+          <span class="pve-legend-sample cpu">23.5%</span>
+          <span>CPU (blue)</span>
+        </div>
+        <div class="pve-legend-item">
+          <span class="pve-legend-sample ram">67.2%</span>
+          <span>RAM (purple)</span>
+        </div>
+      </div>
+      <div class="pve-legend-storage">
+        <span class="pve-legend-bar normal"></span> Normal (&lt;70%)
+        <span class="pve-legend-bar warning"></span> Warning (70-90%)
+        <span class="pve-legend-bar critical"></span> Critical (&gt;90%)
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Data Sources</h3>
+    <div class="data-sources-block">
+      <div class="data-source">
+        <span class="source-label">scheduler.py</span>
+        <span class="source-desc">poll_proxmox() runs every 60 seconds</span>
+      </div>
+      <div class="data-source-endpoints">
+        <div class="endpoint">
+          <code>GET /api2/json/nodes</code>
+          <span>→ Node health (cached in CACHE_PROXMOX)</span>
+        </div>
+        <div class="endpoint">
+          <code>GET /api2/json/nodes/{`{node}`}/qemu</code>
+          <span>→ VMs per node (cached in CACHE_PROXMOX_VMS)</span>
+        </div>
+        <div class="endpoint">
+          <code>GET /api2/json/nodes/{`{node}`}/lxc</code>
+          <span>→ Containers per node (cached)</span>
+        </div>
+        <div class="endpoint">
+          <code>GET /api2/json/nodes/{`{node}`}/storage</code>
+          <span>→ Storage pools (fetched on-demand)</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Node Matching Logic</h3>
+    <p class="section-desc">
+      The backend uses multiple strategies to match clicked nodes flexibly:
+    </p>
+    <div class="matching-strategies">
+      <div class="strategy">
+        <span class="strategy-num">1</span>
+        <span class="strategy-name">Exact match</span>
+        <span class="strategy-example">"proxmox1" → matches node "proxmox1"</span>
+      </div>
+      <div class="strategy">
+        <span class="strategy-num">2</span>
+        <span class="strategy-name">Normalized</span>
+        <span class="strategy-example">"Proxmox 1" → matches "proxmox1" (ignores spaces, case)</span>
+      </div>
+      <div class="strategy">
+        <span class="strategy-num">3</span>
+        <span class="strategy-name">Partial</span>
+        <span class="strategy-example">"host20" → matches node in instance "pve-netlab"</span>
+      </div>
+      <div class="strategy">
+        <span class="strategy-num">4</span>
+        <span class="strategy-name">Reverse</span>
+        <span class="strategy-example">Key "pve:host20" contains input "host20"</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// Technical Details</h3>
+    <div class="tech-table">
+      <div class="tech-row">
+        <span class="tech-label">API Auth</span>
+        <span class="tech-value">PVEAPIToken=user@realm!tokenid=secret header</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">CPU values</span>
+        <span class="tech-value">0.0-1.0 from API, multiply by 100 for display %</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Memory</span>
+        <span class="tech-value">Bytes from API, converted with formatBytes()</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Polling</span>
+        <span class="tech-value">60 seconds (scheduler), 30 seconds (panel refresh)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Storage</span>
+        <span class="tech-value">Fetched on-demand when panel opens (always fresh)</span>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label">Node matching</span>
+        <span class="tech-value">Multiple strategies for flexible matching</span>
+      </div>
+    </div>
+
+    <h3 class="deepdive-subhead">// API Endpoints</h3>
+    <div class="api-endpoints-list">
+      <div class="api-endpoint">
+        <code>GET /api/vms</code>
+        <span>All running VMs/LXCs with summary stats</span>
+      </div>
+      <div class="api-endpoint">
+        <code>GET /api/vms/summary</code>
+        <span>Just the counts (total_running, total_qemu, total_lxc)</span>
+      </div>
+      <div class="api-endpoint">
+        <code>GET /api/vms/node/{`{node_name}`}</code>
+        <span>Full node detail with VMs, LXCs, storage (used by panel)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technical Decisions -->
+  <h2>// Key Technical Decisions</h2>
+  <div class="decisions-grid">
+    {techDecisions.map((d) => (
+      <div class="decision-card">
+        <span class="decision-title">{d.decision}</span>
+        <span class="decision-reason">{d.reason}</span>
+      </div>
+    ))}
+  </div>
+
+  <!-- API Endpoints -->
+  <h2>// API Surface</h2>
+  <div class="api-section">
+    <div class="api-group">
+      <span class="api-label">REST Endpoints</span>
+      <div class="api-list">
+        <code>/api/topology</code>
+        <code>/api/topology/l3</code>
+        <code>/api/alerts</code>
+        <code>/api/vms</code>
+        <code>/api/vms/node/{"{name}"}</code>
+        <code>/api/speedtest</code>
+        <code>/api/port-groups</code>
+        <code>/api/port-groups/export</code>
+        <code>/api/ports/search</code>
+        <code>/api/ports/aliases</code>
+      </div>
+    </div>
+    <div class="api-group">
+      <span class="api-label">WebSocket</span>
+      <div class="api-list">
+        <code>/ws/topology</code>
+        <span class="api-note">Pushes on cache changes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Development Phases -->
+  <h2>// Development Roadmap</h2>
+  <div class="phases-grid">
+    {phases.map((p) => (
+      <div class={`phase-card ${p.status}`}>
+        <div class="phase-header">
+          <span class="phase-num">Phase {p.phase}</span>
+          <span class={`phase-status ${p.status}`}>
+            {p.status === 'completed' ? '✓' : '○'}
+          </span>
+        </div>
+        <span class="phase-name">{p.name}</span>
+        <ul class="phase-items">
+          {p.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <!-- Current Status -->
+  <h2>// Current Status</h2>
+  <div class="status-block">
+    <div class="status-indicator active">
+      <div class="status-pulse"></div>
+      <span>Core functionality deployed and operational</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">✓</span> FastAPI backend with Redis caching</li>
+      <li><span class="check">✓</span> React frontend with ReactFlow topology</li>
+      <li><span class="check">✓</span> LibreNMS + Netdisco + Proxmox integrations</li>
+      <li><span class="check">✓</span> WebSocket real-time updates</li>
+      <li><span class="check">✓</span> CDP/LLDP auto-discovery</li>
+      <li><span class="check">✓</span> L2/L3 topology view toggle</li>
+      <li><span class="check">✓</span> Cisco-style port grid visualization</li>
+      <li><span class="check">✓</span> Speedtest widget with CSV export</li>
+      <li><span class="check">✓</span> Port group traffic monitoring</li>
+      <li><span class="check">✓</span> Mermaid diagram export</li>
+      <li><span class="pending">○</span> JWT authentication</li>
+      <li><span class="pending">○</span> Settings UI</li>
+    </ul>
+  </div>
+</ProjectLayout>
+
+<style>
+  .section-intro {
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Cost Comparison */
+  .cost-comparison {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .cost-card {
+    flex: 1;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .cost-card.solarwinds {
+    border-color: color-mix(in srgb, #ef4444 20%, transparent);
+  }
+
+  .cost-card.watchtower-card {
+    border-color: color-mix(in srgb, #10b981 20%, transparent);
+  }
+
+  .cost-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .cost-icon {
+    font-size: 1.25rem;
+  }
+
+  .cost-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .cost-body {
+    padding: 1rem;
+  }
+
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px dotted color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .cost-row:last-child {
+    border-bottom: none;
+  }
+
+  .cost-key {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .cost-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .cost-value.bad {
+    color: #ef4444;
+  }
+
+  .cost-value.good {
+    color: #10b981;
+  }
+
+  .cost-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5rem;
+  }
+
+  .arrow-savings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+    border-radius: 8px;
+  }
+
+  .savings-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: #10b981;
+  }
+
+  .savings-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .savings-highlight {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0 1.5rem;
+  }
+
+  .highlight-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1.5rem 3rem;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 2px solid color-mix(in srgb, #10b981 30%, transparent);
+    border-radius: 12px;
+  }
+
+  .highlight-stat .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .highlight-stat .stat-label {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+
+  .cost-sources {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    text-align: center;
+    opacity: 0.6;
+    margin-top: 1rem;
+  }
+
+  .cost-sources a {
+    color: currentColor;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .cost-sources a:hover {
+    opacity: 1;
+    color: #10b981;
+  }
+
+  .value-context a {
+    color: #10b981;
+    text-decoration: none;
+  }
+
+  .value-context a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive: Stack on mobile */
+  @media (max-width: 768px) {
+    .cost-comparison {
+      flex-direction: column;
+    }
+
+    .cost-arrow {
+      padding: 0.5rem 0;
+    }
+
+    .highlight-stat {
+      padding: 1rem 2rem;
+    }
+  }
+
+  /* Value Showcase */
+  .value-showcase {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, color-mix(in srgb, #10b981 8%, transparent), color-mix(in srgb, #10b981 3%, transparent));
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 12px;
+  }
+
+  .value-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .value-header h2 {
+    margin: 0 0 0.5rem 0;
+    color: #10b981;
+  }
+
+  .value-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .value-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .value-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+  }
+
+  .value-metric.primary {
+    background: color-mix(in srgb, #10b981 12%, transparent);
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+  }
+
+  .metric-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #10b981;
+    line-height: 1.2;
+  }
+
+  .value-metric.primary .metric-value {
+    font-size: 2rem;
+  }
+
+  .metric-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .metric-context {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+  }
+
+  .value-comparison {
+    margin-bottom: 1.5rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .comparison-row:last-child {
+    border-bottom: none;
+  }
+
+  .comparison-row.header {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .comparison-col {
+    display: flex;
+    align-items: center;
+  }
+
+  .comparison-col:not(:first-child) {
+    justify-content: center;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .comparison-col.negative {
+    color: #ef4444;
+  }
+
+  .comparison-col.positive {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .value-context {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .context-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .context-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .context-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .context-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .context-desc {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+
+  /* GitHub Callout */
+  .github-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid #6e5494;
+    border-radius: 6px;
+    flex-wrap: wrap;
+  }
+
+  .github-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .github-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: color-mix(in srgb, #6e5494 15%, transparent);
+    border-radius: 6px;
+    color: #6e5494;
+  }
+
+  .github-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .github-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .github-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6e5494;
+  }
+
+  .github-desc {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  .github-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .github-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .github-btn.repo {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    color: currentColor;
+  }
+
+  .github-btn.repo:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  .github-btn.star {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+    color: #f59e0b;
+  }
+
+  .github-btn.star:hover {
+    background: color-mix(in srgb, #f59e0b 25%, transparent);
+    border-color: #f59e0b;
+  }
+
+  .github-btn svg {
+    flex-shrink: 0;
+  }
+
+  /* Architecture */
+  .architecture {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .arch-layer {
+    padding: 1.5rem;
+  }
+
+  .layer-label {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .source-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-top: 3px solid var(--accent);
+    border-radius: 4px;
+  }
+
+  .source-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .source-type {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .source-provides {
+    font-size: 0.7rem;
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+
+  .arch-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+  }
+
+  .connector-arrows {
+    display: flex;
+    gap: 2rem;
+    color: #10b981;
+    font-size: 0.8rem;
+  }
+
+  .connector-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: #10b981;
+    padding: 0.2rem 0.6rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border-radius: 20px;
+  }
+
+  .backend-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .backend-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    min-width: 120px;
+  }
+
+  .backend-box .box-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .backend-box .box-desc {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    text-align: center;
+  }
+
+  .backend-box.scheduler { border-color: color-mix(in srgb, #f59e0b 40%, transparent); }
+  .backend-box.scheduler .box-title { color: #f59e0b; }
+  .backend-box.aggregator { border-color: color-mix(in srgb, #3b82f6 40%, transparent); }
+  .backend-box.aggregator .box-title { color: #3b82f6; }
+  .backend-box.redis { border-color: color-mix(in srgb, #ef4444 40%, transparent); }
+  .backend-box.redis .box-title { color: #ef4444; }
+  .backend-box.api { border-color: color-mix(in srgb, #10b981 40%, transparent); }
+  .backend-box.api .box-title { color: #10b981; }
+
+  .flow-arrow {
+    color: #10b981;
+    font-size: 1.25rem;
+    opacity: 0.5;
+  }
+
+  .frontend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .frontend-box {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .frontend-box .box-title {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b5cf6;
+  }
+
+  .frontend-box .box-desc {
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .frontend-box .box-features {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 0.7rem;
+  }
+
+  .frontend-box .box-features li {
+    margin-bottom: 0.2rem;
+    opacity: 0.75;
+  }
+
+  .frontend-box.state {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Features Grid */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .feature-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .feature-card:hover {
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  a.feature-card.clickable {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+  }
+
+  a.feature-card.clickable:hover {
+    background: color-mix(in srgb, currentColor 6%, transparent);
+    border-color: color-mix(in srgb, currentColor 30%, transparent);
+  }
+
+  a.feature-card.clickable .feature-name::after {
+    content: ' →';
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  a.feature-card.clickable:hover .feature-name::after {
+    opacity: 0.5;
+  }
+
+  .feature-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-icon {
+    font-size: 1.25rem;
+  }
+
+  .feature-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .feature-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.5;
+  }
+
+  .feature-tech {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: #10b981;
+    padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border-radius: 3px;
+  }
+
+  /* Data Flow */
+  .dataflow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0;
+    padding: 1.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    margin: 1.5rem 0;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    flex: 1;
+    min-width: 140px;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: calc(var(--step) * 0.1s);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .step-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .step-desc {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  .flow-connector {
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem;
+    height: 60px;
+  }
+
+  .connector-pulse {
+    width: 20px;
+    height: 2px;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    position: relative;
+  }
+
+  .connector-pulse::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 2px;
+    background: #10b981;
+    animation: connectorFlow 1s ease-in-out infinite;
+  }
+
+  @keyframes connectorFlow {
+    0% { left: 0; }
+    100% { left: 14px; }
+  }
+
+  /* Decisions Grid */
+  .decisions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .decision-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .decision-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #3b82f6;
+  }
+
+  .decision-reason {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+
+  /* API Section */
+  .api-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .api-group {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .api-label {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .api-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .api-list code {
+    padding: 0.35rem 0.6rem;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: #10b981;
+  }
+
+  .api-note {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-style: italic;
+    padding: 0.35rem 0;
+  }
+
+  /* Phases Grid */
+  .phases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .phase-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+
+  .phase-card.completed {
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+  }
+
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .phase-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.5;
+  }
+
+  .phase-status {
+    font-size: 0.85rem;
+  }
+
+  .phase-status.completed { color: #10b981; }
+  .phase-status.pending { color: #f59e0b; }
+
+  .phase-name {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .phase-card.completed .phase-name { color: #10b981; }
+
+  .phase-items {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 0.75rem;
+  }
+
+  .phase-items li {
+    margin-bottom: 0.2rem;
+    opacity: 0.7;
+  }
+
+  /* Status Block */
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .status-pulse {
+    width: 12px;
+    height: 12px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+  }
+
+  .check { color: #10b981; font-weight: bold; }
+  .pending { color: #f59e0b; }
+
+  /* Feature Deep Dive */
+  .feature-deepdive {
+    margin: 2.5rem 0;
+    padding: 2rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+  }
+
+  .feature-deepdive h2 {
+    margin-top: 0;
+  }
+
+  .deepdive-intro {
+    opacity: 0.85;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .usecase-block {
+    background: color-mix(in srgb, #f59e0b 8%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 25%, transparent);
+    border-radius: 6px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .usecase-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .usecase-icon {
+    font-size: 1.25rem;
+  }
+
+  .usecase-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f59e0b;
+  }
+
+  .usecase-desc {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .deepdive-subhead {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    margin: 2rem 0 1rem 0;
+    opacity: 0.7;
+  }
+
+  .deepdive-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .flow-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .block-icon {
+    font-size: 1rem;
+  }
+
+  .block-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .flow-block.config .block-title { color: #8b5cf6; }
+  .flow-block.backend .block-title { color: #10b981; }
+  .flow-block.api .block-title { color: #3b82f6; }
+  .flow-block.widget .block-title { color: #f59e0b; }
+
+  .block-code {
+    padding: 1rem;
+  }
+
+  .block-code pre {
+    margin: 0;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .block-code code {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .block-steps {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .backend-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .backend-step .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+
+  .flow-arrow-down {
+    text-align: center;
+    color: #10b981;
+    font-size: 1.25rem;
+    padding: 0.25rem 0;
+  }
+
+  /* Widget Mockup */
+  .widget-mockup {
+    margin: 1rem auto;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 320px;
+  }
+
+  .mockup-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .mockup-icon {
+    opacity: 0.5;
+  }
+
+  .mockup-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .mockup-status {
+    font-size: 0.75rem;
+  }
+
+  .mockup-status.ok { color: #10b981; }
+  .mockup-status.warning { color: #f59e0b; }
+  .mockup-status.critical { color: #ef4444; }
+
+  .mockup-body {
+    padding: 1rem;
+  }
+
+  .mockup-desc {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-bottom: 1rem;
+  }
+
+  .mockup-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+  }
+
+  .mockup-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .stat-arrow {
+    font-size: 1rem;
+  }
+
+  .stat-arrow.down { color: #3b82f6; }
+  .stat-arrow.up { color: #10b981; }
+
+  .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .stat-unit {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .mockup-total {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .mockup-pct {
+    opacity: 0.6;
+    margin-left: 0.5rem;
+  }
+
+  .mockup-bar {
+    position: relative;
+    height: 8px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    overflow: visible;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #10b981);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .bar-markers {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    font-size: 0.55rem;
+    opacity: 0.5;
+  }
+
+  .bar-markers .marker {
+    position: absolute;
+    transform: translateX(-50%);
+  }
+
+  .bar-markers .marker.warning { color: #f59e0b; }
+  .bar-markers .marker.critical { color: #ef4444; }
+
+  .mockup-ports {
+    font-size: 0.7rem;
+    text-align: center;
+    opacity: 0.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .mockup-export {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Tech Table */
+  .tech-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .tech-row {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+
+  .tech-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: #10b981;
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .tech-value {
+    opacity: 0.8;
+  }
+
+  /* Approach Grid */
+  .approach-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .approach-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .approach-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .approach-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .approach-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .approach-desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  /* Port Grid Mockup */
+  .portgrid-mockup {
+    margin: 1.5rem 0;
+  }
+
+  .cisco-chassis {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px color-mix(in srgb, currentColor 10%, transparent);
+    overflow: hidden;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .chassis-bezel {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .chassis-bezel.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  .cisco-brand {
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #00bceb;
+    letter-spacing: 2px;
+  }
+
+  .chassis-hostname {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    opacity: 0.5;
+  }
+
+  .uplink-module {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .uplink-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    opacity: 0.5;
+    min-width: 30px;
+  }
+
+  .uplink-ports {
+    display: flex;
+    gap: 4px;
+  }
+
+  .uplink-range {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    opacity: 0.4;
+    margin-left: auto;
+  }
+
+  .sfp-port {
+    width: 24px;
+    height: 20px;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .sfp-port::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .sfp-port.up::before { background: #22c55e; box-shadow: 0 0 4px #22c55e; }
+  .sfp-port.down::before { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
+  .sfp-port.disabled::before { background: color-mix(in srgb, currentColor 20%, transparent); }
+
+  .port-module {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  .port-module:last-of-type {
+    border-bottom: none;
+  }
+
+  .module-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .port-bank {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .port-labels {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 2px;
+  }
+
+  .port-labels span {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.5rem;
+    opacity: 0.4;
+    width: 18px;
+    text-align: center;
+  }
+
+  .port-labels.top { margin-bottom: 2px; }
+  .port-labels.bottom { margin-top: 2px; }
+
+  .port-row {
+    display: flex;
+    justify-content: space-around;
+    padding: 2px;
+  }
+
+  .rj45-port {
+    width: 18px;
+    height: 14px;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .rj45-port::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+  }
+
+  .rj45-port.up::before { background: #22c55e; box-shadow: 0 0 3px #22c55e; }
+  .rj45-port.down::before { background: #ef4444; box-shadow: 0 0 3px #ef4444; }
+  .rj45-port.warning::before { background: #f59e0b; box-shadow: 0 0 3px #f59e0b; }
+  .rj45-port.disabled::before { background: color-mix(in srgb, currentColor 20%, transparent); }
+
+  .chassis-bezel.bottom {
+    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  .status-legend {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.65rem;
+    opacity: 0.7;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .legend-item .led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .legend-item .led.up { background: #22c55e; }
+  .legend-item .led.down { background: #ef4444; }
+  .legend-item .led.disabled { background: color-mix(in srgb, currentColor 25%, transparent); }
+
+  /* LED Legend */
+  .led-legend {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .led-legend-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .led-legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .led-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .led-sample {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .led-sample.up { background: #22c55e; box-shadow: 0 0 4px #22c55e; }
+  .led-sample.down { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
+  .led-sample.warning { background: #f59e0b; box-shadow: 0 0 4px #f59e0b; }
+  .led-sample.disabled { background: #333; }
+
+  .led-desc {
+    opacity: 0.8;
+  }
+
+  /* Interface Types Table */
+  .interface-types-table {
+    margin: 1rem 0;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 0.8rem;
+  }
+
+  .intf-header {
+    display: grid;
+    grid-template-columns: 60px 1fr 70px 70px;
+    padding: 0.6rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
+  .intf-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 70px 70px;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 5%, transparent);
+    align-items: center;
+  }
+
+  .intf-row:last-child { border-bottom: none; }
+
+  .intf-row code {
+    font-family: "IBM Plex Mono", monospace;
+    color: #3b82f6;
+    background: none;
+    padding: 0;
+  }
+
+  .uplink-yes { color: #10b981; font-weight: 600; }
+  .uplink-no { color: #666; }
+
+  /* Port Detail Mockup */
+  .port-detail-mockup {
+    max-width: 320px;
+    margin: 1rem auto;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .detail-back {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    cursor: pointer;
+  }
+
+  .detail-port {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .detail-led {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .detail-led.up { background: #22c55e; box-shadow: 0 0 4px #22c55e; }
+
+  .detail-body {
+    padding: 1rem;
+  }
+
+  .detail-alias {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .detail-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .stat-value.up { color: #22c55e; }
+
+  .detail-section {
+    margin-bottom: 1rem;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .util-bar {
+    height: 8px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+  }
+
+  .util-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 4px;
+  }
+
+  .util-pct {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: #10b981;
+  }
+
+  .traffic-stats {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .traffic-box {
+    flex: 1;
+    padding: 0.5rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .traffic-dir {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    display: block;
+  }
+
+  .traffic-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    display: block;
+  }
+
+  .traffic-unit {
+    font-size: 0.6rem;
+    opacity: 0.5;
+  }
+
+  .detail-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .badge.trunk {
+    background: color-mix(in srgb, #3b82f6 20%, transparent);
+    color: #3b82f6;
+    border: 1px solid color-mix(in srgb, #3b82f6 40%, transparent);
+  }
+
+  .badge.poe {
+    background: color-mix(in srgb, #f59e0b 20%, transparent);
+    color: #f59e0b;
+    border: 1px solid color-mix(in srgb, #f59e0b 40%, transparent);
+  }
+
+  /* Component Tree */
+  .component-tree {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .tree-node {
+    padding: 0.25rem 0;
+  }
+
+  .tree-node.root {
+    font-weight: 600;
+    color: #3b82f6;
+  }
+
+  .tree-children {
+    margin-left: 1.5rem;
+    border-left: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    padding-left: 1rem;
+  }
+
+  .tree-children .tree-node::before {
+    content: '├─ ';
+    opacity: 0.4;
+  }
+
+  .tree-children .tree-node:last-child::before {
+    content: '└─ ';
+  }
+
+  .parsing-example pre {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  /* Proxmox Panel Mockup */
+  .proxmox-panel-mockup {
+    max-width: 400px;
+    margin: 1.5rem auto;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .pve-section {
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .pve-section:last-child {
+    border-bottom: none;
+  }
+
+  .pve-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .pve-section-icon {
+    font-size: 0.9rem;
+  }
+
+  .pve-section-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+    flex: 1;
+  }
+
+  .pve-section-count {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 10px;
+    opacity: 0.7;
+  }
+
+  .pve-section-body {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .pve-columns {
+    display: grid;
+    grid-template-columns: 1fr 50px 50px;
+    padding: 0 0 0.25rem 18px;
+    font-size: 0.6rem;
+    opacity: 0.5;
+    text-transform: uppercase;
+  }
+
+  .pve-col-cpu, .pve-col-ram {
+    text-align: right;
+  }
+
+  .pve-row {
+    display: grid;
+    grid-template-columns: 14px 1fr 50px 50px;
+    align-items: center;
+    gap: 4px;
+    padding: 0.25rem 0;
+    font-size: 0.75rem;
+  }
+
+  .pve-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .pve-status.running {
+    background: #22c55e;
+    box-shadow: 0 0 4px #22c55e;
+  }
+
+  .pve-status.stopped {
+    background: color-mix(in srgb, currentColor 30%, transparent);
+  }
+
+  .pve-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pve-cpu {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    text-align: right;
+    color: #60a5fa;
+  }
+
+  .pve-ram {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    text-align: right;
+    color: #a78bfa;
+  }
+
+  .pve-section-body.storage {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .storage-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .storage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .storage-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .storage-type {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    padding: 0.1rem 0.4rem;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 3px;
+    opacity: 0.6;
+  }
+
+  .storage-type.warning {
+    background: color-mix(in srgb, #f59e0b 20%, transparent);
+    color: #f59e0b;
+    opacity: 1;
+  }
+
+  .storage-bar-container {
+    height: 8px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .storage-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .storage-bar.normal {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  }
+
+  .storage-bar.warning {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+
+  .storage-bar.critical {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+
+  .storage-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    opacity: 0.7;
+  }
+
+  .storage-used {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .storage-pct {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .storage-pct.warning {
+    color: #f59e0b;
+    opacity: 1;
+  }
+
+  /* Proxmox Legend */
+  .pve-legend {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pve-legend-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .pve-legend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .pve-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .pve-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .pve-legend-dot.running {
+    background: #22c55e;
+    box-shadow: 0 0 4px #22c55e;
+  }
+
+  .pve-legend-dot.stopped {
+    background: color-mix(in srgb, currentColor 30%, transparent);
+  }
+
+  .pve-legend-sample {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+  }
+
+  .pve-legend-sample.cpu {
+    color: #60a5fa;
+  }
+
+  .pve-legend-sample.ram {
+    color: #a78bfa;
+  }
+
+  .pve-legend-storage {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    flex-wrap: wrap;
+  }
+
+  .pve-legend-bar {
+    width: 24px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  .pve-legend-bar.normal {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  }
+
+  .pve-legend-bar.warning {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+
+  .pve-legend-bar.critical {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+
+  /* Data Sources Block */
+  .data-sources-block {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .data-source {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .source-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #3b82f6;
+  }
+
+  .source-desc {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .data-source-endpoints {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .endpoint {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+
+  .endpoint code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    color: #10b981;
+    background: none;
+    padding: 0;
+  }
+
+  .endpoint span {
+    opacity: 0.7;
+  }
+
+  /* Matching Strategies */
+  .matching-strategies {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .strategy {
+    display: grid;
+    grid-template-columns: 24px 80px 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .strategy-num {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+
+  .strategy-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: #3b82f6;
+  }
+
+  .strategy-example {
+    opacity: 0.7;
+    font-size: 0.7rem;
+  }
+
+  /* API Endpoints List */
+  .api-endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .api-endpoint {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .api-endpoint code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: #10b981;
+    background: none;
+    padding: 0;
+    min-width: 180px;
+  }
+
+  .api-endpoint span {
+    opacity: 0.7;
+  }
+
+  /* Diagnostic Scenarios */
+  .diagnostic-scenarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .scenario-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .scenario-card.isp {
+    border-left: 3px solid #ef4444;
+  }
+
+  .scenario-card.internal {
+    border-left: 3px solid #f59e0b;
+  }
+
+  .scenario-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .scenario-icon {
+    font-size: 1.25rem;
+  }
+
+  .scenario-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .scenario-card.isp .scenario-label { color: #ef4444; }
+  .scenario-card.internal .scenario-label { color: #f59e0b; }
+
+  .scenario-indicators {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .indicator {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 6px;
+  }
+
+  .indicator.good {
+    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+  }
+
+  .indicator.bad {
+    border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+  }
+
+  .indicator-icon {
+    font-size: 1rem;
+  }
+
+  .indicator-metric {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .indicator-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .indicator.good .indicator-value { color: #10b981; }
+  .indicator.bad .indicator-value { color: #ef4444; }
+
+  .scenario-conclusion {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    opacity: 0.85;
+    margin: 0;
+  }
+
+  /* Correlation Flow */
+  .correlation-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .corr-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .corr-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .corr-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .corr-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .corr-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+
+  .corr-path {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    color: #8b5cf6;
+    background: color-mix(in srgb, #8b5cf6 10%, transparent);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    width: fit-content;
+  }
+
+  /* CSV Example */
+  .csv-example {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .csv-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .csv-label {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    color: #10b981;
+  }
+
+  .csv-block pre {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  .csv-block code {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .analysis-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 6px;
+  }
+
+  .analysis-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .analysis-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .analysis-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .analysis-desc {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  /* Speedtest Widget Styles */
+  .scheduler-block .block-title { color: #f59e0b; }
+
+  .api-endpoints-list {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .endpoint-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .endpoint-item code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+  }
+
+  .endpoint-desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    padding-left: 0.5rem;
+  }
+
+  .speedtest-widget-mockup {
+    margin: 1rem auto;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 300px;
+  }
+
+  .mockup-collapse {
+    opacity: 0.5;
+    font-size: 0.75rem;
+  }
+
+  .speedtest-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+  }
+
+  .speed-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .speed-arrow {
+    font-size: 1rem;
+  }
+
+  .speed-arrow.down { color: #3b82f6; }
+  .speed-arrow.up { color: #10b981; }
+
+  .speed-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .speed-unit {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .speedtest-latency {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.75rem;
+  }
+
+  .latency-sep {
+    opacity: 0.4;
+  }
+
+  .speedtest-server {
+    font-size: 0.75rem;
+    text-align: center;
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+  }
+
+  .speedtest-time {
+    font-size: 0.7rem;
+    text-align: center;
+    opacity: 0.5;
+    margin-bottom: 0.75rem;
+  }
+
+  .speedtest-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .speedtest-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .speedtest-btn.run {
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+    color: #3b82f6;
+  }
+
+  .speedtest-link {
+    font-size: 0.7rem;
+    text-align: center;
+    color: #3b82f6;
+    opacity: 0.8;
+  }
+
+  .widget-states {
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .widget-state {
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 3px;
+  }
+
+  .section-desc {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+  }
+
+  /* Status Table */
+  .status-table {
+    margin: 1rem 0;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .status-row {
+    display: grid;
+    grid-template-columns: 100px 100px 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .status-row:last-child {
+    border-bottom: none;
+  }
+
+  .status-row.header {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+  }
+
+  .status-col {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-col code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+
+  .status-dot {
+    font-size: 1rem;
+  }
+
+  .status-dot.green { color: #10b981; }
+  .status-dot.yellow { color: #f59e0b; }
+  .status-dot.red { color: #ef4444; }
+
+  /* Code Snippet */
+  .code-snippet {
+    margin: 1rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .snippet-label {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    color: #8b5cf6;
+  }
+
+  .code-snippet pre {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .code-snippet code {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* Topology Example */
+  .topology-example {
+    margin: 1rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .topo-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .topo-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+  }
+
+  .topo-node {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+  }
+
+  .topo-node.firewall { border-color: color-mix(in srgb, #ef4444 40%, transparent); color: #ef4444; }
+  .topo-node.isp { border-color: color-mix(in srgb, #3b82f6 40%, transparent); color: #3b82f6; }
+
+  .topo-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .link-line {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981, #10b981);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .link-line::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -20px;
+    width: 20px;
+    height: 100%;
+    background: rgba(255,255,255,0.4);
+    animation: linkPulse 1s ease-in-out infinite;
+  }
+
+  @keyframes linkPulse {
+    0% { left: -20px; }
+    100% { left: 80px; }
+  }
+
+  .link-label {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .topo-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    font-size: 0.75rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .legend-line {
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .legend-line.green { background: #10b981; }
+  .legend-line.yellow { background: #f59e0b; }
+  .legend-line.red { background: #ef4444; }
+
+  /* Numbered Flow */
+  .numbered-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .flow-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .flow-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    background: #8b5cf6;
+    color: white;
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .flow-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .flow-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .flow-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+
+  /* Port Search Styles */
+  .port-search-mockup {
+    margin: 1rem auto;
+    max-width: 360px;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 320px;
+  }
+
+  .search-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .search-icon {
+    opacity: 0.7;
+  }
+
+  .search-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .search-body {
+    padding: 1rem;
+  }
+
+  .search-input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .search-input {
+    flex: 1;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    color: currentColor;
+  }
+
+  .search-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, #3b82f6 15%, transparent);
+    border: 1px solid color-mix(in srgb, #3b82f6 30%, transparent);
+    border-radius: 4px;
+    color: #3b82f6;
+    cursor: pointer;
+  }
+
+  .status-filters {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .filter-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.35rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 4px;
+    color: currentColor;
+    opacity: 0.6;
+    cursor: pointer;
+  }
+
+  .filter-btn.active {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    color: #10b981;
+    opacity: 1;
+  }
+
+  .api-call-label {
+    text-align: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    color: #3b82f6;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+    border-radius: 4px;
+    margin: 0.5rem auto;
+    width: fit-content;
+  }
+
+  .search-results-mockup {
+    margin: 1rem auto;
+    max-width: 360px;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 320px;
+  }
+
+  .results-header {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .results-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .port-result {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .port-result:last-child {
+    border-bottom: none;
+  }
+
+  .port-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .port-device {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .port-status {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .port-status.up {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    color: #10b981;
+  }
+
+  .port-status.down {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+  }
+
+  .port-result-info {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .port-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: #3b82f6;
+  }
+
+  .port-speed {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 2px;
+    opacity: 0.7;
+  }
+
+  .port-alias {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+  }
+
+  .port-traffic {
+    display: flex;
+    gap: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+  }
+
+  .traffic-in {
+    color: #3b82f6;
+  }
+
+  .traffic-out {
+    color: #10b981;
+  }
+
+  /* Alias Discovery */
+  .alias-discovery {
+    margin: 1rem 0;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .alias-request {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .alias-request code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+  }
+
+  .alias-response {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .alias-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .alias-term {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+  }
+
+  .alias-count {
+    opacity: 0.6;
+  }
+
+  .alias-desc {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    padding: 1rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    margin: 0;
+  }
+
+  /* UI States Grid */
+  .ui-states-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .ui-state {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .state-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #8b5cf6;
+  }
+
+  .state-desc {
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .architecture { padding: 1rem; }
+
+    .backend-flow {
+      flex-direction: column;
+    }
+
+    .flow-arrow {
+      transform: rotate(90deg);
+    }
+
+    .dataflow {
+      flex-direction: column;
+    }
+
+    .flow-connector {
+      height: auto;
+      padding: 0.5rem 0;
+      transform: rotate(90deg);
+    }
+
+    .source-grid,
+    .frontend-grid,
+    .features-grid,
+    .decisions-grid,
+    .phases-grid,
+    .approach-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .feature-deepdive {
+      padding: 1rem;
+    }
+
+    .tech-row {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .tech-label {
+      min-width: auto;
+    }
+
+    .widget-mockup {
+      max-width: 100%;
+    }
+
+    .diagnostic-scenarios {
+      grid-template-columns: 1fr;
+    }
+
+    .scenario-indicators {
+      flex-direction: column;
+    }
+
+    .speedtest-widget-mockup {
+      max-width: 100%;
+    }
+
+    .status-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .status-row.header {
+      display: none;
+    }
+
+    .status-col:first-child::before {
+      content: "Status: ";
+      opacity: 0.6;
+    }
+
+    .topo-visual {
+      flex-direction: column;
+    }
+
+    .link-line {
+      width: 3px;
+      height: 40px;
+    }
+
+    .port-search-mockup,
+    .search-results-mockup {
+      max-width: 100%;
+    }
+
+    .alias-response {
+      grid-template-columns: 1fr;
+    }
+
+    .ui-states-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .value-showcase {
+      padding: 1.5rem;
+    }
+
+    .value-metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .comparison-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+      text-align: center;
+    }
+
+    .comparison-row.header {
+      display: none;
+    }
+
+    .comparison-col:first-child {
+      font-weight: 600;
+      opacity: 0.7;
+      font-size: 0.75rem;
+    }
+
+    .comparison-col:not(:first-child) {
+      justify-content: center;
+    }
+
+    .comparison-col:not(:first-child)::before {
+      content: attr(data-label);
+      font-size: 0.65rem;
+      opacity: 0.5;
+      margin-right: 0.5rem;
+    }
+
+    .value-context {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
