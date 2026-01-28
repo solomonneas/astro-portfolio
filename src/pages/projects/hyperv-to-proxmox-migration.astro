@@ -365,123 +365,14 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
       permissions, and no proper backup strategy. I built an open-source automation toolkit to solve this.
     </p>
 
-    <!-- GitHub Callout -->
-    <div class="github-callout">
-      <div class="github-content">
-        <div class="github-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-          </svg>
-        </div>
-        <div class="github-text">
-          <span class="github-label">Open Source</span>
-          <p class="github-desc">This toolkit is open source! Check out the code, fork it, or give it a star if you find it useful.</p>
-        </div>
+    <a href="/projects/samba-ad-file-server" class="project-link-card">
+      <div class="link-card-icon">🐧</div>
+      <div class="link-card-content">
+        <span class="link-card-title">Samba AD File Server</span>
+        <span class="link-card-desc">Complete project documentation including automation toolkit, SMB3 security hardening, SNMP monitoring, and audit logging.</span>
       </div>
-      <div class="github-actions">
-        <a href="https://github.com/solomonneas/samba-ad-migration" target="_blank" class="github-btn repo">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-          </svg>
-          <span>View Repository</span>
-        </a>
-        <a href="https://github.com/solomonneas/samba-ad-migration/stargazers" target="_blank" class="github-btn star">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-            <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
-          </svg>
-          <span>Star on GitHub</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="fileserver-solution">
-      <div class="solution-header">
-        <span class="solution-icon">🐧</span>
-        <span class="solution-title">samba-ad-migration</span>
-      </div>
-      <div class="solution-body">
-        <p class="solution-desc">
-          A complete automation toolkit for migrating Windows AD file shares to Linux (Samba) on Proxmox.
-          Features a one-liner installer that handles VM provisioning, domain join, and share configuration.
-        </p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang">Bash</span>
-            <span class="code-desc">One-Liner Install (run on Proxmox host)</span>
-          </div>
-          <pre><code>bash -c "$(wget -qLO - https://raw.githubusercontent.com/solomonneas/samba-ad-migration/main/samba-ad.sh)"</code></pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="fileserver-features">
-      <h3>What the Toolkit Automates</h3>
-      <div class="feature-grid">
-        <div class="feature-item">
-          <span class="feature-icon">📦</span>
-          <div class="feature-content">
-            <span class="feature-title">VM Creation</span>
-            <span class="feature-desc">Proxmox VM with cloud-init, Ubuntu 24.04, thin-provisioned data disk</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon">🔐</span>
-          <div class="feature-content">
-            <span class="feature-title">AD Domain Join</span>
-            <span class="feature-desc">Samba + Winbind integration, Kerberos auth, domain user resolution</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon">📁</span>
-          <div class="feature-content">
-            <span class="feature-title">Share Configuration</span>
-            <span class="feature-desc">SMB share with AD permissions, accessible via UNC path</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon">🔄</span>
-          <div class="feature-content">
-            <span class="feature-title">Data Migration</span>
-            <span class="feature-desc">Robocopy script preserving permissions and timestamps</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="fileserver-challenges">
-      <h3>Technical Challenges Solved</h3>
-      <div class="challenge-list">
-        <div class="challenge-item">
-          <span class="challenge-label">Cloud-init Password Auth</span>
-          <span class="challenge-solution">Custom user-data with quoted password hash (the <code>$6$</code> prefix breaks YAML parsing)</span>
-        </div>
-        <div class="challenge-item">
-          <span class="challenge-label">APT Lock Race Condition</span>
-          <span class="challenge-solution">Added <code>cloud-init status --wait</code> before package operations</span>
-        </div>
-        <div class="challenge-item">
-          <span class="challenge-label">DFS Namespace Cutover</span>
-          <span class="challenge-solution">Update DFS targets instead of GPOs for seamless client migration</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="fileserver-cutover">
-      <h3>Migration Cutover: DFS Namespace</h3>
-      <p>Instead of modifying GPO drive mappings, I updated DFS targets for a seamless cutover:</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span class="code-lang">PowerShell</span>
-          <span class="code-desc">DFS Namespace Update</span>
-        </div>
-        <pre><code># Add new Linux server as DFS target
-New-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" -TargetPath "\\fileserv\Shared"
-
-# Set old Windows server offline (keeps for rollback)
-Set-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" `
-  -TargetPath "\\oldserver\share" -State Offline</code></pre>
-      </div>
-    </div>
+      <div class="link-card-arrow">→</div>
+    </a>
   </div>
 
   <!-- Current Status -->
@@ -1015,251 +906,62 @@ Set-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" `
     margin-bottom: 2.5rem;
   }
 
-  .fileserver-solution {
+  /* Project Link Card */
+  .project-link-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
     margin-top: 1rem;
     background: color-mix(in srgb, currentColor 3%, transparent);
     border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
     border-left: 4px solid #10b981;
     border-radius: 6px;
-    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
   }
 
-  .solution-header {
+  .project-link-card:hover {
+    background: color-mix(in srgb, currentColor 6%, transparent);
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+    border-left-color: #10b981;
+  }
+
+  .link-card-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .link-card-content {
+    flex: 1;
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: color-mix(in srgb, #10b981 10%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
-  .solution-icon {
-    font-size: 1.1rem;
-  }
-
-  .solution-title {
+  .link-card-title {
     font-weight: 600;
     font-size: 0.95rem;
     color: #10b981;
     font-family: "IBM Plex Mono", monospace;
   }
 
-  .solution-body {
-    padding: 1rem;
-  }
-
-  .solution-desc {
-    font-size: 0.85rem;
-    line-height: 1.6;
-    margin: 0 0 1rem 0;
-    opacity: 0.9;
-  }
-
-  .fileserver-features {
-    margin-top: 1.5rem;
-  }
-
-  .fileserver-features h3 {
-    font-size: 0.9rem;
-    margin: 0 0 1rem 0;
-    opacity: 0.7;
-  }
-
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.75rem;
-  }
-
-  .feature-item {
-    display: flex;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
-    border-radius: 4px;
-  }
-
-  .feature-icon {
-    font-size: 1.25rem;
-    flex-shrink: 0;
-  }
-
-  .feature-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .feature-title {
-    font-weight: 600;
-    font-size: 0.8rem;
-    font-family: "IBM Plex Mono", monospace;
-  }
-
-  .feature-desc {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    line-height: 1.4;
-  }
-
-  .fileserver-challenges {
-    margin-top: 1.5rem;
-  }
-
-  .fileserver-challenges h3 {
-    font-size: 0.9rem;
-    margin: 0 0 1rem 0;
-    opacity: 0.7;
-  }
-
-  .challenge-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .challenge-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.75rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
-    border-radius: 4px;
-  }
-
-  .challenge-label {
-    font-weight: 600;
-    font-size: 0.8rem;
-    color: #f59e0b;
-    font-family: "IBM Plex Mono", monospace;
-  }
-
-  .challenge-solution {
-    font-size: 0.8rem;
-    opacity: 0.85;
-    line-height: 1.5;
-  }
-
-  .challenge-solution code {
-    background: color-mix(in srgb, currentColor 8%, transparent);
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
-  }
-
-  .fileserver-cutover {
-    margin-top: 1.5rem;
-  }
-
-  .fileserver-cutover h3 {
-    font-size: 0.9rem;
-    margin: 0 0 0.5rem 0;
-    opacity: 0.7;
-  }
-
-  .fileserver-cutover > p {
-    font-size: 0.85rem;
-    margin: 0 0 1rem 0;
-    opacity: 0.85;
-  }
-
-  /* GitHub Callout */
-  .github-callout {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.25rem;
-    margin: 1.5rem 0;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    border-left: 3px solid #6e5494;
-    border-radius: 6px;
-  }
-
-  .github-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .github-icon {
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    padding: 6px;
-    background: color-mix(in srgb, #6e5494 15%, transparent);
-    border-radius: 6px;
-    color: #6e5494;
-  }
-
-  .github-icon svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .github-text {
-    flex: 1;
-  }
-
-  .github-label {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6e5494;
-  }
-
-  .github-desc {
+  .link-card-desc {
     font-size: 0.8rem;
     opacity: 0.75;
-    margin: 0.25rem 0 0 0;
     line-height: 1.5;
   }
 
-  .github-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .github-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: 4px;
+  .link-card-arrow {
+    font-size: 1.25rem;
+    opacity: 0.5;
     transition: all 0.2s ease;
   }
 
-  .github-btn.repo {
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    color: currentColor;
-  }
-
-  .github-btn.repo:hover {
-    background: color-mix(in srgb, currentColor 10%, transparent);
-    border-color: color-mix(in srgb, currentColor 25%, transparent);
-  }
-
-  .github-btn.star {
-    background: color-mix(in srgb, #f59e0b 15%, transparent);
-    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
-    color: #f59e0b;
-  }
-
-  .github-btn.star:hover {
-    background: color-mix(in srgb, #f59e0b 25%, transparent);
-    border-color: #f59e0b;
-  }
-
-  .github-btn svg {
-    flex-shrink: 0;
+  .project-link-card:hover .link-card-arrow {
+    opacity: 1;
+    transform: translateX(4px);
   }
 
   /* Status Section */
