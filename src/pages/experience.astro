@@ -118,12 +118,10 @@ const experienceData = [
       <div class="resume-action">
         <a
           href="https://drive.google.com/file/d/1O9_WXA0WdIa-oM3HKlxCfOfcRN1p76-L/view?usp=sharing"
-          class="resume-link"
+          class="resume-button"
           target="_blank"
         >
-          <span class="prompt">$</span>
-          <span class="command">curl -O</span>
-          <span class="url">https://solomonneas.dev/resume.pdf</span>
+          [ Download my Resume ]
         </a>
       </div>
 
@@ -200,47 +198,29 @@ const experienceData = [
     background: color-mix(in srgb, currentColor 2%, transparent);
   }
 
-  /* Resume Link */
+  /* Resume Button */
   .resume-action {
     margin-bottom: 2rem;
   }
 
-  .resume-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-    border-radius: 4px;
-    text-decoration: none;
-    color: inherit;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
-  }
-
-  .resume-link:hover {
-    background: color-mix(in srgb, currentColor 6%, transparent);
-    border-color: color-mix(in srgb, #10b981 40%, transparent);
-  }
-
-  .resume-link .prompt {
-    opacity: 0.5;
-  }
-
-  .resume-link .command {
+  .resume-button {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
     color: #10b981;
-    font-weight: 600;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    padding: 0.6rem 1.25rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
   }
 
-  .resume-link .url {
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-  }
-
-  .resume-link:hover .url {
-    opacity: 1;
-    text-decoration: underline;
+  .resume-button:hover {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-color: #10b981;
+    box-shadow: 0 0 10px color-mix(in srgb, #10b981 25%, transparent);
   }
 
   /* Navigation */

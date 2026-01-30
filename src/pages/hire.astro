@@ -18,6 +18,15 @@ import StatusLight from "../components/StatusLight.astro";
       <div class="intro-block">
         <p class="intro-text">I'm at a crossroads in my career and looking for a more senior role. If any of my skills appeal to you, please reach out. Select a service module below to explore available services.</p>
         <p class="work-auth"><span class="badge"><svg class="flag-icon" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="40" fill="#bf0a30"/><rect y="3" width="60" height="3" fill="#fff"/><rect y="9" width="60" height="3" fill="#fff"/><rect y="15" width="60" height="3" fill="#fff"/><rect y="21" width="60" height="3" fill="#fff"/><rect y="27" width="60" height="3" fill="#fff"/><rect y="33" width="60" height="3" fill="#fff"/><rect width="24" height="21" fill="#002868"/><g fill="#fff"><circle cx="4" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="12" cy="3" r="1.2"/><circle cx="16" cy="3" r="1.2"/><circle cx="20" cy="3" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="10" cy="6" r="1.2"/><circle cx="14" cy="6" r="1.2"/><circle cx="18" cy="6" r="1.2"/><circle cx="4" cy="9" r="1.2"/><circle cx="8" cy="9" r="1.2"/><circle cx="12" cy="9" r="1.2"/><circle cx="16" cy="9" r="1.2"/><circle cx="20" cy="9" r="1.2"/><circle cx="6" cy="12" r="1.2"/><circle cx="10" cy="12" r="1.2"/><circle cx="14" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/><circle cx="4" cy="15" r="1.2"/><circle cx="8" cy="15" r="1.2"/><circle cx="12" cy="15" r="1.2"/><circle cx="16" cy="15" r="1.2"/><circle cx="20" cy="15" r="1.2"/><circle cx="6" cy="18" r="1.2"/><circle cx="10" cy="18" r="1.2"/><circle cx="14" cy="18" r="1.2"/><circle cx="18" cy="18" r="1.2"/></g></svg>[US CITIZEN]</span> No visa sponsorship required. <span class="badge">[FLORIDA]</span></p>
+        <div class="resume-action">
+          <a
+            href="https://drive.google.com/file/d/1O9_WXA0WdIa-oM3HKlxCfOfcRN1p76-L/view?usp=sharing"
+            class="resume-button"
+            target="_blank"
+          >
+            [ Download my Resume ]
+          </a>
+        </div>
       </div>
 
       <!-- Services Grid -->
@@ -290,6 +299,30 @@ import StatusLight from "../components/StatusLight.astro";
     align-items: center;
     color: #10b981;
     font-weight: 600;
+  }
+
+  .resume-action {
+    margin-top: 1rem;
+  }
+
+  .resume-button {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    padding: 0.6rem 1.25rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
+  }
+
+  .resume-button:hover {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-color: #10b981;
+    box-shadow: 0 0 10px color-mix(in srgb, #10b981 25%, transparent);
   }
 
   .flag-icon {
