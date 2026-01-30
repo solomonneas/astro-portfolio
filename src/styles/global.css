@@ -419,6 +419,29 @@ a.kofi-button {
     margin-left: 5px;
 }
 
+.theme-btn {
+    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--text);
+    border-radius: 4px;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.theme-btn:hover {
+    background: var(--text);
+    color: var(--background);
+    transform: translateY(-1px);
+}
+
+.theme-btn:active {
+    transform: scale(0.96);
+}
+
 .productions {
     font-size: .8rem;
     color: var(--text);
