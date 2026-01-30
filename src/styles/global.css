@@ -421,21 +421,24 @@ a.kofi-button {
 
 .theme-btn {
     font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
-    font-size: 0.85rem;
-    color: var(--text);
-    background: transparent;
-    border: 1px solid var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--background);
+    background: var(--text);
+    border: 2px solid var(--text);
     border-radius: 4px;
-    padding: 0.35rem 0.7rem;
+    padding: 0.4rem 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    letter-spacing: 0.03em;
 }
 
 .theme-btn:hover {
-    background: var(--text);
-    color: var(--background);
+    background: transparent;
+    color: var(--text);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .theme-btn:active {
