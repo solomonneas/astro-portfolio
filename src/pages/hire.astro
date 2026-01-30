@@ -31,7 +31,79 @@ import StatusLight from "../components/StatusLight.astro";
 
       <!-- Services Grid -->
       <div class="services-grid">
-    <!-- Service Module 1: Infrastructure & Cybersecurity -->
+    <!-- Service Module 1: Instructional Design -->
+    <div class="service-card">
+      <div class="card-header">
+        <div class="header-left">
+          <StatusLight status="completed" />
+          <span class="module-id">MOD_EDU_DESIGN</span>
+        </div>
+        <span class="status-label">ACTIVE</span>
+      </div>
+      <div class="card-body">
+        <h2 class="service-title">Instructional Design & Adjunct Services</h2>
+        <p class="service-desc">
+          Academic consultation, curriculum development, and hands-on lab design for technical education programs.
+        </p>
+        <div class="tech-specs">
+          <h3>// Technical Specs</h3>
+          <ul>
+            <li><span class="prefix">[+]</span> Adjunct Faculty Contracts</li>
+            <li><span class="prefix">[+]</span> AI Engineering & Prompt Design Curriculum</li>
+            <li><span class="prefix">[+]</span> Programming Fundamentals & Applied Development</li>
+            <li><span class="prefix">[+]</span> Windows/Linux Administration Curriculum</li>
+            <li><span class="prefix">[+]</span> Server Administration Course Design</li>
+            <li><span class="prefix">[+]</span> Hands-On Lab Environment Design</li>
+          </ul>
+        </div>
+        <div class="case-study-links">
+          <a href="/projects/linux-vm-labs-and-documentation" class="case-study-link">> Linux_VM_Labs.log</a>
+          <a href="/projects/ndg-proxmox-workshop" class="case-study-link">> NDG_Proxmox_Workshop.log</a>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="/contact" class="cta-button">[ Request: Adjunct_CV ]</a>
+      </div>
+    </div>
+
+    <!-- Service Module 2: Web Development -->
+    <div class="service-card">
+      <div class="card-header">
+        <div class="header-left">
+          <StatusLight status="completed" />
+          <span class="module-id">MOD_WEB_DEV</span>
+        </div>
+        <span class="status-label">ACTIVE</span>
+      </div>
+      <div class="card-body">
+        <h2 class="service-title">Full-Stack Web Development</h2>
+        <p class="service-desc">
+          High-performance hybrid and SSR applications. Bespoke business solutions from interactive data dashboards to
+          custom tools.
+        </p>
+        <div class="tech-specs">
+          <h3>// Technical Specs</h3>
+          <ul>
+            <li><span class="prefix">[+]</span> Hybrid/SSR Application Development</li>
+            <li><span class="prefix">[+]</span> Interactive Data Dashboards</li>
+            <li><span class="prefix">[+]</span> Custom Business Tools & Portals</li>
+            <li><span class="prefix">[+]</span> API Design & Integration</li>
+            <li><span class="prefix">[+]</span> Small-to-Mid Business Solutions</li>
+          </ul>
+        </div>
+        <div class="case-study-links">
+          <a href="/projects/watchtower-noc-dashboard" class="case-study-link">> Watchtower_NOC_Dashboard.log</a>
+          <a href="/projects/portgrid-network-visualization" class="case-study-link">> PortGrid_Dashboard.log</a>
+          <a href="/projects/laim-capstone" class="case-study-link">> LAIM_Capstone.log</a>
+          <a href="/projects/learning-astro" class="case-study-link">> solomonneas.dev.log</a>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://ko-fi.com/solomonneas" target="_blank" class="cta-button">[ Execute: Start_Project ]</a>
+      </div>
+    </div>
+
+    <!-- Service Module 3: Infrastructure & Cybersecurity -->
     <div class="service-card">
       <div class="card-header">
         <div class="header-left">
@@ -67,78 +139,6 @@ import StatusLight from "../components/StatusLight.astro";
       </div>
       <div class="card-footer">
         <a href="/contact" class="cta-button">[ Execute: Request_Consultation ]</a>
-      </div>
-    </div>
-
-    <!-- Service Module 2: Instructional Design -->
-    <div class="service-card">
-      <div class="card-header">
-        <div class="header-left">
-          <StatusLight status="completed" />
-          <span class="module-id">MOD_EDU_DESIGN</span>
-        </div>
-        <span class="status-label">ACTIVE</span>
-      </div>
-      <div class="card-body">
-        <h2 class="service-title">Instructional Design & Adjunct Services</h2>
-        <p class="service-desc">
-          Academic consultation, curriculum development, and hands-on lab design for technical education programs.
-        </p>
-        <div class="tech-specs">
-          <h3>// Technical Specs</h3>
-          <ul>
-            <li><span class="prefix">[+]</span> Adjunct Faculty Contracts</li>
-            <li><span class="prefix">[+]</span> AI Engineering & Prompt Design Curriculum</li>
-            <li><span class="prefix">[+]</span> Programming Fundamentals & Applied Development</li>
-            <li><span class="prefix">[+]</span> Windows/Linux Administration Curriculum</li>
-            <li><span class="prefix">[+]</span> Server Administration Course Design</li>
-            <li><span class="prefix">[+]</span> Hands-On Lab Environment Design</li>
-          </ul>
-        </div>
-        <div class="case-study-links">
-          <a href="/projects/linux-vm-labs-and-documentation" class="case-study-link">> Linux_VM_Labs.log</a>
-          <a href="/projects/ndg-proxmox-workshop" class="case-study-link">> NDG_Proxmox_Workshop.log</a>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a href="/contact" class="cta-button">[ Request: Adjunct_CV ]</a>
-      </div>
-    </div>
-
-    <!-- Service Module 3: Web Development -->
-    <div class="service-card">
-      <div class="card-header">
-        <div class="header-left">
-          <StatusLight status="completed" />
-          <span class="module-id">MOD_WEB_DEV</span>
-        </div>
-        <span class="status-label">ACTIVE</span>
-      </div>
-      <div class="card-body">
-        <h2 class="service-title">Full-Stack Web Development</h2>
-        <p class="service-desc">
-          High-performance hybrid and SSR applications. Bespoke business solutions from interactive data dashboards to
-          custom tools.
-        </p>
-        <div class="tech-specs">
-          <h3>// Technical Specs</h3>
-          <ul>
-            <li><span class="prefix">[+]</span> Hybrid/SSR Application Development</li>
-            <li><span class="prefix">[+]</span> Interactive Data Dashboards</li>
-            <li><span class="prefix">[+]</span> Custom Business Tools & Portals</li>
-            <li><span class="prefix">[+]</span> API Design & Integration</li>
-            <li><span class="prefix">[+]</span> Small-to-Mid Business Solutions</li>
-          </ul>
-        </div>
-        <div class="case-study-links">
-          <a href="/projects/watchtower-noc-dashboard" class="case-study-link">> Watchtower_NOC_Dashboard.log</a>
-          <a href="/projects/portgrid-network-visualization" class="case-study-link">> PortGrid_Dashboard.log</a>
-          <a href="/projects/laim-capstone" class="case-study-link">> LAIM_Capstone.log</a>
-          <a href="/projects/learning-astro" class="case-study-link">> solomonneas.dev.log</a>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a href="https://ko-fi.com/solomonneas" target="_blank" class="cta-button">[ Execute: Start_Project ]</a>
       </div>
     </div>
       </div>
