@@ -442,14 +442,6 @@ a.kofi-button {
     transform: scale(0.96);
 }
 
-.click-hint {
-    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
-    font-size: 0.75rem;
-    color: var(--text);
-    opacity: 0.6;
-    white-space: nowrap;
-}
-
 .productions {
     font-size: .8rem;
     color: var(--text);
