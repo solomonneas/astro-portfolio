@@ -13,9 +13,7 @@
     workspace = {
       # Runs when a workspace is first created with this `dev.nix` file
       onCreate = {
-        install = ''
-          npm ci --prefer-offline --no-audit --no-progress --timing || npm i --no-audit --no-progress --timing
-          yes | npx astro add tailwind'';
+        install = "npm ci --prefer-offline --no-audit --no-progress --timing";
         # Open editors for the following files by default, if they exist:
         default.openFiles = [ "src/pages/index.astro" ];
       };
