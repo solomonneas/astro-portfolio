@@ -2,5 +2,7 @@
   "printWidth": 120,
   "htmlWhitespaceSensitivity": "ignore",
   "bracketSameLine": true,
-  "singleQuote": false
+  "singleQuote": false,
+  "trailingComma": "es5",
+  "semi": true
 }
