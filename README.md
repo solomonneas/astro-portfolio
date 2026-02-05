@@ -22,7 +22,7 @@ npm run dev
 npm run build
 ```
 
-## � Key Directories
+## Key Directories
 
 - `src/pages/`: File-based routing for all site pages.
 - `src/layouts/`: Core page structure and dynamic theme logic.
