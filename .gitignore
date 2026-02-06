@@ -1,3 +1,10 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
 # AI/Automation Files - DO NOT COMMIT
 CLAUDE.md
 BOOTSTRAP.md
