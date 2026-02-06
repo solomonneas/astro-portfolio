@@ -67,6 +67,6 @@ When polishing or reviewing frontend code:
 
 ## Remember
 
-Claude is capable of extraordinary creative work. Don't hold back. Show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
+Claude is capable of extraordinary creative work. Don't hold back. Show what can truly be created when pushing creative boundaries and committing fully to a distinctive vision.
 
 Each of the five designs should feel like it was created by a different designer with a different aesthetic philosophy.

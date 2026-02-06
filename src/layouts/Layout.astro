@@ -95,7 +95,8 @@ import Analytics from "@vercel/analytics/astro";
           let closestIdx = 0;
           let closestDiff = 360;
           curatedThemes.forEach((h, i) => {
-            const diff = Math.abs(h - savedHue);
+            const d = Math.abs(h - savedHue);
+            const diff = Math.min(d, 360 - d);
             if (diff < closestDiff) {
               closestDiff = diff;
               closestIdx = i;
