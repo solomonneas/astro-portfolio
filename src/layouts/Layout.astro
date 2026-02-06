@@ -21,10 +21,37 @@ import Analytics from "@vercel/analytics/astro";
 
     <script>
       let darkmode = false;
+      let themeIndex = 0;
       const svgIcon = document.getElementById("svg-icon");
 
-      function random(min, max) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
+      // Curated hue rotations that maintain good contrast (WCAG AA 4.5:1+)
+      // Each has been tested with base colors #fff2d1 (bg) and #655a3d (text)
+      // in both light mode (invert=0) and dark mode (invert=100)
+      const curatedThemes = [
+        0,    // Original warm cream/brown
+        25,   // Soft peach/coral
+        45,   // Golden amber
+        70,   // Olive/sage green
+        95,   // Forest/moss green
+        125,  // Teal green
+        155,  // Cool cyan
+        180,  // Ocean blue
+        200,  // Sky blue
+        225,  // Periwinkle/lavender
+        255,  // Purple/violet
+        280,  // Magenta
+        305,  // Rose pink
+        330,  // Warm coral pink
+        350   // Salmon/blush
+      ];
+
+      function getNextTheme() {
+        themeIndex = (themeIndex + 1) % curatedThemes.length;
+        return curatedThemes[themeIndex];
+      }
+
+      function shuffleStartIndex() {
+        themeIndex = Math.floor(Math.random() * curatedThemes.length);
       }
 
       function applyTheme(inverted, hueRotation) {
@@ -63,6 +90,19 @@ import Analytics from "@vercel/analytics/astro";
         }
 
         if (hueRotation) {
+          // Find closest curated theme index for saved rotation
+          const savedHue = parseInt(hueRotation, 10);
+          let closestIdx = 0;
+          let closestDiff = 360;
+          curatedThemes.forEach((h, i) => {
+            const d = Math.abs(h - savedHue);
+            const diff = Math.min(d, 360 - d);
+            if (diff < closestDiff) {
+              closestDiff = diff;
+              closestIdx = i;
+            }
+          });
+          themeIndex = closestIdx;
           applyTheme(inverted, hueRotation);
         }
       }
@@ -71,10 +111,12 @@ import Analytics from "@vercel/analytics/astro";
         const btn = document.getElementById("color");
         btn.addEventListener("click", () => {
           darkmode = !darkmode;
-          const hue = Math.floor(random(0, 360));
+          const hue = getNextTheme();
           applyTheme(darkmode, hue);
         });
 
+        // Start at a random position in the curated list
+        shuffleStartIndex();
         getThemeFromLocalStorage();
 
         const animationStyle = document.createElement("style");

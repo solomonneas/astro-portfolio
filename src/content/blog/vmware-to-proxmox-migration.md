@@ -4,9 +4,9 @@ pubDate: 2025-08-15
 tags: ["infrastructure", "proxmox", "vmware", "migration", "virtualization", "cost-savings"]
 ---
 
-When Broadcom acquired VMware in November 2023, the writing was on the wall. Within weeks, they discontinued perpetual licenses, moved to subscription-only pricing at $350+ per core, and—most critically for us—terminated the VMware IT Academy program that had provided free educational licensing.
+When Broadcom acquired VMware in November 2023, the writing was on the wall. Within weeks, they discontinued perpetual licenses, moved to subscription-only pricing at $350+ per core, and-most critically for us-terminated the VMware IT Academy program that had provided free educational licensing.
 
-For our 6-node cluster running 196 cores, staying on VMware meant facing roughly **$68,600 annually** in licensing costs. For an educational institution, that's not just expensive—it's untenable.
+For our 6-node cluster running 196 cores, staying on VMware meant facing roughly **$68,600 annually** in licensing costs. For an educational institution, that's not just expensive-it's untenable.
 
 ## The Decision
 
@@ -27,7 +27,7 @@ This wasn't a committee project with delegated tasks. I was the workhorse:
 
 **The Proxmox 9 Incident**: Upgraded to Proxmox 9 and everything broke. NETLAB+'s packages were built for Debian Bookworm (12), and Proxmox 9 runs on Trixie (13). Library incompatibilities cascaded. Rolled back, pinned to Proxmox 8, learned to always check upstream dependencies.
 
-**Corosync Communication**: The heartbeat of a Proxmox cluster. Misconfigure ring addresses and nodes can't see each other—cluster splits, quorum fails. The dedicated 10G network wasn't a luxury; it was a necessity for stable cluster communication.
+**Corosync Communication**: The heartbeat of a Proxmox cluster. Misconfigure ring addresses and nodes can't see each other-cluster splits, quorum fails. The dedicated 10G network wasn't a luxury; it was a necessity for stable cluster communication.
 
 **Bonding vs. Etherchannel**: Linux bonding and Cisco Etherchannel are conceptually identical but configured differently on each end. Understanding hash policies and why one NIC was saturated while others sat idle taught me more about networking than any certification course.
 
@@ -44,7 +44,7 @@ This wasn't a committee project with delegated tasks. I was the workhorse:
 
 ## Current Status
 
-The cluster is fully operational. Six nodes running NETLAB+ lab pods for cybersecurity and networking students. Live migration works. HA failover works. Students don't know or care what hypervisor runs underneath—they just know their labs are available.
+The cluster is fully operational. Six nodes running NETLAB+ lab pods for cybersecurity and networking students. Live migration works. HA failover works. Students don't know or care what hypervisor runs underneath-they just know their labs are available.
 
 The infrastructure that Broadcom thought they could hold hostage is now completely under our control.
 

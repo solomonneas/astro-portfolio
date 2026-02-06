@@ -4,7 +4,7 @@ pubDate: 2025-10-20
 tags: ["critical-infrastructure", "ics", "scada", "water-security", "ot-security", "research"]
 ---
 
-In February 2021, someone accessed the water treatment plant in Oldsmar, Florida via TeamViewer and tried to increase sodium hydroxide levels to 11,100 ppm—111 times the normal concentration. Lye at those levels would cause severe chemical burns to anyone who drank the water.
+In February 2021, someone accessed the water treatment plant in Oldsmar, Florida via TeamViewer and tried to increase sodium hydroxide levels to 11,100 ppm-111 times the normal concentration. Lye at those levels would cause severe chemical burns to anyone who drank the water.
 
 An operator noticed the mouse moving on its own and stopped the attack in real-time.
 
@@ -14,7 +14,7 @@ These weren't sophisticated attacks. They exploited the most basic failures: def
 
 ## The Scale of the Problem
 
-The United States has over 50,000 community water and wastewater systems serving 324 million people—97% of the population. The daily economic impact of nationwide water disruption would exceed $43.5 billion.
+The United States has over 50,000 community water and wastewater systems serving 324 million people-97% of the population. The daily economic impact of nationwide water disruption would exceed $43.5 billion.
 
 And here's the terrifying part: **70% of these systems don't meet basic cybersecurity requirements.**
 
@@ -64,7 +64,7 @@ The mitigations aren't complicated. They're just not implemented:
 4. **Disable unnecessary remote access** - If you don't need TeamViewer, uninstall it
 5. **Enable logging and monitoring** - You can't detect attacks you're not watching for
 
-CISA offers free assessments for critical infrastructure. EPA is the designated Sector Risk Management Agency under NSM-22. The resources exist—the challenge is getting small utilities to use them.
+CISA offers free assessments for critical infrastructure. EPA is the designated Sector Risk Management Agency under NSM-22. The resources exist-the challenge is getting small utilities to use them.
 
 The next Oldsmar might not have an alert operator watching the screen.
 

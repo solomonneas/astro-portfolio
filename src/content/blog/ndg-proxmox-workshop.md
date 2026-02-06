@@ -18,9 +18,9 @@ Network Development Group (NDG) runs these workshops specifically for institutio
 
 ## Key Technical Insights
 
-**Storage Architecture**: RAID controllers become bottlenecks at scale. NDG recommends HBA mode (IT mode) for direct drive access. ZFS isn't officially supported due to complexity—they've seen too many institutions get burned by it.
+**Storage Architecture**: RAID controllers become bottlenecks at scale. NDG recommends HBA mode (IT mode) for direct drive access. ZFS isn't officially supported due to complexity-they've seen too many institutions get burned by it.
 
-**Linked Clone Limitations**: Proxmox can't span linked clones across different storage pools. Master images and their clones must live on the same storage. That's why the large NVMe requirement—you need room for masters AND all the clones.
+**Linked Clone Limitations**: Proxmox can't span linked clones across different storage pools. Master images and their clones must live on the same storage. That's why the large NVMe requirement-you need room for masters AND all the clones.
 
 **Windows 11 Gotcha**: CPU type MUST be set to 'Host' for Windows 11 VMs. VirtIO drivers need to be pre-installed or injected via WinRE before first boot. Miss this and you're reimaging.
 
@@ -32,7 +32,7 @@ Network Development Group (NDG) runs these workshops specifically for institutio
 
 2. **VMware Migration**: Keep your physical pod configurations (PDUs, routers, switches), migrate the NETLAB+ database, swap the hypervisor layer. More complex but preserves your existing lab topology.
 
-3. **Hybrid**: Run both simultaneously during transition. NDG doesn't recommend this—the complexity rarely justifies the benefit.
+3. **Hybrid**: Run both simultaneously during transition. NDG doesn't recommend this-the complexity rarely justifies the benefit.
 
 ## What I Applied Immediately
 
