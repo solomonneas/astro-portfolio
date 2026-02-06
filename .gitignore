@@ -1,64 +1,46 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# Dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# Testing
-/coverage
-
-# Production
-/build
-
-# Misc
-.DS_Store
-*.pem
-
-# Debug
-.npm
-.npmrc
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Local Env Files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Astro
-.astro/
-dist/
-
-# AI CLI Tools
+# AI/Automation Files - DO NOT COMMIT
 CLAUDE.md
-.claude/
-GEMINI.md
-.gemini/
-CODEX.md
-.codex/
-COPILOT.md
-.copilot/
-.agent/
-.cursor/
-.aider/
-.continue/
-plan.md
-*.plan.md
-blueprint.md
-*-context.md
+BOOTSTRAP.md
+SOUL.md
+IDENTITY.md
+USER.md
 AGENTS.md
+HEARTBEAT.md
+TOOLS.md
+SAFETY_RULES.md
+MEMORY.md
 
-# Project notes
-SOC.md
-netlabs.md
-netlabs_linux.md
-portgrid-project.md
-laim-project.md
-capstone.md
+# Claude Code project files
+.claude/
 
-# Backup files
-*.backup
+# OpenClaw files
+.openclaw/
+*.sqlite
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Secrets
+credentials.json
+*-credentials.json
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -4,7 +4,7 @@ pubDate: 2025-10-15
 tags: ["threat-intel", "apt", "russia", "sandworm", "mitre-attack", "malware"]
 ---
 
-When the lights went out across western Ukraine in December 2015, it wasn't a winter storm or equipment failure. It was the first publicly confirmed cyberattack to cause a power outage—and the beginning of what would become a decade of increasingly destructive operations by GRU Unit 74455.
+When the lights went out across western Ukraine in December 2015, it wasn't a winter storm or equipment failure. It was the first publicly confirmed cyberattack to cause a power outage-and the beginning of what would become a decade of increasingly destructive operations by GRU Unit 74455.
 
 We know them as Sandworm. Mandiant designated them APT44. The Ukrainian government calls them by their military unit number. Whatever the name, they represent the most operationally mature and dangerous state-sponsored cyber threat actor currently active.
 
@@ -12,7 +12,7 @@ We know them as Sandworm. Mandiant designated them APT44. The Ukrainian governme
 
 This isn't a typical espionage-focused APT. Sandworm's mandate includes sabotage, disruption, and influence operations that directly support Russian military objectives:
 
-- **2015-2016**: Two separate attacks on Ukraine's power grid. First BLACKENERGY, then INDUSTROYER—custom malware frameworks designed specifically to manipulate industrial control systems.
+- **2015-2016**: Two separate attacks on Ukraine's power grid. First BLACKENERGY, then INDUSTROYER-custom malware frameworks designed specifically to manipulate industrial control systems.
 
 - **2017**: NotPetya. What appeared to be ransomware was actually a wiper masquerading as extortion. $10 billion+ in damages worldwide, including Maersk, Merck, and FedEx.
 
@@ -47,7 +47,7 @@ Sandworm doesn't rely on commodity malware. Their toolkit includes:
 
 ## Defensive Implications
 
-Organizations in Sandworm's target sectors—government, defense, energy, telecommunications—need to assume they're already targeted. Key mitigations:
+Organizations in Sandworm's target sectors-government, defense, energy, telecommunications-need to assume they're already targeted. Key mitigations:
 
 1. **Edge infrastructure hardening** - VPNs, firewalls, and mail gateways are the front door
 2. **Credential hygiene** - Sandworm loves credential harvesting; MFA isn't optional

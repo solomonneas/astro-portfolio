@@ -4,7 +4,7 @@ pubDate: 2025-12-01
 tags: ["security", "soc", "wazuh", "thehive", "cortex", "siem", "open-source"]
 ---
 
-Commercial SIEM solutions cost hundreds of thousands of dollars. Splunk, Microsoft Sentinel, IBM QRadar—they're powerful, but their licensing models assume enterprise budgets. What if you need the same capabilities for education, research, or a smaller organization?
+Commercial SIEM solutions cost hundreds of thousands of dollars. Splunk, Microsoft Sentinel, IBM QRadar-they're powerful, but their licensing models assume enterprise budgets. What if you need the same capabilities for education, research, or a smaller organization?
 
 You build it yourself.
 
@@ -26,13 +26,13 @@ This isn't a toy deployment. It's a production-grade Security Operations Center 
 
 Here's something the documentation doesn't emphasize enough: TheHive and Cortex run on Ubuntu 22.04 LTS ("Jammy Jellyfish") specifically for compatibility with Cassandra and Elasticsearch dependencies.
 
-Both are JVM-based applications. They allocate heap memory at startup and don't release it. You need to tune `-Xms` and `-Xmx` flags carefully—give them too little and they crash, too much and they starve other services.
+Both are JVM-based applications. They allocate heap memory at startup and don't release it. You need to tune `-Xms` and `-Xmx` flags carefully-give them too little and they crash, too much and they starve other services.
 
 Jammy provides OpenSSL 3.0 and the 5.15 Linux kernel, which are crucial for running current Java versions. The LTS support until 2032 means you're not constantly chasing distribution upgrades on critical security infrastructure.
 
 ## The Integration Challenge
 
-The real work isn't installing individual tools—it's making them talk to each other:
+The real work isn't installing individual tools-it's making them talk to each other:
 
 - Wazuh alerts → TheHive cases (via webhook integration)
 - TheHive observables → Cortex analysis (native integration)
