@@ -1,0 +1,790 @@
+---
+import Layout from "../layouts/Layout.astro";
+import StatusLight from "../components/StatusLight.astro";
+
+// Featured projects (top showcase for recruiters)
+const featuredProjects = [
+  {
+    date: "2025.12",
+    status: "ongoing",
+    identifier: "Open_Source_Security_Operations_Center_(SOC)",
+    origin: "Polk State College",
+    description: "Full-stack Security Operations Center with SIEM, incident response, threat intelligence, and network IDS. 7 integrated VMs across the college network.",
+    href: "/projects/designing-and-building-an-open-source-soc",
+    techStack: ["Wazuh", "TheHive", "Cortex", "MISP", "Zeek", "Suricata"],
+    highlight: "Cost Savings: $140K–$217K",
+  },
+  {
+    date: "2026.01",
+    status: "ongoing",
+    identifier: "Watchtower_Network_Operations_Center_(NOC)_Dashboard",
+    origin: "Polk State College",
+    description: "Full-stack custom-built NOC dashboard aggregating LibreNMS, Netdisco, and Proxmox into an interactive topology visualization with WebSocket updates.",
+    href: "/projects/watchtower-noc-dashboard",
+    techStack: ["FastAPI", "React", "ReactFlow", "Redis", "WebSocket"],
+    highlight: "Cost Savings: $110K–$150K",
+  },
+  {
+    date: "2025.08",
+    status: "completed",
+    identifier: "VMware_to_Proxmox_Migration",
+    origin: "Polk State College",
+    description: "Led complete infrastructure migration of 6-node server cluster from VMware ESXi to Proxmox VE, eliminating annual licensing costs.",
+    href: "/projects/vmware-to-proxmox-migration",
+    techStack: ["Proxmox VE", "10G Networking", "LACP", "KVM/QEMU"],
+    highlight: "Cost Savings: $68,600/year",
+  },
+  {
+    date: "2026.01",
+    status: "ongoing",
+    identifier: "HyperV_to_Proxmox_Migration",
+    origin: "Polk State College",
+    description: "Enterprise infrastructure migration with open-source Samba AD toolkit for Windows-to-Linux file server consolidation.",
+    href: "/projects/hyperv-to-proxmox-migration",
+    techStack: ["Proxmox", "Samba", "Active Directory", "Bash"],
+    highlight: "Enterprise Infrastructure",
+  },
+  {
+    date: "2025.01",
+    status: "ongoing",
+    identifier: "LAIM_Lab_Asset_Inventory_Manager",
+    origin: "Work Project",
+    description: "Modern rewrite of a legacy PHP inventory system with async FastAPI backend, automated inventory tracking via multi-source device discovery from Netdisco/LibreNMS, and role-based access control.",
+    href: "/projects/laim",
+    techStack: ["FastAPI", "PostgreSQL", "SQLAlchemy", "Docker", "Python"],
+    highlight: "Automated Inventory",
+  },
+  {
+    date: "2025.11",
+    status: "completed",
+    identifier: "Linux_VM_Labs",
+    origin: "Polk State College",
+    description: "Designed and built a Linux+ certification course at Polk State College with comprehensive lab environments and hands-on curriculum.",
+    href: "/projects/linux-vm-labs-and-documentation",
+    techStack: ["Linux", "Fedora", "Ubuntu", "Rocky"],
+    highlight: "Course Design",
+  },
+];
+
+// Categorized projects
+const categories = [
+  {
+    name: "Inventory & Asset Management",
+    icon: "📦",
+    projects: [
+      {
+        date: "2025.01",
+        status: "ongoing",
+        identifier: "LAIM_Lab_Asset_Inventory_Manager",
+        origin: "Work Project",
+        description: "Modern rewrite of a legacy PHP inventory system with async FastAPI backend, multi-source device discovery from Netdisco/LibreNMS, and role-based access control.",
+        href: "/projects/laim",
+        techStack: ["FastAPI", "PostgreSQL", "SQLAlchemy", "Docker", "Python"],
+      },
+      {
+        date: "2024.12",
+        status: "completed",
+        identifier: "NSET_Hardware_Inventory",
+        origin: "Polk State College - BAS Capstone",
+        description: "Full-stack PHP/MySQL CRUD application for IT hardware asset tracking with secure authentication.",
+        href: "/projects/nset-hardware-inventory",
+        techStack: ["PHP", "MariaDB", "PDO", "bcrypt", "JavaScript"],
+      },
+    ],
+  },
+  {
+    name: "Network Visualization",
+    icon: "🔌",
+    projects: [
+      {
+        date: "2026.01",
+        status: "ongoing",
+        identifier: "Watchtower_Network_Operations_Center_(NOC)_Dashboard",
+        origin: "Polk State College",
+        description: "Real-time NOC dashboard replacing $110K-$150K commercial tools with interactive topology, WebSocket updates, and multi-source aggregation.",
+        href: "/projects/watchtower-noc-dashboard",
+        techStack: ["FastAPI", "React", "ReactFlow", "Redis", "WebSocket"],
+      },
+      {
+        date: "2026.01",
+        status: "completed",
+        identifier: "PortGrid_Network_Visualization",
+        origin: "Polk State College",
+        description: "Modern web dashboard for visualizing network switch ports, replacing legacy Switchmap with real-time LibreNMS API integration.",
+        href: "/projects/portgrid-network-visualization",
+        techStack: ["Next.js", "React", "TanStack", "TypeScript", "LibreNMS API"],
+      },
+      {
+        date: "2025.08",
+        status: "completed",
+        identifier: "Network_Observability_Framework",
+        origin: "Polk State College",
+        description: "Integrated monitoring stack for L2/L3 topology mapping and infrastructure visibility.",
+        href: "/projects/enterprise-network-observability",
+        techStack: ["Netdisco", "LibreNMS", "SNMP", "PostgreSQL"],
+      },
+    ],
+  },
+  {
+    name: "Infrastructure & Migrations",
+    icon: "🖥️",
+    projects: [
+      {
+        date: "2026.01",
+        status: "ongoing",
+        identifier: "HyperV_to_Proxmox_Migration",
+        origin: "Polk State College",
+        description: "Enterprise migration with open-source Samba AD toolkit for file server consolidation.",
+        href: "/projects/hyperv-to-proxmox-migration",
+        techStack: ["Proxmox", "Samba", "Active Directory", "Bash"],
+      },
+      {
+        date: "2026.01",
+        status: "completed",
+        identifier: "Samba_AD_File_Server",
+        origin: "Polk State College",
+        description: "Ubuntu 24.04 Samba file server with AD integration, SMB3 hardening, SNMP monitoring, and audit logging.",
+        href: "/projects/samba-ad-file-server",
+        techStack: ["Ubuntu", "Samba", "Active Directory", "SNMP", "XFS"],
+      },
+      {
+        date: "2025.07",
+        status: "completed",
+        identifier: "VMware_to_Proxmox_Migration",
+        origin: "Migration for online platform",
+        description: "Seamless infrastructure migration with zero downtime.",
+        href: "/projects/vmware-to-proxmox-migration",
+        techStack: ["VMware", "Proxmox", "Linux"],
+      },
+      {
+        date: "2025.07",
+        status: "completed",
+        identifier: "NDG_Proxmox_Workshop",
+        origin: "Network Development Group",
+        description: "18-hour intensive workshop on deploying Proxmox VE 8 for NETLAB+ educational environments.",
+        href: "/projects/ndg-proxmox-workshop",
+        techStack: ["Proxmox VE 8", "NETLAB+", "Clustering"],
+      },
+      {
+        date: "2025.11",
+        status: "ongoing",
+        identifier: "Proxmox_Homelab",
+        origin: "Personal Project",
+        description: "Building a redundant homelab cluster for DevOps and security testing.",
+        href: "/projects/proxmox-homelab",
+        techStack: ["Proxmox", "Networking", "Linux"],
+      },
+    ],
+  },
+  {
+    name: "Security & Threat Intelligence",
+    icon: "🛡️",
+    projects: [
+      {
+        date: "2025.12",
+        status: "ongoing",
+        identifier: "Open_Source_Security_Operations_Center_(SOC)",
+        origin: "Polk State College",
+        description: "Full-stack Security Operations Center with SIEM, SOAR, and threat intelligence.",
+        href: "/projects/designing-and-building-an-open-source-soc",
+        techStack: ["Wazuh", "TheHive", "Cortex", "MISP", "Zeek"],
+      },
+      {
+        date: "2026.02",
+        status: "completed",
+        identifier: "CyberBRIEF_Threat_Intel_Briefing_Tool",
+        origin: "Portfolio Project",
+        description: "AI-powered threat intel briefing tool with BLUF reports, MITRE ATT&CK mapping, IOC extraction, and Chicago-style citations.",
+        href: "/projects/cyberbrief",
+        techStack: ["React", "FastAPI", "Python", "TypeScript", "Tailwind"],
+      },
+      {
+        date: "2026.02",
+        status: "completed",
+        identifier: "Intel_Workbench_ACH_Analysis_Tool",
+        origin: "Portfolio Project",
+        description: "Analysis of Competing Hypotheses (ACH) tool for structured intelligence analysis with evidence weighting and cognitive bias detection.",
+        href: "/projects/intel-workbench",
+        techStack: ["React", "TypeScript", "Zustand", "Tailwind"],
+      },
+      {
+        date: "2026.01",
+        status: "completed",
+        identifier: "FortiSim_Firewall_Simulator",
+        origin: "Portfolio Project",
+        description: "FortiGate firewall simulator with CLI emulation, policy rule engine, dual-interface mode, and shadow/conflict detection.",
+        href: "/projects/fortisim",
+        techStack: ["React", "TypeScript", "Tailwind"],
+      },
+      {
+        date: "2026.01",
+        status: "completed",
+        identifier: "FortiLogForge_Log_Analyzer",
+        origin: "Portfolio Project",
+        description: "Fortinet log analyzer with multi-format parsing, pattern detection, interactive timeline visualization, and Docker deployment.",
+        href: "/projects/fortilogforge",
+        techStack: ["React", "FastAPI", "Python", "TypeScript", "Docker"],
+      },
+      {
+        date: "2026.01",
+        status: "completed",
+        identifier: "SOC_Showcase_Dashboard",
+        origin: "Portfolio Project",
+        description: "Unified SOC dashboard demo with realistic alert generation, Framer Motion animations, and configurable widget grid.",
+        href: "/projects/soc-showcase",
+        techStack: ["React", "TypeScript", "Framer Motion", "Tailwind"],
+      },
+      {
+        date: "2026.02",
+        status: "completed",
+        identifier: "Playbook_Forge_IR_Builder",
+        origin: "Portfolio Project",
+        description: "Visual incident response playbook builder with ReactFlow workflow editor, ATT&CK-mapped templates, and multi-format export.",
+        href: "/projects/playbook-forge",
+        techStack: ["React", "FastAPI", "ReactFlow", "Python", "TypeScript"],
+      },
+      {
+        date: "2025.10",
+        status: "completed",
+        identifier: "APT44_Cyber_Intelligence",
+        origin: "University of South Florida",
+        description: "Intelligence assessment of Russia's Sandworm (GRU Unit 74455) cyber sabotage operations.",
+        href: "/projects/apt44-intelligence-report",
+        techStack: ["Threat Intel", "MITRE ATT&CK", "OSINT"],
+      },
+      {
+        date: "2025.10",
+        status: "completed",
+        identifier: "Water_Utility_Security",
+        origin: "University of South Florida",
+        description: "Researching security vulnerabilities in national critical infrastructure.",
+        href: "/projects/securing-us-water-and-wastewater-utilities",
+        techStack: ["Research", "Cybersecurity", "SCADA"],
+      },
+    ],
+  },
+  {
+    name: "Instructional Design",
+    icon: "📚",
+    projects: [
+      {
+        date: "2025.11",
+        status: "completed",
+        identifier: "Linux_VM_Labs",
+        origin: "Training Material",
+        description: "Comprehensive lab environments for CompTIA Linux+ certification preparation.",
+        href: "/projects/linux-vm-labs-and-documentation",
+        techStack: ["Linux", "Fedora", "Ubuntu", "Rocky"],
+      },
+      {
+        date: "2025.12",
+        status: "ongoing",
+        identifier: "solomonneas.dev",
+        origin: "Personal Development",
+        description: "Building a performant, content-driven portfolio website demonstrating modern web development.",
+        href: "/projects/learning-astro",
+        techStack: ["Astro", "Node.js", "JavaScript", "Vercel"],
+      },
+    ],
+  },
+  {
+    name: "Developer Tools & AI",
+    icon: "🔧",
+    projects: [
+      {
+        date: "2026.02",
+        status: "completed",
+        identifier: "Model_Arena_LLM_Comparison",
+        origin: "Portfolio Project",
+        description: "LLM comparison dashboard with custom SVG radar charts, side-by-side model responses, and configurable evaluation criteria.",
+        href: "/projects/model-arena",
+        techStack: ["React", "TypeScript", "SVG Charts", "Tailwind"],
+      },
+      {
+        date: "2025.12",
+        status: "ongoing",
+        identifier: "Learning_Neovim",
+        origin: "Personal Development",
+        description: "Mastering modal editing and building a custom Lua-based configuration.",
+        href: "/projects/learning-neovim",
+        techStack: ["Lua", "Neovim"],
+      },
+      {
+        date: "2025.12",
+        status: "ongoing",
+        identifier: "Ollama_Local_LLMs",
+        origin: "Personal Project",
+        description: "Self-hosting large language models for private and offline AI assistance.",
+        href: "/projects/ollama-and-local-llms",
+        techStack: ["Python", "Ollama", "ComfyUI"],
+      },
+      {
+        date: "2025.07",
+        status: "ongoing",
+        identifier: "Obsidian_PKM",
+        origin: "Personal Development",
+        description: "Building a second brain with PARA methodology and interconnected markdown.",
+        href: "/projects/obsidian-pkm",
+        techStack: ["Obsidian", "Markdown", "Dataview"],
+      },
+      {
+        date: "2025.06",
+        status: "completed",
+        identifier: "Hardware_MECM_Integration",
+        origin: "Polk State College",
+        description: "Optimizing campus hardware lifecycles and automated endpoint management.",
+        href: null,
+        techStack: ["Windows", "Active Directory", "MECM"],
+      },
+    ],
+  },
+  {
+    name: "Fun & Experimental",
+    icon: "🎮",
+    projects: [
+      {
+        date: "2026.02",
+        status: "completed",
+        identifier: "AI_Invaders",
+        origin: "Portfolio Project",
+        description: "Space Invaders clone with AI company-themed enemies, 3-phase Grok boss fight, Web Audio synthesis, and touch controls. Pure vanilla JS.",
+        href: "/projects/ai-invaders",
+        techStack: ["HTML5", "Canvas API", "JavaScript", "Web Audio"],
+      },
+    ],
+  },
+];
+
+const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => sum + cat.projects.length, 0);
+---
+
+<Layout pageTitle="Projects">
+  <section class="cards-page">
+    <header class="page-header">
+      <h1>Projects</h1>
+      <p class="subtitle">{totalProjects} projects across security, infrastructure, and development</p>
+    </header>
+
+    <!-- Featured Projects -->
+    <div class="featured-section">
+      <h2 class="section-title">Featured Work</h2>
+      <hr class="section-rule" />
+      <div class="featured-grid">
+        {featuredProjects.map((project) => (
+          <a href={project.href} class="hero-card">
+            <div class="hero-top">
+              <span class={`highlight-badge ${project.highlight.includes('$') ? 'savings' : 'label'}`}>
+                {project.highlight}
+              </span>
+              <span class={`status-badge ${project.status}`}>
+                {project.status === "ongoing" ? (
+                  <><span class="status-dot ongoing"></span> Ongoing</>
+                ) : (
+                  <><span class="status-check">&#10003;</span> Completed</>
+                )}
+              </span>
+            </div>
+            <h3 class="hero-title">{project.identifier.replace(/_/g, " ")}</h3>
+            <p class="hero-origin">{project.origin}</p>
+            <p class="hero-description">{project.description}</p>
+            <div class="tech-pills">
+              {project.techStack.map((tech) => (
+                <span class="tech-pill">{tech}</span>
+              ))}
+            </div>
+            <span class="hero-date">{project.date}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Categorized Projects -->
+    {categories.map((category) => (
+      <div class="category-section">
+        <h2 class="section-title">
+          <span class="cat-icon">{category.icon}</span>
+          {category.name}
+        </h2>
+        <hr class="section-rule" />
+        <div class="card-grid">
+          {category.projects.map((project) => (
+            <div class="project-card">
+              <div class="card-header">
+                <span class={`status-badge small ${project.status}`}>
+                  {project.status === "ongoing" ? (
+                    <><span class="status-dot ongoing"></span> Ongoing</>
+                  ) : (
+                    <><span class="status-check">&#10003;</span> Completed</>
+                  )}
+                </span>
+                <span class="card-date">{project.date}</span>
+              </div>
+              {project.href ? (
+                <a href={project.href} class="card-title-link">
+                  <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
+                </a>
+              ) : (
+                <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
+              )}
+              <p class="card-origin">{project.origin}</p>
+              <p class="card-description">{project.description}</p>
+              <div class="tech-pills">
+                {project.techStack.map((tech) => (
+                  <span class="tech-pill">{tech}</span>
+                ))}
+              </div>
+              {project.href && (
+                <a href={project.href} class="card-link">View Case Study &rarr;</a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <!-- Navigation -->
+    <nav class="nav-section">
+      <p class="nav-label">Continue exploring</p>
+      <div class="nav-links">
+        <a href="/experience" class="nav-link">Experience</a>
+        <a href="/hire" class="nav-link">Hire Me</a>
+        <a href="/blog" class="nav-link">Blog</a>
+      </div>
+    </nav>
+  </section>
+</Layout>
+
+<style>
+  .cards-page {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  /* Section Headers */
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cat-icon {
+    font-size: 1.2rem;
+  }
+
+  .section-rule {
+    border: none;
+    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    margin: 0 0 1.5rem 0;
+  }
+
+  /* Featured Grid */
+  .featured-section {
+    margin-bottom: 3rem;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Hero Card */
+  .hero-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+  }
+
+  .hero-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+    background: color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .highlight-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .highlight-badge.savings {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    color: #d97706;
+  }
+
+  .highlight-badge.label {
+    background: color-mix(in srgb, #3b82f6 12%, transparent);
+    color: #3b82f6;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+
+  .status-badge.small {
+    font-size: 0.65rem;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .status-dot.ongoing {
+    background: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .status-check {
+    color: #10b981;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .hero-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+  }
+
+  .hero-origin {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .hero-description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.75;
+    margin: 0 0 1rem 0;
+    flex: 1;
+  }
+
+  .hero-date {
+    font-size: 0.75rem;
+    opacity: 0.4;
+    margin-top: 0.75rem;
+  }
+
+  /* Tech Pills */
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tech-pill {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+    color: #10b981;
+    border: 1px solid color-mix(in srgb, #10b981 20%, transparent);
+  }
+
+  /* Category Section */
+  .category-section {
+    margin-bottom: 2.5rem;
+  }
+
+  /* Card Grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* Project Card */
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .project-card:hover {
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: color-mix(in srgb, currentColor 15%, transparent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-date {
+    font-size: 0.7rem;
+    opacity: 0.4;
+  }
+
+  .card-title-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-title-link:hover .card-title {
+    color: #10b981;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .card-origin {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .card-description {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    opacity: 0.7;
+    margin: 0 0 1rem 0;
+    flex: 1;
+  }
+
+  .card-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #10b981;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .card-link:hover {
+    opacity: 0.8;
+  }
+
+  /* Navigation */
+  .nav-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    text-align: center;
+  }
+
+  .nav-label {
+    font-size: 0.85rem;
+    opacity: 0.5;
+    margin: 0 0 1rem 0;
+  }
+
+  .nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: inherit;
+    text-decoration: none;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    border-color: #10b981;
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 5%, transparent);
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .cards-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+    }
+
+    .featured-grid,
+    .card-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-card {
+      padding: 1.25rem;
+    }
+  }
+</style>

@@ -1,69 +1,59 @@
 ---
-title: "Building MockWatchtower: A NOC-Style Network Monitoring Dashboard"
+title: "Building MockWatchtower: A Live NOC Dashboard Demo"
 pubDate: 2025-01-22
-tags: ["python", "fastapi", "react", "websocket", "networking", "monitoring", "reactflow"]
+tags: ["react", "typescript", "tailwind", "framer-motion", "portfolio", "networking"]
 ---
 
-Walk into any Network Operations Center and the first thing you notice is the wall of screens. Topology maps with green and red indicators. Traffic graphs updating in real time. Alert tickers scrolling across the bottom. These dashboards exist because network teams need to see the state of their infrastructure at a glance. I wanted to build one from scratch. Not a toy demo with hardcoded data, but a real monitoring dashboard that polls actual devices and updates in real time. That project became MockWatchtower.
+I built Watchtower as a real NOC dashboard for my college lab. It pulls live data from LibreNMS, Netdisco, and Proxmox. It works great, but there's a problem: nobody can see it unless they're on my network. So I built MockWatchtower, a fully self-contained demo version that runs anywhere, no infrastructure required.
 
-## What Makes a NOC Dashboard
+## The Demo Problem
 
-Before writing any code, I spent time studying what makes NOC dashboards effective. The good ones share a few traits. They aggregate data from multiple sources into a single view. They update continuously without requiring manual refreshes. They surface problems quickly through visual hierarchy: red means something is wrong, and you should not have to read a log file to figure out what.
+Portfolio projects that need backend infrastructure are invisible to recruiters. You can write a beautiful README, add screenshots, describe the architecture. But nothing beats clicking a link and seeing the thing actually work. MockWatchtower solves that by simulating an entire SMB network environment with realistic data, status changes, and alert patterns. Same frontend, same topology canvas, same real-time updates. Just powered by simulation instead of real devices.
 
-MockWatchtower targets all three of those principles. It pulls device data from LibreNMS, Netdisco, and Proxmox. It uses WebSocket connections for real-time updates. And it presents everything through an interactive topology map where device status is visible at a glance.
+## Simulating a Real Network
 
-## Backend Architecture
+The demo simulates a Meridian Financial Group campus network. I chose a fictional mid-size company because it gives enough complexity to be interesting without being overwhelming. The topology includes core switches, distribution layer, access switches, firewalls, servers, wireless controllers, and endpoints across multiple buildings.
 
-The backend is Python with FastAPI, which has become my go-to for projects like this. FastAPI's native WebSocket support was a major factor in choosing it. REST APIs work well for request-response patterns, but a monitoring dashboard needs to push updates to the browser the moment something changes. Polling a REST endpoint every few seconds would work, but it wastes bandwidth on unchanged data and introduces latency. WebSockets give you a persistent connection where the server sends updates only when they happen.
+Every device has a realistic profile: hostname following a naming convention, correct interface counts for the hardware model, appropriate VLAN assignments, and plausible traffic patterns. A core switch pushes more traffic than an access switch. A firewall shows UTM inspection metrics. The wireless controller reports client counts that fluctuate throughout the day.
 
-The polling engine is the core of the backend. It runs on configurable intervals, reaching out to each data source and collecting device status, metrics, and topology information.
+Status changes follow patterns too. Devices don't just randomly flip between up and down. The simulation models scenarios: a switch in Building C goes down, and the devices behind it follow. An interface starts showing CRC errors before it goes down completely. A server's CPU usage climbs gradually before triggering an alert. These cascading patterns are what make the demo feel real rather than random.
 
-LibreNMS provides device up/down status, latency measurements, interface utilization, and alert states. The integration uses the LibreNMS REST API, pulling data for all monitored devices in batch requests to minimize API overhead.
+## Interactive Topology
 
-Netdisco contributes layer 2 topology data: which devices are connected to which switch ports, VLAN information, and neighbor relationships discovered through CDP and LLDP. This data is what makes the topology map meaningful. Without it, you just have a list of devices. With it, you can show how they connect.
+The topology canvas is built with ReactFlow. Each device is a custom node component showing hostname, device type icon, and a color-coded status indicator. You can pan, zoom, and drag devices around. Clicking a node opens a detail panel with metrics, interface status, and recent alerts.
 
-Proxmox integration adds hypervisor and virtual machine status. In my lab, several network services run as VMs or containers on Proxmox, and knowing their state matters for troubleshooting. If a DNS server VM goes down, the network symptoms look very different from a switch failure, but both show up on the dashboard.
+The layout reflects actual network hierarchy. Core devices sit at the top, distribution in the middle, access at the edges. Connections between nodes show link status and can display bandwidth utilization. When a device goes down in the simulation, its node pulses red and the connected links dim, giving you immediate visual feedback without reading any text.
 
-I also integrated a speedtest module that periodically tests WAN connectivity. It is a simple addition, but having historical bandwidth data on the dashboard helps identify ISP issues versus internal network problems.
+I spent time getting the edge routing right. In a real NOC dashboard, messy overlapping lines make the topology useless. ReactFlow's edge routing handles most cases, but I added custom path logic for situations where connections would overlap or cross unnecessarily.
 
-All data source configurations live in YAML files. Adding a new LibreNMS instance or Proxmox node means adding a few lines to the config, not changing code. The topology layout is also YAML-configured, letting you define device positions, groupings, and connection overrides without touching the frontend.
+## The Port Grid
 
-## Real-Time Updates with WebSockets
+One of my favorite features is the switch port grid. Open the detail panel for any switch and you see a visual grid mimicking the physical port layout. Each port is color-coded: green for up, red for down, orange for errors, gray for admin disabled. Hover over a port and you see the connected device, VLAN, speed, and current throughput.
 
-The WebSocket implementation follows a pub/sub pattern. When a client connects, it subscribes to updates for specific device groups or the entire topology. The backend maintains a registry of active connections and broadcasts state changes as they occur.
+In the real Watchtower, this data comes from LibreNMS and Netdisco APIs. In MockWatchtower, the simulation generates it. But the visual is identical. It's the kind of feature that makes network engineers nod because they immediately understand what they're looking at. No explanation needed.
 
-Each WebSocket message carries a typed payload. Device status changes include the device identifier, old status, new status, and timestamp. Metric updates carry the measurement type, value, and unit. Alert messages include severity, source device, and description. The frontend uses these types to route updates to the correct visual components without re-rendering the entire dashboard.
+## Alert System
 
-Connection resilience was important to get right. WebSocket connections drop for all sorts of reasons: browser tabs going to sleep, network blips, server restarts. The client implements automatic reconnection with exponential backoff. When it reconnects, it requests a full state snapshot to catch up on anything it missed.
+The alert ticker runs across the top of the dashboard. Alerts come in three severities: critical (pulsing red), warning (steady amber), and informational (blue). The simulation generates alerts that match the network scenarios. When that Building C switch goes down, you see a critical alert for the device, followed by warning alerts for the downstream devices losing connectivity.
 
-## Frontend: React, TypeScript, and ReactFlow
+Alerts are also logged in a filterable table. You can filter by severity, device, time range, or acknowledgment status. It's basic incident management, enough to show the concept without building a full ticketing system.
 
-The frontend is built with React and TypeScript, using ReactFlow as the foundation for the interactive topology canvas. ReactFlow provides a canvas with pan, zoom, node dragging, and edge rendering out of the box. I extended it with custom node components that display device status visually.
+## Five Visual Variants
 
-Each device on the topology map is a custom ReactFlow node. The node shows the device hostname, an icon representing its type (router, switch, server, firewall), and a status indicator that changes color based on the current state. Clicking a node opens a detail panel with full metrics, recent alerts, and interface status.
+Like all my portfolio projects, MockWatchtower ships with five distinct visual themes. Each one completely changes the look while keeping the same functionality:
 
-Edges between nodes represent physical or logical connections. They change color based on link status and can display bandwidth utilization as a thickness or label. The topology layout loads from the YAML configuration but can be rearranged by dragging nodes, and the positions persist.
+1. **NOC Command** uses the classic dark theme with green accents that you'd see in an actual operations center
+2. **Arctic Monitor** goes light and clean with blue tones, optimized for well-lit environments
+3. **Cyber Grid** leans into the cyberpunk aesthetic with neon highlights on dark backgrounds
+4. **Blueprint** takes inspiration from engineering drawings with a technical, schematic feel
+5. **Sunset Ops** uses warm amber and orange tones for a distinctive look that's easy on the eyes during long shifts
 
-Zustand handles state management. I chose it over Redux for its simplicity. The store structure separates device state, topology layout, alert history, and UI preferences into distinct slices. WebSocket messages update the relevant slice, and React components re-render only when their subscribed data changes. This keeps the dashboard responsive even with frequent updates.
+A theme picker in the top bar lets you switch instantly. Theme preference persists in localStorage.
 
-The port grid visualization is one of my favorite features. For switches, the detail panel shows a grid of ports mimicking the physical layout of the device. Each port cell is colored by status: green for up, red for down, orange for error state, gray for administratively disabled. Hovering over a port shows the connected device, VLAN, and current throughput. It is a quick way to spot a bad port or an unexpected device on the network.
+## What It Demonstrates
 
-The alert system aggregates warnings and critical events from all data sources into a unified feed. Alerts appear as a ticker at the top of the dashboard and are also logged in a filterable table. You can acknowledge alerts, add notes, and track resolution. Severity levels control visual priority: critical alerts pulse, warnings display steadily, and informational messages are available but not intrusive.
+MockWatchtower isn't just a pretty dashboard. It demonstrates specific skills that matter for infrastructure and security roles:
 
-## Demo Mode
+Real-time data visualization with WebSocket-style updates. Interactive topology mapping with ReactFlow. State management with Zustand for complex, frequently updating data. Responsive design that works on tablets (because NOC dashboards increasingly live on mounted tablets). Network domain knowledge reflected in realistic device modeling and alert patterns.
 
-Since MockWatchtower is also a portfolio piece, I built a demo mode that simulates a live network environment. Demo mode generates realistic device status changes, metric fluctuations, and occasional alerts without requiring any actual infrastructure. It uses the same WebSocket pipeline as live mode, so the frontend behavior is identical.
-
-This was important because anyone visiting my portfolio should be able to see the dashboard in action without needing access to my lab. Demo mode cycles through scenarios: normal operation, a simulated device outage, a bandwidth spike, and recovery. It shows off the full range of dashboard capabilities in a self-contained loop.
-
-## Lessons Learned
-
-WebSockets are powerful but demand careful state management. When a client reconnects, you need to reconcile its local state with the server's current state cleanly. Race conditions between REST snapshot requests and incoming WebSocket messages can cause flickering or stale data if you are not careful about ordering.
-
-ReactFlow was an excellent choice for the topology canvas, but customizing it required deep understanding of its rendering pipeline. Custom nodes need to be performant because the canvas re-renders frequently during pan and zoom operations. Memoization and careful prop management made a noticeable difference in smoothness.
-
-Building a multi-source polling system taught me about the challenges of data normalization. LibreNMS reports device status as integers (0, 1, 2). Netdisco uses boolean flags. Proxmox has its own status vocabulary. Normalizing all of these into a consistent model that the frontend can consume without caring about the source was essential and required more thought than I expected.
-
-## Looking Ahead
-
-MockWatchtower is running in my lab and has already helped me catch issues faster than checking individual tool dashboards. Future plans include adding NetFlow visualization for traffic analysis, integrating with ticketing systems for alert escalation, and building a mobile-responsive layout for on-the-go monitoring. The source is on my GitHub if you want to explore it or adapt it for your own network.
+The demo runs at [mockwatchtower.vercel.app](https://mockwatchtower.vercel.app) if you want to see it in action. Source is on GitHub.
