@@ -9,6 +9,7 @@ const showHomeLink = !isIndex && !isBlogPost && !isProjectPage;
 
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
+const isDev = import.meta.env.DEV;
 ---
 
 <!doctype html>
@@ -344,6 +345,6 @@ import Analytics from "@vercel/analytics/astro";
         </div>
       </footer>
     </div>
-    <Analytics />
+    {!isDev && <Analytics />}
   </body>
 </html>

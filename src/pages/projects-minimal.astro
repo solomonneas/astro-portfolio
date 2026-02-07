@@ -359,92 +359,83 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 ---
 
 <Layout pageTitle="Projects">
-  <section class="cards-page">
+  <section class="minimal-page">
     <header class="page-header">
       <h1>Projects</h1>
-      <p class="subtitle">{totalProjects} projects across security, infrastructure, and development</p>
+      <p class="count">{totalProjects} projects</p>
     </header>
 
-    <!-- Featured Projects -->
+    <!-- Featured -->
     <div class="featured-section">
-      <h2 class="section-title">Featured Work</h2>
-      <hr class="section-rule" />
-      <div class="featured-grid">
+      <h2 class="section-label">Featured</h2>
+      <div class="list">
         {featuredProjects.map((project) => (
-          <a href={project.href} class="hero-card">
-            <div class="hero-top">
-              <span class={`highlight-badge ${project.highlight.includes('$') ? 'savings' : 'label'}`}>
-                {project.highlight}
-              </span>
-              <span class={`status-badge ${project.status}`}>
-                {project.status === "ongoing" ? (
-                  <><span class="status-dot ongoing"></span> Ongoing</>
-                ) : (
-                  <><span class="status-check">&#10003;</span> Completed</>
-                )}
-              </span>
+          <a href={project.href} class="list-item featured-item">
+            <div class="item-main">
+              <h3 class="item-title featured-title">{project.identifier.replace(/_/g, " ")}</h3>
+              <p class="item-desc featured-desc">{project.description}</p>
+              <div class="item-tech">
+                {project.techStack.map((tech) => (
+                  <span class="tech">{tech}</span>
+                ))}
+              </div>
             </div>
-            <h3 class="hero-title">{project.identifier.replace(/_/g, " ")}</h3>
-            <p class="hero-origin">{project.origin}</p>
-            <p class="hero-description">{project.description}</p>
-            <div class="tech-pills">
-              {project.techStack.map((tech) => (
-                <span class="tech-pill">{tech}</span>
-              ))}
+            <div class="item-meta">
+              <span class={`item-highlight ${project.highlight.includes('$') ? 'savings' : ''}`}>{project.highlight}</span>
+              <span class="item-date">{project.date}</span>
             </div>
-            <span class="hero-date">{project.date}</span>
           </a>
         ))}
       </div>
     </div>
 
-    <!-- Categorized Projects -->
+    <!-- Categories -->
     {categories.map((category) => (
       <div class="category-section">
-        <h2 class="section-title">
-          <span class="cat-icon">{category.icon}</span>
-          {category.name}
-        </h2>
-        <hr class="section-rule" />
-        <div class="card-grid">
-          {category.projects.map((project) => (
-            <div class="project-card">
-              <div class="card-header">
-                <span class={`status-badge small ${project.status}`}>
-                  {project.status === "ongoing" ? (
-                    <><span class="status-dot ongoing"></span> Ongoing</>
-                  ) : (
-                    <><span class="status-check">&#10003;</span> Completed</>
-                  )}
-                </span>
-                <span class="card-date">{project.date}</span>
+        <h2 class="section-label">{category.name}</h2>
+        <div class="list">
+          {category.projects.map((project) => {
+            const Tag = project.href ? 'a' : 'div';
+            return project.href ? (
+              <a href={project.href} class="list-item">
+                <div class="item-main">
+                  <h3 class="item-title">{project.identifier.replace(/_/g, " ")}</h3>
+                  <p class="item-desc">{project.description}</p>
+                  <div class="item-tech">
+                    {project.techStack.map((tech) => (
+                      <span class="tech">{tech}</span>
+                    ))}
+                  </div>
+                </div>
+                <div class="item-meta">
+                  <StatusLight status={project.status} />
+                  <span class="item-date">{project.date}</span>
+                </div>
+              </a>
+            ) : (
+              <div class="list-item">
+                <div class="item-main">
+                  <h3 class="item-title">{project.identifier.replace(/_/g, " ")}</h3>
+                  <p class="item-desc">{project.description}</p>
+                  <div class="item-tech">
+                    {project.techStack.map((tech) => (
+                      <span class="tech">{tech}</span>
+                    ))}
+                  </div>
+                </div>
+                <div class="item-meta">
+                  <StatusLight status={project.status} />
+                  <span class="item-date">{project.date}</span>
+                </div>
               </div>
-              {project.href ? (
-                <a href={project.href} class="card-title-link">
-                  <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
-                </a>
-              ) : (
-                <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
-              )}
-              <p class="card-origin">{project.origin}</p>
-              <p class="card-description">{project.description}</p>
-              <div class="tech-pills">
-                {project.techStack.map((tech) => (
-                  <span class="tech-pill">{tech}</span>
-                ))}
-              </div>
-              {project.href && (
-                <a href={project.href} class="card-link">View Case Study &rarr;</a>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     ))}
 
     <!-- Navigation -->
     <nav class="nav-section">
-      <p class="nav-label">Continue exploring</p>
       <div class="nav-links">
         <a href="/experience" class="nav-link">Experience</a>
         <a href="/hire" class="nav-link">Hire Me</a>
@@ -455,298 +446,160 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 </Layout>
 
 <style>
-  .cards-page {
-    max-width: 64rem;
+  .minimal-page {
+    max-width: 48rem;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 3rem 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
   }
 
-  /* Page Header */
+  /* Header */
   .page-header {
-    margin-bottom: 3rem;
-    text-align: center;
+    margin-bottom: 3.5rem;
   }
 
   .page-header h1 {
-    font-size: 2.5rem;
+    font-size: 2.75rem;
     font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    letter-spacing: -0.02em;
-  }
-
-  .subtitle {
-    font-size: 1rem;
-    opacity: 0.6;
     margin: 0;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
   }
 
-  /* Section Headers */
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .count {
+    font-size: 0.9rem;
+    opacity: 0.35;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400;
   }
 
-  .cat-icon {
-    font-size: 1.2rem;
-  }
-
-  .section-rule {
-    border: none;
-    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-    margin: 0 0 1.5rem 0;
-  }
-
-  /* Featured Grid */
-  .featured-section {
-    margin-bottom: 3rem;
-  }
-
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-  }
-
-  /* Hero Card */
-  .hero-card {
-    display: flex;
-    flex-direction: column;
-    padding: 1.75rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    border-radius: 12px;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.25s ease;
-  }
-
-  .hero-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    border-color: color-mix(in srgb, currentColor 20%, transparent);
-    background: color-mix(in srgb, currentColor 5%, transparent);
-  }
-
-  .hero-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .highlight-badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 0.3rem 0.6rem;
-    border-radius: 6px;
-  }
-
-  .highlight-badge.savings {
-    background: color-mix(in srgb, #f59e0b 15%, transparent);
-    color: #d97706;
-  }
-
-  .highlight-badge.label {
-    background: color-mix(in srgb, #3b82f6 12%, transparent);
-    color: #3b82f6;
-  }
-
-  /* Status Badge */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.7rem;
-    font-weight: 500;
-    opacity: 0.7;
-  }
-
-  .status-badge.small {
-    font-size: 0.65rem;
-  }
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .status-dot.ongoing {
-    background: #10b981;
-    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .status-check {
-    color: #10b981;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  .hero-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin: 0 0 0.25rem 0;
-    line-height: 1.3;
-  }
-
-  .hero-origin {
+  /* Section Labels */
+  .section-label {
     font-size: 0.8rem;
-    opacity: 0.5;
-    margin: 0 0 0.75rem 0;
-  }
-
-  .hero-description {
-    font-size: 0.85rem;
-    line-height: 1.6;
-    opacity: 0.75;
-    margin: 0 0 1rem 0;
-    flex: 1;
-  }
-
-  .hero-date {
-    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
     opacity: 0.4;
-    margin-top: 0.75rem;
+    margin: 0 0 1rem 0;
   }
 
-  /* Tech Pills */
-  .tech-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+  .featured-section .section-label {
+    font-size: 0.85rem;
+    opacity: 0.5;
   }
 
-  .tech-pill {
-    font-size: 0.65rem;
-    font-weight: 500;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, #10b981 10%, transparent);
-    color: #10b981;
-    border: 1px solid color-mix(in srgb, #10b981 20%, transparent);
-  }
-
-  /* Category Section */
-  .category-section {
-    margin-bottom: 2.5rem;
-  }
-
-  /* Card Grid */
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-
-  /* Project Card */
-  .project-card {
+  /* List */
+  .list {
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
-    background: color-mix(in srgb, currentColor 2%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
-    border-radius: 10px;
-    transition: all 0.2s ease;
   }
 
-  .project-card:hover {
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border-color: color-mix(in srgb, currentColor 15%, transparent);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  }
-
-  .card-header {
+  .list-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-  }
-
-  .card-date {
-    font-size: 0.7rem;
-    opacity: 0.4;
-  }
-
-  .card-title-link {
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 1.25rem 1rem;
+    margin: 0 -1rem;
+    border-radius: 8px;
     text-decoration: none;
     color: inherit;
+    transition: background 0.15s ease;
   }
 
-  .card-title-link:hover .card-title {
-    color: #10b981;
+  a.list-item:hover {
+    background: color-mix(in srgb, currentColor 4%, transparent);
   }
 
-  .card-title {
-    font-size: 1rem;
+  .item-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-title {
+    font-size: 0.95rem;
     font-weight: 600;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.3rem 0;
     line-height: 1.3;
-    transition: color 0.2s ease;
   }
 
-  .card-origin {
-    font-size: 0.75rem;
-    opacity: 0.5;
-    margin: 0 0 0.5rem 0;
+  .featured-title {
+    font-size: 1.1rem;
+    font-weight: 700;
   }
 
-  .card-description {
+  .item-desc {
     font-size: 0.8rem;
     line-height: 1.5;
-    opacity: 0.7;
-    margin: 0 0 1rem 0;
-    flex: 1;
+    opacity: 0.55;
+    margin: 0 0 0.5rem 0;
   }
 
-  .card-link {
-    display: inline-block;
-    margin-top: 0.75rem;
-    font-size: 0.75rem;
+  .featured-desc {
+    font-size: 0.85rem;
+    opacity: 0.6;
+  }
+
+  .item-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tech {
+    font-size: 0.65rem;
     font-weight: 500;
-    color: #10b981;
-    text-decoration: none;
-    transition: opacity 0.2s ease;
+    opacity: 0.4;
+    letter-spacing: 0.02em;
   }
 
-  .card-link:hover {
-    opacity: 0.8;
+  .item-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    padding-top: 0.15rem;
+  }
+
+  .item-highlight {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #3b82f6;
+    white-space: nowrap;
+  }
+
+  .item-highlight.savings {
+    color: #f59e0b;
+  }
+
+  .item-date {
+    font-size: 0.7rem;
+    opacity: 0.3;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Category */
+  .category-section {
+    margin-top: 2.5rem;
+  }
+
+  .featured-section {
+    margin-bottom: 1rem;
   }
 
   /* Navigation */
   .nav-section {
-    margin-top: 3rem;
+    margin-top: 4rem;
     padding-top: 2rem;
-    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    text-align: center;
-  }
-
-  .nav-label {
-    font-size: 0.85rem;
-    opacity: 0.5;
-    margin: 0 0 1rem 0;
+    border-top: 1px solid color-mix(in srgb, currentColor 8%, transparent);
   }
 
   .nav-links {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 2rem;
   }
 
   .nav-link {
@@ -754,37 +607,39 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     font-weight: 500;
     color: inherit;
     text-decoration: none;
-    padding: 0.5rem 1.25rem;
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    opacity: 0.7;
+    opacity: 0.4;
+    transition: opacity 0.15s ease;
   }
 
   .nav-link:hover {
-    opacity: 1;
-    border-color: #10b981;
-    color: #10b981;
-    background: color-mix(in srgb, #10b981 5%, transparent);
+    opacity: 0.8;
   }
 
   /* Mobile */
   @media (max-width: 640px) {
-    .cards-page {
-      padding: 1.5rem 1rem;
+    .minimal-page {
+      padding: 2rem 1rem;
     }
 
     .page-header h1 {
       font-size: 2rem;
     }
 
-    .featured-grid,
-    .card-grid {
-      grid-template-columns: 1fr;
+    .list-item {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1rem 0.75rem;
+      margin: 0 -0.75rem;
     }
 
-    .hero-card {
-      padding: 1.25rem;
+    .item-meta {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-links {
+      gap: 1.5rem;
     }
   }
 </style>
