@@ -78,10 +78,6 @@ const challenges = [
     label: "APT Lock Race Condition",
     solution: "Added cloud-init status --wait before package operations"
   },
-  {
-    label: "DFS Namespace Cutover",
-    solution: "Update DFS targets instead of GPOs for seamless client migration"
-  },
 ];
 ---
 
@@ -91,7 +87,7 @@ const challenges = [
   <p>
     Built a production Ubuntu 24.04 Samba file server joined to Active Directory, replacing a legacy
     "split-brain" configuration where files were scattered across multiple Windows 10 machines with
-    inconsistent permissions and no proper backup strategy. The server runs as a DFS namespace member
+    inconsistent permissions and no proper backup strategy. The server runs as an AD member
     on Proxmox 9.1.2 with 4TB XFS storage.
   </p>
 
@@ -106,7 +102,7 @@ const challenges = [
     </div>
     <div class="spec-item">
       <span class="spec-label">Role</span>
-      <span class="spec-value">AD member file server with DFS namespace</span>
+      <span class="spec-value">AD member file server</span>
     </div>
     <div class="spec-item">
       <span class="spec-label">Hypervisor</span>
@@ -423,23 +419,6 @@ free -h  # Should show: Swap: 4.0Gi</code></pre>
   </div>
 
   <!-- DFS Cutover -->
-  <div class="cutover-section">
-    <h2>// Migration Cutover: DFS Namespace</h2>
-    <p>Instead of modifying GPO drive mappings, I updated DFS targets for a seamless cutover:</p>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">PowerShell</span>
-        <span class="code-desc">DFS Namespace Update</span>
-      </div>
-      <pre><code># Add new Linux server as DFS target
-New-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" -TargetPath "\\fileserv\Shared"
-
-# Set old Windows server offline (keeps for rollback)
-Set-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" `
-  -TargetPath "\\oldserver\share" -State Offline</code></pre>
-    </div>
-  </div>
-
   <!-- Drive Mapping -->
   <div class="cutover-section">
     <h2>// Client Drive Mapping</h2>
