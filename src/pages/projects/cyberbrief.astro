@@ -1,0 +1,264 @@
+---
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+
+const frontmatter = {
+  title: "CyberBrief: Threat Intelligence Briefing Tool",
+  status: "Complete",
+  statusType: "complete",
+  origin: "Portfolio Project",
+  date: "2025.01",
+  techStack: ["React", "FastAPI", "Python", "TypeScript", "Tailwind CSS", "OpenAI API", "MITRE ATT&CK"],
+};
+
+const stackComponents = [
+  { name: "React + TypeScript", role: "Frontend Framework", purpose: "Component-based UI with type safety for complex form interactions and dynamic briefing displays", color: "#61dafb" },
+  { name: "FastAPI", role: "Backend API", purpose: "Async Python backend handling threat feed ingestion, summarization requests, and briefing generation", color: "#009688" },
+  { name: "Tailwind CSS", role: "Styling", purpose: "Utility-first CSS for responsive layouts, dark mode support, and consistent design tokens", color: "#38bdf8" },
+  { name: "Python + NLP", role: "Processing Engine", purpose: "Threat feed parsing, entity extraction, MITRE ATT&CK mapping, and summary generation pipeline", color: "#3776ab" },
+];
+
+const highlights = [
+  {
+    category: "Architecture",
+    title: "Multi-Source Feed Aggregation",
+    scenario: "Analysts spend hours reading multiple threat feeds to produce a single daily briefing",
+    solution: "Built an ingestion pipeline that pulls from configurable RSS/API sources, deduplicates by IOC and CVE reference, and ranks by severity and relevance to configured industry verticals",
+    impact: "Consolidates multiple feeds into a single prioritized view in seconds",
+  },
+  {
+    category: "NLP Pipeline",
+    title: "Automated Summarization",
+    scenario: "Raw threat reports are verbose and inconsistent in format across different sources",
+    solution: "Implemented a multi-stage summarization pipeline: extract key entities (IOCs, TTPs, affected products), map to MITRE ATT&CK framework, then generate concise executive and technical summaries",
+    impact: "Consistent briefing format regardless of source, with ATT&CK context included automatically",
+  },
+  {
+    category: "UX Design",
+    title: "Audience-Adaptive Output",
+    scenario: "Security briefings need different levels of detail for executives vs. SOC analysts",
+    solution: "Designed dual-view output: executive summary with risk scores and business impact, plus a technical deep-dive with IOCs, detection rules, and remediation steps",
+    impact: "One tool serves both leadership updates and analyst action items",
+  },
+];
+
+const skills = [
+  { name: "Full-Stack Development", items: ["React component architecture", "FastAPI async endpoints", "REST API design", "TypeScript interfaces"] },
+  { name: "Data Processing", items: ["Feed parsing and normalization", "Entity extraction", "Deduplication logic", "MITRE ATT&CK mapping"] },
+  { name: "Security Domain", items: ["Threat intelligence workflows", "IOC management", "CVE prioritization", "Executive briefing formats"] },
+  { name: "Frontend", items: ["Tailwind responsive design", "Dark/light mode", "PDF export", "Real-time filtering"] },
+];
+---
+
+<ProjectLayout frontmatter={frontmatter}>
+  <h2>// Overview</h2>
+  <p>
+    CyberBrief automates the daily threat intelligence briefing process. It ingests threat feeds from multiple
+    configurable sources, extracts key indicators and tactics, maps them to the MITRE ATT&CK framework, and
+    generates both executive and technical summaries. The goal is to compress hours of manual reading into a
+    structured, actionable briefing.
+  </p>
+  <p>
+    The tool addresses a real workflow pain point: analysts reading the same reports from different angles,
+    reformatting content for different audiences, and manually cross-referencing IOCs against ATT&CK. CyberBrief
+    handles all of that in a single pipeline.
+  </p>
+
+  <!-- Tech Stack -->
+  <h2>// Tech Stack</h2>
+  <p class="section-intro">Full-stack application with a Python processing backend and React frontend:</p>
+  <div class="stack-grid">
+    {stackComponents.map((comp, i) => (
+      <div class="stack-card" style={`--accent: ${comp.color}; --delay: ${i * 0.1}s`}>
+        <div class="stack-header">
+          <span class="stack-indicator"></span>
+          <span class="stack-name">{comp.name}</span>
+        </div>
+        <div class="stack-role">{comp.role}</div>
+        <p class="stack-purpose">{comp.purpose}</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Technical Highlights -->
+  <h2>// Technical Highlights</h2>
+  <div class="highlights-grid">
+    {highlights.map((item, i) => (
+      <div class="highlight-card" style={`--delay: ${i * 0.1}s`}>
+        <div class="highlight-header">
+          <span class="highlight-category">{item.category}</span>
+          <span class="highlight-title">{item.title}</span>
+        </div>
+        <div class="highlight-body">
+          <div class="highlight-row">
+            <span class="row-label">Problem:</span>
+            <span class="row-value">{item.scenario}</span>
+          </div>
+          <div class="highlight-row">
+            <span class="row-label">Solution:</span>
+            <span class="row-value">{item.solution}</span>
+          </div>
+          <div class="highlight-row impact">
+            <span class="row-label">Result:</span>
+            <span class="row-value">{item.impact}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Skills -->
+  <h2>// Skills Demonstrated</h2>
+  <div class="skills-grid">
+    {skills.map((skill) => (
+      <div class="skill-card">
+        <div class="skill-header">
+          <span class="skill-name">{skill.name}</span>
+        </div>
+        <ul class="skill-items">
+          {skill.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <!-- Status -->
+  <h2>// Project Status</h2>
+  <div class="status-block">
+    <div class="status-indicator complete">
+      <div class="status-pulse"></div>
+      <span>Complete</span>
+    </div>
+    <ul class="status-list">
+      <li><span class="check">&#10003;</span> Multi-source feed ingestion pipeline</li>
+      <li><span class="check">&#10003;</span> MITRE ATT&CK mapping engine</li>
+      <li><span class="check">&#10003;</span> Executive and technical summary generation</li>
+      <li><span class="check">&#10003;</span> PDF export with branded templates</li>
+      <li><span class="check">&#10003;</span> Configurable industry vertical filtering</li>
+      <li><span class="check">&#10003;</span> Dark/light mode responsive UI</li>
+    </ul>
+  </div>
+</ProjectLayout>
+
+<style>
+  .section-intro { opacity: 0.85; margin-bottom: 1.5rem; }
+
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .stack-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 1rem;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stack-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .stack-indicator { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .stack-name { font-family: "IBM Plex Mono", monospace; font-size: 1rem; font-weight: 600; }
+  .stack-role { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--accent); margin-bottom: 0.75rem; }
+  .stack-purpose { font-size: 0.8rem; opacity: 0.75; margin: 0; line-height: 1.5; }
+
+  .highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .highlight-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: fadeSlideIn 0.5s ease-out both;
+    animation-delay: var(--delay);
+  }
+
+  .highlight-header {
+    display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .highlight-category { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #10b981; }
+  .highlight-title { font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; font-weight: 600; }
+  .highlight-body { padding: 1rem; }
+  .highlight-row { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; }
+  .highlight-row:last-child { margin-bottom: 0; }
+  .highlight-row .row-label { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; font-weight: 600; color: #10b981; }
+  .highlight-row .row-value { font-size: 0.8rem; opacity: 0.8; line-height: 1.5; }
+  .highlight-row.impact .row-value { color: #10b981; font-weight: 500; opacity: 1; }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .skill-card {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .skill-header {
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .skill-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; }
+
+  .skill-items { list-style: none; padding: 0.75rem 1rem; margin: 0; }
+  .skill-items li { font-size: 0.75rem; padding: 0.3rem 0; padding-left: 1rem; position: relative; opacity: 0.75; }
+  .skill-items li::before { content: ">"; position: absolute; left: 0; color: #10b981; font-family: "IBM Plex Mono", monospace; }
+
+  .status-block {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .status-indicator {
+    display: flex; align-items: center; gap: 0.75rem;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; font-weight: 500; margin-bottom: 1rem;
+  }
+
+  .status-indicator.complete .status-pulse { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+  .status-pulse { width: 12px; height: 12px; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+
+  .status-list {
+    list-style: none; padding: 0; margin: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.5rem;
+  }
+
+  .status-list li {
+    display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem;
+    padding: 0.5rem 0.75rem; background: color-mix(in srgb, currentColor 3%, transparent); border-radius: 4px;
+  }
+
+  .check { color: #10b981; font-weight: bold; }
+
+  @media (max-width: 768px) {
+    .highlights-grid, .stack-grid { grid-template-columns: 1fr; }
+  }
+</style>
