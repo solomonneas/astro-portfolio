@@ -25,7 +25,7 @@ Sometimes the best way to show you understand systems is to build something fun.
 
 Play it in my portfolio: [link]
 
-#JavaScript #GameDev #WebDev #CyberSecurity #Portfolio #CanvasAPI
+\#JavaScript #GameDev #WebDev #CyberSecurity #Portfolio #CanvasAPI
 
 ---
 
@@ -57,7 +57,7 @@ Some fun technical bits:
 
 It lives in my portfolio alongside security tools and dashboards. Variety is good.
 
-#JavaScript #GameDev #WebDev #Canvas
+\#JavaScript #GameDev #WebDev #Canvas
 
 ---
 

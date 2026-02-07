@@ -355,7 +355,11 @@ const categories = [
   },
 ];
 
-const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => sum + cat.projects.length, 0);
+const allIdentifiers = new Set([
+  ...featuredProjects.map(p => p.identifier),
+  ...categories.flatMap(cat => cat.projects.map(p => p.identifier)),
+]);
+const totalProjects = allIdentifiers.size;
 ---
 
 <Layout pageTitle="Projects">
@@ -395,7 +399,6 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
         <h2 class="section-label">{category.name}</h2>
         <div class="list">
           {category.projects.map((project) => {
-            const Tag = project.href ? 'a' : 'div';
             return project.href ? (
               <a href={project.href} class="list-item">
                 <div class="item-main">

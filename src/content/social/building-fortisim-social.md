@@ -12,7 +12,7 @@ The entire application runs client-side with React, TypeScript, and Tailwind CSS
 
 Full technical write-up: https://solomonneas.dev/blog/building-fortisim
 
-#Networking #Firewall #Fortinet #Cybersecurity #React #TypeScript
+\#Networking #Firewall #Fortinet #Cybersecurity #React #TypeScript
 
 ---
 

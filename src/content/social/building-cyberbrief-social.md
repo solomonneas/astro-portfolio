@@ -12,7 +12,7 @@ The frontend is React, TypeScript, Vite, and Tailwind CSS. I built five visual v
 
 Building this deepened my understanding of both threat intelligence tradecraft and the engineering challenges of multi-source data aggregation. I wrote up the full technical details on my blog: https://solomonneas.dev/blog/building-cyberbrief
 
-#ThreatIntelligence #Cybersecurity #MITREATTACK #Python #FastAPI #React
+\#ThreatIntelligence #Cybersecurity #MITREATTACK #Python #FastAPI #React
 
 ---
 

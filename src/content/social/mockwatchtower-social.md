@@ -29,7 +29,7 @@ The demo mode was important. Anyone can see the dashboard in action without need
 
 Source on GitHub: [link]
 
-#NetworkEngineering #Monitoring #WebSocket #React #Python #NOC #HomeLab
+\#NetworkEngineering #Monitoring #WebSocket #React #Python #NOC #HomeLab
 
 ---
 

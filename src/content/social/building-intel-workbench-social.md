@@ -14,7 +14,7 @@ Building this tool made me significantly more aware of my own cognitive biases i
 
 Full write-up: https://solomonneas.dev/blog/building-intel-workbench
 
-#IntelligenceAnalysis #Cybersecurity #CognitiveBias #StructuredAnalysis #React #TypeScript
+\#IntelligenceAnalysis #Cybersecurity #CognitiveBias #StructuredAnalysis #React #TypeScript
 
 ---
 

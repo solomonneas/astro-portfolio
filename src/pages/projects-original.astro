@@ -356,7 +356,11 @@ const categories = [
 ];
 
 // Count total projects
-const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => sum + cat.projects.length, 0);
+const allIdentifiers = new Set([
+  ...featuredProjects.map(p => p.identifier),
+  ...categories.flatMap(cat => cat.projects.map(p => p.identifier)),
+]);
+const totalProjects = allIdentifiers.size;
 ---
 
 <Layout pageTitle="Projects">

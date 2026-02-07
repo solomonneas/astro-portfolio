@@ -261,4 +261,9 @@ const skills = [
   @media (max-width: 768px) {
     .highlights-grid, .stack-grid { grid-template-columns: 1fr; }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-in { animation: none; opacity: 1; }
+    .stack-indicator { animation: none; }
+  }
 </style>
