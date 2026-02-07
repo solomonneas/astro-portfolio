@@ -440,6 +440,37 @@ Set-DfsnFolderTarget -Path "\\domain.local\dfs\Shared" `
     </div>
   </div>
 
+  <!-- Drive Mapping -->
+  <div class="cutover-section">
+    <h2>// Client Drive Mapping</h2>
+    <p>Two shared drives mapped to all domain workstations via GPO login script. X: for department files, Y: for shared resources.</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Batch</span>
+        <span class="code-desc">GPO Login Script (map-drives.bat)</span>
+      </div>
+      <pre><code>@echo off
+:: Map X: drive - Department Files
+net use X: /delete /yes 2>nul
+net use X: \\fileserv\Department /persistent:yes
+
+:: Map Y: drive - Shared Resources
+net use Y: /delete /yes 2>nul
+net use Y: \\fileserv\Shared /persistent:yes</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">PowerShell</span>
+        <span class="code-desc">GPO Drive Map (alternative, Group Policy Preferences)</span>
+      </div>
+      <pre><code># Computer Configuration > Preferences > Windows Settings > Drive Maps
+# Action: Replace | Drive Letter: X: | Location: \\fileserv\Department
+# Action: Replace | Drive Letter: Y: | Location: \\fileserv\Shared
+# Item-level targeting: Security Group = "Domain Users"</code></pre>
+    </div>
+    <p>Both methods work. The login script is simpler to debug, but GPO Drive Maps give you item-level targeting per security group, OU, or machine type.</p>
+  </div>
+
   <!-- Service Commands -->
   <div class="commands-section">
     <h2>// Service Commands</h2>
