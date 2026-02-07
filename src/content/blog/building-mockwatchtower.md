@@ -1,6 +1,6 @@
 ---
 title: "Building MockWatchtower: A NOC-Style Network Monitoring Dashboard"
-pubDate: 2025-02-07
+pubDate: 2025-01-22
 tags: ["python", "fastapi", "react", "websocket", "networking", "monitoring", "reactflow"]
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: "Building LAIM: A Lightweight Asset Inventory Manager for Network Admins"
-pubDate: 2025-02-07
+pubDate: 2025-01-20
 tags: ["python", "fastapi", "networking", "asset-management", "homelab"]
 ---
 

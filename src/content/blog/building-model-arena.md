@@ -1,6 +1,6 @@
 ---
 title: "Building Model Arena: A Data-Driven LLM Comparison Dashboard"
-pubDate: 2025-02-07
+pubDate: 2025-02-05
 tags: ["llm", "react", "data-visualization", "typescript", "svg", "benchmarks"]
 ---
 

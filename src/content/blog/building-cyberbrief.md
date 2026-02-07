@@ -1,6 +1,6 @@
 ---
 title: "Building CyberBRIEF: An Automated Threat Intelligence Briefing Tool"
-pubDate: 2025-02-07
+pubDate: 2025-02-02
 tags: ["cybersecurity", "threat-intelligence", "python", "fastapi", "react", "mitre-attack"]
 ---
 

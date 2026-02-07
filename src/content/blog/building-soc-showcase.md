@@ -1,6 +1,6 @@
 ---
 title: "Building SOC Showcase: Designing a Security Operations Center Dashboard Demo"
-pubDate: 2025-02-07
+pubDate: 2025-01-29
 tags: ["soc", "cybersecurity", "react", "tailwind", "dashboard", "framer-motion"]
 ---
 

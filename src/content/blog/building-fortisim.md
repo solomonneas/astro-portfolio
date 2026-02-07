@@ -1,6 +1,6 @@
 ---
 title: "Building FortiSim: A Fortinet Firewall Rule Simulator"
-pubDate: 2025-02-07
+pubDate: 2025-01-25
 tags: ["networking", "firewall", "fortinet", "react", "typescript", "simulation"]
 ---
 

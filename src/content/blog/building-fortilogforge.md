@@ -1,6 +1,6 @@
 ---
 title: "Building FortiLogForge: A Fortinet Log Generator and Analyzer"
-pubDate: 2025-02-07
+pubDate: 2025-01-27
 tags: ["python", "fastapi", "react", "fortinet", "security", "log-analysis"]
 ---
 

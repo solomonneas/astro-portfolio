@@ -1,6 +1,6 @@
 ---
 title: "Building Playbook Forge: Turning Incident Response Plans into Visual Flowcharts"
-pubDate: 2025-02-07
+pubDate: 2025-01-31
 tags: ["incident-response", "python", "react", "cybersecurity", "fastapi", "nist"]
 ---
 

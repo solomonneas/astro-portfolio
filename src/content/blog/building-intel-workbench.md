@@ -1,6 +1,6 @@
 ---
 title: "Building Intel Workbench: Structured Analysis with the ACH Method"
-pubDate: 2025-02-07
+pubDate: 2025-02-03
 tags: ["cybersecurity", "intelligence-analysis", "react", "typescript", "ACH"]
 ---
 
