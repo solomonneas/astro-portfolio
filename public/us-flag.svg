@@ -1,0 +1,18 @@
+<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="60" height="40" fill="#bf0a30"/>
+  <rect y="3" width="60" height="3" fill="#fff"/>
+  <rect y="9" width="60" height="3" fill="#fff"/>
+  <rect y="15" width="60" height="3" fill="#fff"/>
+  <rect y="21" width="60" height="3" fill="#fff"/>
+  <rect y="27" width="60" height="3" fill="#fff"/>
+  <rect y="33" width="60" height="3" fill="#fff"/>
+  <rect width="24" height="21" fill="#002868"/>
+  <g fill="#fff">
+    <circle cx="4" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="12" cy="3" r="1.2"/><circle cx="16" cy="3" r="1.2"/><circle cx="20" cy="3" r="1.2"/>
+    <circle cx="6" cy="6" r="1.2"/><circle cx="10" cy="6" r="1.2"/><circle cx="14" cy="6" r="1.2"/><circle cx="18" cy="6" r="1.2"/>
+    <circle cx="4" cy="9" r="1.2"/><circle cx="8" cy="9" r="1.2"/><circle cx="12" cy="9" r="1.2"/><circle cx="16" cy="9" r="1.2"/><circle cx="20" cy="9" r="1.2"/>
+    <circle cx="6" cy="12" r="1.2"/><circle cx="10" cy="12" r="1.2"/><circle cx="14" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>
+    <circle cx="4" cy="15" r="1.2"/><circle cx="8" cy="15" r="1.2"/><circle cx="12" cy="15" r="1.2"/><circle cx="16" cy="15" r="1.2"/><circle cx="20" cy="15" r="1.2"/>
+    <circle cx="6" cy="18" r="1.2"/><circle cx="10" cy="18" r="1.2"/><circle cx="14" cy="18" r="1.2"/><circle cx="18" cy="18" r="1.2"/>
+  </g>
+</svg>

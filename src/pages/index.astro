@@ -4,111 +4,149 @@ import StatusLight from "../components/StatusLight.astro";
 ---
 
 <Layout pageTitle="Home">
-  <section class="readme-terminal">
-    <header class="terminal-header">
-      <div class="header-left">
-        <StatusLight status="ongoing" />
-        <span class="status-text">ONLINE</span>
-      </div>
-      <h1>$ cat ~/README.md</h1>
-    </header>
+  <section class="splash">
+    <!-- Hero - designed to fill the viewport -->
+    <div class="hero">
+      <p class="hero-prompt">$ whoami</p>
+      <h1 class="hero-name">Solomon Neas</h1>
+      <p class="hero-role">Infrastructure Engineer · Security Architect · AI-Augmented Developer</p>
+      <p class="hero-stat">30+ applications · 9 MCP servers · Full security operations toolkit</p>
 
-    <div class="terminal-body">
-      <!-- Intro Section -->
-      <div class="readme-section intro">
-        <p class="greeting"># Hello, I'm Solomon Neas</p>
-        <p class="tagline">
-          Father | Network & Systems Engineer | AI Engineer | Educator | Software Developer | Cybersecurity Graduate Student
-        </p>
-        <p class="bio">
-          I build production infrastructure designed to teach. Open-source SOC, NOC, and virtualization
-          platforms with documentation baked in so students can study, break, and rebuild real systems.
-          ~$165K+ in annual cost avoidance for Polk State College. Pursuing M.S. in Cybersecurity
-          Intelligence and Information Security at USF.
-        </p>
+      <div class="hero-actions">
+        <a href="/hire" class="action-primary">Hire Me</a>
+        <a href="/projects" class="action-secondary">View Projects</a>
+        <a href="/solomon_neas_resume.pdf" target="_blank" class="action-secondary">Resume ↓</a>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="stats-row">
-        <div class="stat">
-          <span class="stat-label">[LOCATION]</span>
-          <span class="stat-value">Florida, USA</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">[STATUS]</span>
-          <span class="stat-value status-available">Available for Work</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">[FOCUS]</span>
-          <span class="stat-value">Infrastructure, Security, AI & Programming</span>
+      <div class="hero-badges">
+        <span class="badge green"><StatusLight status="ongoing" /> Open to Work</span>
+        <span class="badge muted">Florida, USA</span>
+        <span class="badge muted">M.S. Cybersecurity @ USF</span>
+      </div>
+
+      <div class="scroll-hint">
+        <span class="scroll-arrow">↓</span>
+        <span class="scroll-text">scroll to explore</span>
+      </div>
+    </div>
+
+    <!-- Everything below the fold -->
+    <div class="below-fold">
+      <!-- Product Showcase -->
+      <div class="section">
+        <p class="section-header">$ ls ~/products</p>
+        <p class="section-comment">// Live demos and source code. Click to explore.</p>
+
+        <div class="product-grid">
+          <!-- Security Tools -->
+          <div class="product-category">
+            <h3 class="cat-label"><span class="cat-icon">🛡</span> Security Operations</h3>
+            <div class="product-list">
+              <a href="/projects/cyberbrief" class="product-card">
+                <span class="product-name">CyberBRIEF</span>
+                <span class="product-desc">AI threat intel with BLUF reports and ATT&CK mapping</span>
+              </a>
+              <a href="/projects/soc-showcase" class="product-card">
+                <span class="product-name">SOC Showcase</span>
+                <span class="product-desc">Full SOC operations platform demo</span>
+              </a>
+              <a href="/projects/fortisim" class="product-card">
+                <span class="product-name">FortiSim</span>
+                <span class="product-desc">FortiGate firewall simulator with traffic generation</span>
+              </a>
+              <a href="/projects/playbook-forge" class="product-card">
+                <span class="product-name">Playbook Forge</span>
+                <span class="product-desc">Incident response playbook builder</span>
+              </a>
+              <a href="/projects/fortilogforge" class="product-card">
+                <span class="product-name">FortiLogForge</span>
+                <span class="product-desc">Realistic FortiGate log generator for SIEM testing</span>
+              </a>
+              <a href="/projects/intel-workbench" class="product-card">
+                <span class="product-name">Intel Workbench</span>
+                <span class="product-desc">Threat intelligence analysis platform</span>
+              </a>
+              <a href="https://github.com/solomonneas/bro-hunter" class="product-card">
+                <span class="product-name">Bro Hunter</span>
+                <span class="product-desc">Zeek + Suricata threat hunting with beacon detection</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Developer Tools -->
+          <div class="product-category">
+            <h3 class="cat-label"><span class="cat-icon">⚡</span> Developer & Infrastructure Tools</h3>
+            <div class="product-list">
+              <a href="/projects/model-arena" class="product-card">
+                <span class="product-name">Model Arena</span>
+                <span class="product-desc">Side-by-side LLM comparison and benchmarking</span>
+              </a>
+              <a href="/projects/laim" class="product-card">
+                <span class="product-name">LAIM</span>
+                <span class="product-desc">Lab asset inventory manager with auto-discovery</span>
+              </a>
+              <a href="/projects/watchtower-noc-dashboard" class="product-card">
+                <span class="product-name">Watchtower</span>
+                <span class="product-desc">Network operations center dashboard</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- MCP Servers -->
+          <div class="product-category">
+            <h3 class="cat-label"><span class="cat-icon">🔌</span> MCP Servers <span class="cat-count">9</span></h3>
+            <div class="product-list mcp-list">
+              <a href="https://github.com/solomonneas/zeek-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">Zeek</span>
+              </a>
+              <a href="https://github.com/solomonneas/suricata-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">Suricata</span>
+              </a>
+              <a href="https://github.com/solomonneas/wazuh-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">Wazuh</span>
+              </a>
+              <a href="https://github.com/solomonneas/mitre-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">MITRE ATT&CK</span>
+              </a>
+              <a href="https://github.com/solomonneas/thehive-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">TheHive</span>
+              </a>
+              <a href="https://github.com/solomonneas/misp-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">MISP</span>
+              </a>
+              <a href="https://github.com/solomonneas/cortex-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">Cortex</span>
+              </a>
+              <a href="https://github.com/solomonneas/rapid7-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">Rapid7</span>
+              </a>
+              <a href="https://github.com/solomonneas/sophos-mcp" target="_blank" class="product-card compact">
+                <span class="product-name">Sophos</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Directory Listing -->
-      <div class="directory-section">
-        <p class="section-header">## ~/sitemap</p>
-        <p class="section-comment">// Navigate to learn more</p>
-
-        <div class="directory-grid">
-          <!-- About -->
-          <a href="/about" class="dir-card">
-            <div class="dir-header">
-              <span class="dir-icon">drwxr-xr-x</span>
-              <span class="dir-name">/about</span>
-            </div>
-            <p class="dir-desc">Background, skills, and certifications. The full picture.</p>
-            <span class="dir-link">$ cd /about</span>
+      <!-- Site Navigation -->
+      <div class="section">
+        <p class="section-header">$ ls ~/site</p>
+        <div class="nav-grid">
+          <a href="/about" class="nav-card">
+            <span class="nav-name">/about</span>
+            <span class="nav-desc">Background, skills, certifications</span>
           </a>
-
-          <!-- Experience -->
-          <a href="/experience" class="dir-card">
-            <div class="dir-header">
-              <span class="dir-icon">drwxr-xr-x</span>
-              <span class="dir-name">/experience</span>
-            </div>
-            <p class="dir-desc">Current roles, education timeline, and professional history.</p>
-            <span class="dir-link">$ cd /experience</span>
+          <a href="/experience" class="nav-card">
+            <span class="nav-name">/experience</span>
+            <span class="nav-desc">Career timeline and education</span>
           </a>
-
-          <!-- Projects -->
-          <a href="/projects" class="dir-card">
-            <div class="dir-header">
-              <span class="dir-icon">drwxr-xr-x</span>
-              <span class="dir-name">/projects</span>
-            </div>
-            <p class="dir-desc">SOC builds, homelab infrastructure, migrations, and research.</p>
-            <span class="dir-link">$ cd /projects</span>
+          <a href="/projects" class="nav-card">
+            <span class="nav-name">/projects</span>
+            <span class="nav-desc">Full project portfolio with case studies</span>
           </a>
-
-          <!-- Blog -->
-          <a href="/blog" class="dir-card">
-            <div class="dir-header">
-              <span class="dir-icon">drwxr-xr-x</span>
-              <span class="dir-name">/blog</span>
-            </div>
-            <p class="dir-desc">Thoughts on networking, security, education, and tech.</p>
-            <span class="dir-link">$ cd /blog</span>
-          </a>
-
-          <!-- Hire -->
-          <a href="/hire" class="dir-card highlight">
-            <div class="dir-header">
-              <span class="dir-icon">-rwxr-xr-x</span>
-              <span class="dir-name">/hire</span>
-              <StatusLight status="ongoing" class="card-status" />
-            </div>
-            <p class="dir-desc">Consulting, adjunct teaching, and web development services.</p>
-            <span class="dir-link">$ cd /hire</span>
-          </a>
-
-          <!-- Contact -->
-          <a href="/contact" class="dir-card">
-            <div class="dir-header">
-              <span class="dir-icon">-rw-r--r--</span>
-              <span class="dir-name">/contact</span>
-            </div>
-            <p class="dir-desc">Email, LinkedIn, GitHub, and other ways to connect.</p>
-            <span class="dir-link">$ cd /contact</span>
+          <a href="/blog" class="nav-card">
+            <span class="nav-name">/blog</span>
+            <span class="nav-desc">Technical writing and insights</span>
           </a>
         </div>
       </div>
@@ -122,118 +160,182 @@ import StatusLight from "../components/StatusLight.astro";
 </Layout>
 
 <style>
-  .readme-terminal {
+  .splash {
     font-family: "IBM Plex Mono", monospace;
-    max-width: 52rem;
+    max-width: 56rem;
     margin: 0 auto;
   }
 
-  .terminal-header {
+  /* Hero - fills viewport */
+  .hero {
+    min-height: calc(100vh - 12rem);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 2rem;
   }
 
-  .header-left {
+  .hero-prompt {
+    font-size: 0.8rem;
+    opacity: 0.4;
+    margin: 0 0 0.75rem 0;
+    animation: fadeSlideIn 0.6s ease both;
+  }
+
+  .hero-name {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.05;
+    color: #10b981;
+    animation: fadeSlideIn 0.6s ease 0.1s both;
+  }
+
+  .hero-role {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: clamp(0.85rem, 2vw, 1.05rem);
+    opacity: 0.65;
+    margin: 0 0 0.75rem 0;
+    letter-spacing: 0.01em;
+    animation: fadeSlideIn 0.6s ease 0.2s both;
+  }
+
+  .hero-stat {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin: 0 0 2rem 0;
+    animation: fadeSlideIn 0.6s ease 0.3s both;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    animation: fadeSlideIn 0.6s ease 0.4s both;
+  }
+
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    animation: fadeSlideIn 0.6s ease 0.5s both;
+  }
+
+  .scroll-hint {
+    margin-top: auto;
+    padding-top: 2rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    opacity: 0.3;
+    animation: fadeSlideIn 0.6s ease 0.8s both;
+    transition: opacity 0.3s ease;
   }
 
-  .status-text {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    color: #10b981;
+  .scroll-hint:hover {
+    opacity: 0.6;
   }
 
-  .terminal-header h1 {
+  .scroll-arrow {
+    animation: bobDown 2s ease-in-out infinite;
     font-size: 1rem;
-    font-weight: 500;
-    margin: 0;
-    opacity: 0.8;
   }
 
-  .terminal-body {
-    padding: 1.5rem 1.25rem 1.25rem;
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-    background: color-mix(in srgb, currentColor 2%, transparent);
-  }
-
-  /* Intro Section */
-  .intro {
-    margin-bottom: 2rem;
-  }
-
-  .greeting {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    color: #10b981;
-  }
-
-  .tagline {
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin: 0 0 1rem 0;
-    letter-spacing: 0.02em;
-  }
-
-  .bio {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin: 0;
-    max-width: 50ch;
-    opacity: 0.85;
-  }
-
-  /* Stats Row */
-  .stats-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2.5rem;
-    padding: 1rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
-    border-radius: 4px;
-  }
-
-  .stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .stat-label {
-    font-size: 0.65rem;
-    opacity: 0.5;
+  .scroll-text {
+    font-size: 0.7rem;
     letter-spacing: 0.05em;
   }
 
-  .stat-value {
-    font-size: 0.8rem;
-    font-weight: 500;
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  .stat-value.status-available {
+  @keyframes bobDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
+  .badge.green {
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
     color: #10b981;
   }
 
-  /* Directory Section */
-  .directory-section {
-    margin-bottom: 1.5rem;
+  .badge.muted {
+    opacity: 0.6;
+  }
+
+  /* Actions */
+  .action-primary,
+  .action-secondary {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid;
+  }
+
+  .action-primary {
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 8%, transparent);
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    font-weight: 600;
+  }
+
+  .action-primary:hover {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    border-color: #10b981;
+    box-shadow: 0 0 15px color-mix(in srgb, #10b981 20%, transparent);
+    color: #10b981;
+  }
+
+  .action-secondary {
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
+  .action-secondary:hover {
+    border-color: color-mix(in srgb, currentColor 40%, transparent);
+    background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  /* Below the fold */
+  .below-fold {
+    padding-top: 1rem;
+    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 2.5rem;
   }
 
   .section-header {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
     opacity: 0.9;
@@ -241,21 +343,108 @@ import StatusLight from "../components/StatusLight.astro";
 
   .section-comment {
     font-size: 0.75rem;
-    opacity: 0.5;
+    opacity: 0.45;
     margin: 0 0 1.25rem 0;
     font-style: italic;
   }
 
-  .directory-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
-  }
-
-  .dir-card {
+  /* Product Grid */
+  .product-grid {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .product-category {
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .cat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 0.6rem 1rem;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cat-icon {
+    font-style: normal;
+  }
+
+  .cat-count {
+    font-size: 0.65rem;
+    opacity: 0.5;
+    margin-left: auto;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+  }
+
+  .product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0;
+  }
+
+  .mcp-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: inherit;
+    border: none;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 6%, transparent);
+    border-right: 1px solid color-mix(in srgb, currentColor 6%, transparent);
+    transition: all 0.15s ease;
+  }
+
+  .product-card:hover {
+    background: color-mix(in srgb, #10b981 6%, transparent);
+  }
+
+  .product-card:hover .product-name {
+    color: #10b981;
+  }
+
+  .product-card.compact {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .product-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+
+  .product-desc {
+    font-size: 0.7rem;
+    opacity: 0.55;
+    margin-top: 0.2rem;
+    line-height: 1.4;
+  }
+
+  /* Nav Grid */
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .nav-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
     background: color-mix(in srgb, currentColor 3%, transparent);
     border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
     border-radius: 4px;
@@ -264,60 +453,26 @@ import StatusLight from "../components/StatusLight.astro";
     transition: all 0.2s ease;
   }
 
-  .dir-card:hover {
-    background: color-mix(in srgb, currentColor 7%, transparent);
+  .nav-card:hover {
     border-color: color-mix(in srgb, currentColor 25%, transparent);
-    transform: translateY(-2px);
+    background: color-mix(in srgb, currentColor 6%, transparent);
+    transform: translateY(-1px);
   }
 
-  .dir-card.highlight {
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
+  .nav-card:hover .nav-name {
+    color: #10b981;
   }
 
-  .dir-card.highlight:hover {
-    border-color: #10b981;
-    box-shadow: 0 0 15px color-mix(in srgb, #10b981 15%, transparent);
-  }
-
-  .dir-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .dir-icon {
-    font-size: 0.65rem;
-    opacity: 0.4;
-  }
-
-  .dir-name {
-    font-size: 0.9rem;
+  .nav-name {
+    font-size: 0.85rem;
     font-weight: 600;
-    color: #10b981;
+    transition: color 0.15s ease;
   }
 
-  .card-status {
-    margin-left: auto;
-  }
-
-  .dir-desc {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    margin: 0 0 0.75rem 0;
-    line-height: 1.5;
-    flex-grow: 1;
-  }
-
-  .dir-link {
+  .nav-desc {
     font-size: 0.7rem;
-    opacity: 0.5;
-    transition: opacity 0.2s ease, color 0.2s ease;
-  }
-
-  .dir-card:hover .dir-link {
-    opacity: 1;
-    color: #10b981;
+    opacity: 0.55;
+    margin-top: 0.2rem;
   }
 
   /* Footer */
@@ -338,22 +493,33 @@ import StatusLight from "../components/StatusLight.astro";
 
   /* Responsive */
   @media (max-width: 640px) {
-    .terminal-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
+    .hero {
+      min-height: calc(100vh - 10rem);
     }
 
-    .stats-row {
+    .hero-name {
+      font-size: 2.2rem;
+    }
+
+    .hero-actions {
       flex-direction: column;
     }
 
-    .directory-grid {
+    .action-primary,
+    .action-secondary {
+      justify-content: center;
+    }
+
+    .product-list {
       grid-template-columns: 1fr;
     }
 
-    .greeting {
-      font-size: 1.25rem;
+    .mcp-list {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .nav-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
