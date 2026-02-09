@@ -224,11 +224,12 @@ import StatusLight from "../components/StatusLight.astro";
 
   .scroll-hint {
     margin-top: auto;
-    padding-top: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    opacity: 0.3;
+    opacity: 0.4;
     animation: fadeSlideIn 0.6s ease 0.8s both;
     transition: opacity 0.3s ease;
   }
@@ -494,7 +495,7 @@ import StatusLight from "../components/StatusLight.astro";
   /* Responsive */
   @media (max-width: 640px) {
     .hero {
-      min-height: calc(100vh - 10rem);
+      min-height: calc(100dvh - 8rem);
     }
 
     .hero-name {
