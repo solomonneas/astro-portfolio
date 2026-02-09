@@ -408,35 +408,50 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
         <hr class="section-rule" />
         <div class="card-grid">
           {category.projects.map((project) => (
-            <div class="project-card">
-              <div class="card-header">
-                <span class={`status-badge small ${project.status}`}>
-                  {project.status === "ongoing" ? (
-                    <><span class="status-dot ongoing"></span> Ongoing</>
-                  ) : (
-                    <><span class="status-check">&#10003;</span> Completed</>
-                  )}
-                </span>
-                <span class="card-date">{project.date}</span>
-              </div>
-              {project.href ? (
-                <a href={project.href} class="card-title-link">
-                  <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
-                </a>
-              ) : (
+            project.href ? (
+              <a href={project.href} class="project-card">
+                <div class="card-header">
+                  <span class={`status-badge small ${project.status}`}>
+                    {project.status === "ongoing" ? (
+                      <><span class="status-dot ongoing"></span> Ongoing</>
+                    ) : (
+                      <><span class="status-check">&#10003;</span> Completed</>
+                    )}
+                  </span>
+                  <span class="card-date">{project.date}</span>
+                </div>
                 <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
-              )}
-              <p class="card-origin">{project.origin}</p>
-              <p class="card-description">{project.description}</p>
-              <div class="tech-pills">
-                {project.techStack.map((tech) => (
-                  <span class="tech-pill">{tech}</span>
-                ))}
+                <p class="card-origin">{project.origin}</p>
+                <p class="card-description">{project.description}</p>
+                <div class="tech-pills">
+                  {project.techStack.map((tech) => (
+                    <span class="tech-pill">{tech}</span>
+                  ))}
+                </div>
+                <span class="card-link">View Case Study &rarr;</span>
+              </a>
+            ) : (
+              <div class="project-card">
+                <div class="card-header">
+                  <span class={`status-badge small ${project.status}`}>
+                    {project.status === "ongoing" ? (
+                      <><span class="status-dot ongoing"></span> Ongoing</>
+                    ) : (
+                      <><span class="status-check">&#10003;</span> Completed</>
+                    )}
+                  </span>
+                  <span class="card-date">{project.date}</span>
+                </div>
+                <h3 class="card-title">{project.identifier.replace(/_/g, " ")}</h3>
+                <p class="card-origin">{project.origin}</p>
+                <p class="card-description">{project.description}</p>
+                <div class="tech-pills">
+                  {project.techStack.map((tech) => (
+                    <span class="tech-pill">{tech}</span>
+                  ))}
+                </div>
               </div>
-              {project.href && (
-                <a href={project.href} class="card-link">View Case Study &rarr;</a>
-              )}
-            </div>
+            )
           ))}
         </div>
       </div>
@@ -687,12 +702,20 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
     border-radius: 10px;
     transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
   }
 
   .project-card:hover {
     background: color-mix(in srgb, currentColor 5%, transparent);
     border-color: color-mix(in srgb, currentColor 15%, transparent);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover .card-title {
+    color: #10b981;
   }
 
   .card-header {
@@ -705,15 +728,6 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
   .card-date {
     font-size: 0.7rem;
     opacity: 0.4;
-  }
-
-  .card-title-link {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .card-title-link:hover .card-title {
-    color: #10b981;
   }
 
   .card-title {
