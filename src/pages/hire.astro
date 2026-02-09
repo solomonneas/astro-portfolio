@@ -17,6 +17,7 @@ import StatusLight from "../components/StatusLight.astro";
       <!-- Intro -->
       <div class="intro-block">
         <p class="intro-text">I build at the intersection of AI, software, and infrastructure. I orchestrate multi-model AI pipelines (Claude, GPT, Gemini) to ship production-quality applications at startup speed, with enterprise rigor. 30+ projects. 9 MCP servers. A full security operations toolkit. If you need someone who can architect it, build it, secure it, and teach others how to do the same, let's talk.</p>
+        <p class="outgrown-text"><span class="prefix">[!]</span> Currently a Laboratory Assistant, but the title stopped fitting a long time ago. I'm building enterprise-grade security platforms, orchestrating AI development pipelines, and shipping more code than most full teams. I'm looking for senior-level roles in network administration, infrastructure engineering, or security operations where my output matches my title.</p>
         <p class="work-auth"><span class="badge"><svg class="flag-icon" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="40" fill="#bf0a30"/><rect y="3" width="60" height="3" fill="#fff"/><rect y="9" width="60" height="3" fill="#fff"/><rect y="15" width="60" height="3" fill="#fff"/><rect y="21" width="60" height="3" fill="#fff"/><rect y="27" width="60" height="3" fill="#fff"/><rect y="33" width="60" height="3" fill="#fff"/><rect width="24" height="21" fill="#002868"/><g fill="#fff"><circle cx="4" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="12" cy="3" r="1.2"/><circle cx="16" cy="3" r="1.2"/><circle cx="20" cy="3" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="10" cy="6" r="1.2"/><circle cx="14" cy="6" r="1.2"/><circle cx="18" cy="6" r="1.2"/><circle cx="4" cy="9" r="1.2"/><circle cx="8" cy="9" r="1.2"/><circle cx="12" cy="9" r="1.2"/><circle cx="16" cy="9" r="1.2"/><circle cx="20" cy="9" r="1.2"/><circle cx="6" cy="12" r="1.2"/><circle cx="10" cy="12" r="1.2"/><circle cx="14" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/><circle cx="4" cy="15" r="1.2"/><circle cx="8" cy="15" r="1.2"/><circle cx="12" cy="15" r="1.2"/><circle cx="16" cy="15" r="1.2"/><circle cx="20" cy="15" r="1.2"/><circle cx="6" cy="18" r="1.2"/><circle cx="10" cy="18" r="1.2"/><circle cx="14" cy="18" r="1.2"/><circle cx="18" cy="18" r="1.2"/></g></svg>[US CITIZEN]</span> No visa sponsorship required. <span class="badge">[FLORIDA]</span></p>
         <div class="resume-action">
           <a
@@ -232,6 +233,22 @@ import StatusLight from "../components/StatusLight.astro";
     opacity: 0.8;
     margin: 0 0 0.75rem 0;
     line-height: 1.6;
+  }
+
+  .outgrown-text {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin: 0.75rem 0;
+    line-height: 1.6;
+    padding: 0.75rem 1rem;
+    border-left: 2px solid #f59e0b;
+    background: color-mix(in srgb, #f59e0b 5%, transparent);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .outgrown-text .prefix {
+    color: #f59e0b;
+    font-weight: 600;
   }
 
   .work-auth {
