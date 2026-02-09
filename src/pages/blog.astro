@@ -1,13 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import StatusLight from "../components/StatusLight.astro";
 
 const allPosts = await getCollection("blog");
-// Sort posts by date, newest first
 allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-// Format date as YYYY.MM.DD
 function formatDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -17,135 +14,135 @@ function formatDate(date: Date) {
 ---
 
 <Layout pageTitle="Blog">
-  <section class="blog-terminal">
-    <header class="terminal-header">
-      <div class="header-left">
-        <StatusLight status="completed" />
-        <span class="status-text">INDEXED</span>
-      </div>
-      <h1>$ ls -la ~/blog/</h1>
+  <section class="blog-page">
+    <header class="page-header">
+      <p class="prompt">$ ls ~/blog</p>
+      <h1>Blog</h1>
+      <p class="subtitle">{allPosts.length} posts on security, infrastructure, and building things</p>
     </header>
 
-    <div class="terminal-body">
-      <p class="log-meta">[+] {allPosts.length} entries found</p>
-
-      <div class="blog-entries">
-        {
-          allPosts.map((post) => (
-            <a href={`/blog/${post.slug}`} class="blog-entry">
-              <span class="entry-date">[{formatDate(post.data.pubDate)}]</span>
+    <div class="blog-entries">
+      {
+        allPosts.map((post) => (
+          <a href={`/blog/${post.slug}`} class="blog-entry">
+            <div class="entry-main">
+              <span class="entry-date">{formatDate(post.data.pubDate)}</span>
               <span class="entry-title">{post.data.title}</span>
-              {post.data.tags && (
-                <span class="entry-tags">
-                  {post.data.tags.map((tag) => (
-                    <span class="tag">[{tag}]</span>
-                  ))}
-                </span>
-              )}
-            </a>
-          ))
-        }
-      </div>
-
-      <!-- Navigation -->
-      <div class="nav-section">
-        <p class="nav-comment">// Continue exploring</p>
-        <div class="nav-links">
-          <a href="/projects" class="nav-link">$ cd /projects</a>
-          <a href="/about" class="nav-link">$ cd /about</a>
-          <a href="/contact" class="nav-link">$ cd /contact</a>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="terminal-footer">
-        <span class="cursor-blink">█</span> EOF
-      </div>
+            </div>
+            {post.data.tags && (
+              <div class="entry-tags">
+                {post.data.tags.map((tag: string) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        ))
+      }
     </div>
+
+    {allPosts.length === 0 && (
+      <div class="empty-state">
+        <p class="empty-prompt">$ cat /dev/null</p>
+        <p class="empty-text">No posts yet. Check back soon.</p>
+      </div>
+    )}
+
+    <nav class="page-nav">
+      <a href="/projects" class="page-nav-link">Projects</a>
+      <a href="/experience" class="page-nav-link">Experience</a>
+      <a href="/hire" class="page-nav-link">Hire Me</a>
+    </nav>
   </section>
 </Layout>
 
 <style>
-  /* Terminal Wrapper */
-  .blog-terminal {
-    font-family: "IBM Plex Mono", monospace;
+  .blog-page {
     max-width: 52rem;
     margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  .terminal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  /* Reset globals */
+  .blog-page a,
+  .blog-page a:visited {
+    font-size: inherit;
     border-bottom: none;
-    border-radius: 6px 6px 0 0;
+    color: inherit;
+  }
+  .blog-page a:hover {
+    border-bottom: none;
+  }
+  .blog-page p {
+    text-align: left;
+  }
+  .blog-page h1 {
+    font-family: "IBM Plex Mono", monospace;
   }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  /* Page Header */
+  .page-header {
+    margin-bottom: 3rem;
   }
 
-  .status-text {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+  .prompt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    opacity: 0.4;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .page-header h1 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
     color: #10b981;
+    line-height: 1.1;
   }
 
-  .terminal-header h1 {
-    font-size: 1rem;
-    font-weight: 500;
+  .subtitle {
+    font-size: 0.9rem;
+    opacity: 0.6;
     margin: 0;
-    opacity: 0.8;
-  }
-
-  .terminal-body {
-    padding: 1.5rem 1.25rem 1.25rem;
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-    background: color-mix(in srgb, currentColor 2%, transparent);
-  }
-
-  .log-meta {
-    font-size: 0.75rem;
-    opacity: 0.5;
-    margin: 0 0 1.5rem 0;
   }
 
   /* Blog Entries */
   .blog-entries {
     display: flex;
     flex-direction: column;
-    gap: 0;
   }
 
   .blog-entry {
     display: flex;
-    flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-bottom: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
     text-decoration: none;
     color: currentColor;
     transition: background 0.2s ease;
   }
 
   .blog-entry:first-child {
-    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
   }
 
   .blog-entry:hover {
-    background: color-mix(in srgb, currentColor 5%, transparent);
+    background: color-mix(in srgb, currentColor 4%, transparent);
+  }
+
+  .entry-main {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    min-width: 0;
   }
 
   .entry-date {
+    font-family: "IBM Plex Mono", monospace;
     font-size: 0.8rem;
     color: #10b981;
     font-weight: 500;
@@ -154,100 +151,86 @@ function formatDate(date: Date) {
 
   .entry-title {
     font-size: 0.95rem;
-    font-weight: 400;
-    flex-grow: 1;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .entry-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-left: auto;
+    gap: 0.35rem;
+    flex-shrink: 0;
   }
 
   .tag {
-    font-size: 0.7rem;
-    opacity: 0.6;
-    padding: 0.1rem 0.3rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border-radius: 2px;
-  }
-
-  /* Navigation */
-  .nav-section {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
-  }
-
-  .nav-comment {
-    font-size: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
     opacity: 0.5;
-    margin: 0 0 0.75rem 0;
-    font-style: italic;
-  }
-
-  .nav-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .nav-link {
-    font-size: 0.8rem;
-    color: inherit;
-    text-decoration: none;
-    opacity: 0.6;
-    transition: all 0.2s ease;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid transparent;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
     border-radius: 3px;
   }
 
-  .nav-link:hover {
-    opacity: 1;
-    color: #10b981;
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
-    background: color-mix(in srgb, #10b981 5%, transparent);
-  }
-
-  /* Footer */
-  .terminal-footer {
-    margin-top: 1.5rem;
-    font-size: 0.8rem;
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
     opacity: 0.5;
   }
 
-  .cursor-blink {
-    animation: blink 1s step-end infinite;
+  .empty-prompt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    margin: 0 0 0.5rem 0;
   }
 
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
+  .empty-text {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* Navigation */
+  .page-nav {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .page-nav-link {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent) !important;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .page-nav-link:hover {
+    opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent) !important;
+    background: color-mix(in srgb, #10b981 5%, transparent);
   }
 
   /* Responsive */
   @media (max-width: 640px) {
-    .terminal-header {
+    .blog-entry {
       flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
-    .blog-entry {
+    .entry-main {
       flex-direction: column;
       gap: 0.25rem;
     }
 
-    .entry-tags {
-      margin-top: 0.25rem;
-      margin-left: 0;
-    }
-
-    .nav-links {
-      flex-direction: column;
-      gap: 0.5rem;
+    .entry-title {
+      white-space: normal;
     }
   }
 </style>

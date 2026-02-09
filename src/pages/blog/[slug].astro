@@ -2,7 +2,6 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
-// This function is required for Astro to know which pages to generate
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog");
   return blogEntries.map((entry) => ({
@@ -14,7 +13,6 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 
-// Format date
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -27,16 +25,14 @@ function formatDate(date: Date) {
 <Layout pageTitle={entry.data.title}>
   <article class="blog-post">
     <header class="post-header">
+      <a href="/blog" class="back-link"><span class="prompt">$</span> cd ~/blog</a>
       <h1 class="post-title">{entry.data.title}</h1>
-      <p class="post-meta">
-        <span class="meta-label">[+] Published:</span>
-        <span class="meta-value">{formatDate(entry.data.pubDate)}</span>
-      </p>
+      <p class="post-meta">{formatDate(entry.data.pubDate)}</p>
       {
         entry.data.tags && (
           <div class="post-tags">
-            {entry.data.tags.map((tag) => (
-              <span class="tag">[{tag}]</span>
+            {entry.data.tags.map((tag: string) => (
+              <span class="tag">{tag}</span>
             ))}
           </div>
         )
@@ -48,33 +44,42 @@ function formatDate(date: Date) {
     </div>
 
     <footer class="post-footer">
-      <a href="/blog" class="back-link"><span class="prompt">$</span> cd ~/blog/</a>
+      <a href="/blog" class="back-link"><span class="prompt">$</span> cd ~/blog</a>
     </footer>
   </article>
 </Layout>
 
 <style>
   .blog-post {
-    padding: 2rem 0;
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   .post-header {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
   }
 
   .back-link {
     display: inline-block;
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: currentColor;
     text-decoration: none;
-    opacity: 0.7;
-    margin-bottom: 1rem;
-    transition: opacity 0.2s ease;
+    opacity: 0.5;
+    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 4px;
+    transition: all 0.2s ease;
   }
 
   .back-link:hover {
     opacity: 1;
+    color: #10b981;
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    background: color-mix(in srgb, #10b981 5%, transparent);
   }
 
   .prompt {
@@ -83,55 +88,52 @@ function formatDate(date: Date) {
   }
 
   .post-title {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin: 0.5rem 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
     line-height: 1.3;
+    color: #10b981;
   }
 
   .post-meta {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.8rem;
-    opacity: 0.7;
-    margin: 0.5rem 0;
-  }
-
-  .meta-label {
-    color: #10b981;
-    font-weight: 500;
+    opacity: 0.5;
+    margin: 0 0 0.75rem 0;
   }
 
   .post-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.75rem;
+    gap: 0.35rem;
   }
 
   .tag {
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.7rem;
-    opacity: 0.6;
-    padding: 0.1rem 0.3rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border-radius: 2px;
+    font-size: 0.65rem;
+    opacity: 0.5;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 3px;
   }
 
   .post-content {
-    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
     padding-top: 2rem;
   }
 
   .post-content :global(h2),
   .post-content :global(h3),
   .post-content :global(h4) {
+    font-family: "IBM Plex Mono", monospace;
     margin-top: 2rem;
     margin-bottom: 0.75rem;
   }
 
   .post-content :global(p) {
     margin-bottom: 1rem;
-    line-height: 1.7;
+    line-height: 1.75;
   }
 
   .post-content :global(pre) {
@@ -140,7 +142,8 @@ function formatDate(date: Date) {
     padding: 1rem;
     border-radius: 4px;
     overflow-x: auto;
-    margin: 1rem 0;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
   }
 
   .post-content :global(code) {
@@ -148,9 +151,33 @@ function formatDate(date: Date) {
     font-size: 0.9em;
   }
 
+  .post-content :global(a) {
+    color: #10b981;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .post-content :global(a:hover) {
+    opacity: 0.8;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 3px solid #10b981;
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+    opacity: 0.8;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
   .post-footer {
     margin-top: 3rem;
-    padding-top: 1rem;
-    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  @media (max-width: 640px) {
+    .blog-post {
+      padding: 1.5rem 1rem;
+    }
   }
 </style>
