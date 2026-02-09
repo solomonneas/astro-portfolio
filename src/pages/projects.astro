@@ -445,16 +445,40 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     <!-- Navigation -->
     <nav class="nav-section">
       <p class="nav-label">Continue exploring</p>
-      <div class="nav-links">
-        <a href="/experience" class="nav-link">Experience</a>
-        <a href="/hire" class="nav-link">Hire Me</a>
-        <a href="/blog" class="nav-link">Blog</a>
+      <div class="page-nav-links">
+        <a href="/experience" class="page-nav-link">Experience</a>
+        <a href="/hire" class="page-nav-link">Hire Me</a>
+        <a href="/blog" class="page-nav-link">Blog</a>
       </div>
     </nav>
   </section>
 </Layout>
 
 <style>
+  /* Reset global styles that leak into card layout */
+  .cards-page a,
+  .cards-page a:visited {
+    font-size: inherit;
+    border-bottom: none;
+    background: transparent;
+  }
+
+  .cards-page a:hover {
+    background: transparent;
+    color: inherit;
+  }
+
+  .cards-page p {
+    text-align: left;
+    margin-bottom: 0;
+  }
+
+  .cards-page h1,
+  .cards-page h2,
+  .cards-page h3 {
+    font-family: inherit;
+  }
+
   .cards-page {
     max-width: 64rem;
     margin: 0 auto;
@@ -742,14 +766,14 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     margin: 0 0 1rem 0;
   }
 
-  .nav-links {
+  .page-nav-links {
     display: flex;
     justify-content: center;
     gap: 1rem;
     flex-wrap: wrap;
   }
 
-  .nav-link {
+  .page-nav-link {
     font-size: 0.85rem;
     font-weight: 500;
     color: inherit;
@@ -761,7 +785,7 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     opacity: 0.7;
   }
 
-  .nav-link:hover {
+  .page-nav-link:hover {
     opacity: 1;
     border-color: #10b981;
     color: #10b981;
