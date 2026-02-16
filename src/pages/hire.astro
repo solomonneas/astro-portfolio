@@ -40,7 +40,32 @@ import StatusLight from "../components/StatusLight.astro";
           <span class="badge">📍 Florida</span>
           <span class="badge">🎓 M.S. Cybersecurity @ USF</span>
         </div>
-        <a href="/solomon_neas_resume.pdf" target="_blank" class="resume-btn">↓ Download Resume</a>
+        <div class="resume-selector">
+          <button class="resume-toggle" id="resumeToggle">↓ Download Resume</button>
+          <div class="resume-dropdown" id="resumeDropdown">
+            <a href="/Solomon_Neas_Resume_Infrastructure_Security.pdf" target="_blank" class="resume-option">
+              <span class="option-icon">🛡</span>
+              <div class="option-text">
+                <span class="option-label">Infrastructure & Security</span>
+                <span class="option-desc">Network admin, SOC, infra engineering</span>
+              </div>
+            </a>
+            <a href="/Solomon_Neas_Resume_Adjunct_Teaching.pdf" target="_blank" class="resume-option">
+              <span class="option-icon">📚</span>
+              <div class="option-text">
+                <span class="option-label">Adjunct & Teaching</span>
+                <span class="option-desc">Faculty, curriculum, lab design</span>
+              </div>
+            </a>
+            <a href="/Solomon_Neas_Resume_Software_AI.pdf" target="_blank" class="resume-option">
+              <span class="option-icon">⚡</span>
+              <div class="option-text">
+                <span class="option-label">Software & AI Engineering</span>
+                <span class="option-desc">Full-stack, AI pipelines, MCP servers</span>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -158,6 +183,27 @@ import StatusLight from "../components/StatusLight.astro";
     </div>
   </section>
 </Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('resumeToggle');
+    const dropdown = document.getElementById('resumeDropdown');
+    if (!toggle || !dropdown) return;
+
+    toggle.addEventListener('click', () => {
+      const open = dropdown.classList.toggle('open');
+      toggle.classList.toggle('active', open);
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!toggle.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
+        dropdown.classList.remove('open');
+        toggle.classList.remove('active');
+      }
+    });
+  });
+</script>
 
 <style>
   .hire {
@@ -295,7 +341,12 @@ import StatusLight from "../components/StatusLight.astro";
     border: none;
   }
 
-  .resume-btn {
+  /* Resume Selector */
+  .resume-selector {
+    position: relative;
+  }
+
+  .resume-toggle {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.8rem;
     color: #10b981;
@@ -303,16 +354,81 @@ import StatusLight from "../components/StatusLight.astro";
     border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
     padding: 0.6rem 1.25rem;
     border-radius: 3px;
-    text-decoration: none;
+    cursor: pointer;
     transition: all 0.2s ease;
     display: inline-block;
   }
 
-  .resume-btn:hover {
+  .resume-toggle:hover,
+  .resume-toggle.active {
     background: color-mix(in srgb, #10b981 15%, transparent);
     border-color: #10b981;
     box-shadow: 0 0 12px color-mix(in srgb, #10b981 20%, transparent);
     color: #10b981;
+  }
+
+  .resume-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    min-width: 280px;
+    background: #0d1117;
+    border: 1px solid color-mix(in srgb, #10b981 25%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .resume-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .resume-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .resume-option:last-child {
+    border-bottom: none;
+  }
+
+  .resume-option:hover {
+    background: color-mix(in srgb, #10b981 10%, transparent);
+  }
+
+  .option-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .option-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+
+  .option-desc {
+    font-size: 0.65rem;
+    opacity: 0.5;
   }
 
   /* Services Grid */
@@ -497,6 +613,12 @@ import StatusLight from "../components/StatusLight.astro";
 
     .services-grid {
       grid-template-columns: 1fr;
+    }
+
+    .resume-dropdown {
+      right: auto;
+      left: 0;
+      min-width: 260px;
     }
 
     .nav-links {
