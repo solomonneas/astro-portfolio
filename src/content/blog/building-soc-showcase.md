@@ -1,81 +1,84 @@
 ---
-title: "Building SOC Showcase: Designing a Security Operations Center Dashboard Demo"
+title: "SOC Showcase: What a Security Operations Center Actually Looks Like"
 pubDate: 2025-01-29
+updatedDate: 2026-02-16
 tags: ["soc", "cybersecurity", "react", "tailwind", "dashboard", "framer-motion"]
 ---
 
-Security Operations Centers are the nerve center of any serious cybersecurity program. They are where alerts flow in, analysts triage threats, incidents get escalated, and the overall security posture of an organization gets monitored in real time. But if you have never worked in a SOC, it can be hard to understand what actually happens inside one. SOC Showcase is my attempt to change that: a frontend dashboard demo that visualizes the tools, architecture, workflows, and case timelines of a modern SOC.
 
-## What Makes a Good SOC Dashboard
 
-Before writing any code, I spent time thinking about what a SOC dashboard actually needs to communicate. The answer broke down into five categories.
+If you've never been inside a Security Operations Center, you probably imagine a dark room with giant screens and people typing really fast. That's... not wrong, actually. But there's a lot more going on.
 
-First, tooling. A SOC runs on tools: SIEM platforms, EDR agents, threat intelligence feeds, ticketing systems, forensic utilities. A dashboard needs to show what tools are in the stack and how they relate to each other.
+I deployed a full SOC stack in my college lab. 30+ open-source tools, real traffic, real alerts. SOC Showcase is a frontend dashboard demo that visualizes the tools, architecture, workflows, and case timelines of that setup. It's the "here's what this actually looks like" project.
 
-Second, architecture. How do those tools connect? Where does data flow from endpoints to the SIEM? How do alerts get routed to analysts? Architecture visualization gives context that a list of tool names cannot provide.
+## Five Things a SOC Dashboard Needs to Show
 
-Third, metrics. Mean time to detect, mean time to respond, alert volumes, false positive rates, case closure rates. Numbers tell the story of whether the SOC is working.
+Before I wrote any code, I had to figure out what the dashboard actually needed to communicate. It came down to five things.
 
-Fourth, case timelines. Individual incidents have lifecycles. A phishing email arrives, gets flagged, gets investigated, leads to credential reset, ends in a post-incident report. Showing this timeline gives a concrete sense of what SOC work looks like day to day.
+**Tooling.** A SOC runs on tools: SIEM, EDR, threat intel feeds, ticketing systems, forensic utilities. The dashboard needs to show what's in the stack and how the pieces relate.
 
-Fifth, pipeline. The incident response pipeline itself: how alerts move from detection through triage, investigation, response, and closure. This is the operational backbone of the SOC.
+**Architecture.** How do those tools connect? Where does data flow from endpoints to the SIEM? How do alerts get routed? A list of tool names doesn't capture this.
 
-SOC Showcase addresses all five.
+**Metrics.** Mean time to detect, mean time to respond, alert volumes, false positive rates. Numbers tell you whether the SOC is working.
 
-## The Tech Stack
+**Case timelines.** A phishing email arrives, gets flagged, gets investigated, leads to a credential reset, ends in a post-incident report. Showing that lifecycle gives a concrete sense of SOC work.
 
-This is a frontend-only project. No backend, no API, no database. Everything is rendered client-side with static data. The goal was not to build a real SOC tool (that would require actual data sources and integrations) but to build a compelling visualization of what a SOC looks like.
+**Pipeline.** How alerts move from detection through triage, investigation, response, and closure. The operational backbone.
 
-The stack is React with TypeScript, styled with Tailwind CSS. Animations use Framer Motion. Icons come from Lucide. It is a straightforward modern frontend stack, chosen for speed of development and visual polish.
+## Frontend Only, On Purpose
 
-I went with Tailwind because SOC dashboards are visually dense. There are lots of cards, grids, status indicators, and data-heavy layouts. Tailwind's utility classes let me iterate on layout and spacing quickly without context-switching to separate CSS files. For a project where I was constantly tweaking visual density and alignment, that speed mattered.
+No backend, no API, no database. Everything renders client-side with static data. The goal was never to build a real SOC tool (that would need actual data sources). The goal was a compelling visualization of what a SOC looks like.
 
-Framer Motion handles the animations: data flow visualizations, metric counter transitions, timeline reveals, and section entry animations. Animations in a dashboard context serve a functional purpose beyond aesthetics. They guide the eye, indicate data freshness, and create a sense of activity that makes static data feel alive.
+React with TypeScript, Tailwind CSS, Framer Motion for animations, Lucide for icons.
 
-## Shared Component Library
+Tailwind was the right call here. SOC dashboards are visually dense. Lots of cards, grids, status indicators, data-heavy layouts. Utility classes let me iterate on spacing and density fast without jumping to separate CSS files. For a project where I'm constantly tweaking visual alignment, that speed mattered.
 
-The real engineering work in SOC Showcase is in the shared component library. I built six core components that all five variants use.
+## The Component Library That Did the Heavy Lifting
 
-**AnimatedDataFlow** is the most visually striking. It renders animated particles moving along paths between SOC components, representing data flowing from endpoints to collectors to the SIEM to analyst workstations. The particles follow SVG paths with configurable speed, color, and density. This single component does more to communicate "this is a living system" than any amount of static text could.
+Six shared components power all five variants.
 
-**ArchitectureGraph** renders the SOC's technical architecture as an interactive node graph. Tools and systems are nodes. Data flows and integrations are edges. Users can see how the SIEM connects to log sources, how the EDR feeds into the alert queue, and where threat intelligence gets consumed. It is not a full network diagram tool, but it communicates the architecture clearly.
+**AnimatedDataFlow** is the showstopper. Animated particles move along SVG paths between SOC components, representing data flowing from endpoints to collectors to the SIEM to analyst workstations. This single component communicates "living system" better than any paragraph of text.
 
-**CaseTimeline** displays individual security incidents as vertical timelines with timestamped events. Each event has a type (alert, triage, investigation, action, resolution), an icon, and a description. Scrolling through a case timeline gives you the narrative of an incident from detection to closure. I included realistic sample cases: a phishing campaign, a suspicious login from an unexpected geography, and a malware detection on a developer workstation.
+**ArchitectureGraph** renders the technical architecture as an interactive node graph. Tools are nodes, data flows are edges. You can see how the SIEM connects to log sources, how EDR feeds into the alert queue, where threat intel gets consumed.
 
-**MetricCard** is the simplest component but one of the most important. It displays a single metric with a label, value, trend indicator, and optional sparkline. SOC dashboards live and die by their metrics. Mean time to detect dropping from 45 minutes to 12 minutes tells a story. A metric card makes that story visible at a glance.
+**CaseTimeline** displays incidents as vertical timelines with timestamped events. Each event has a type (alert, triage, investigation, action, resolution). I included realistic sample cases: a phishing campaign, a suspicious login from unexpected geography, malware on a developer workstation.
 
-**PipelineStage** visualizes the incident response pipeline as a horizontal flow of stages. Each stage shows its name, a count of items currently in that stage, and a status indicator. The pipeline view answers the question "where is our work right now?" that every SOC manager asks multiple times per shift.
+**MetricCard** is the simplest but one of the most important. One metric, one label, a trend indicator, optional sparkline. Mean time to detect dropping from 45 minutes to 12 minutes tells a story. The card makes it visible at a glance.
 
-**ToolCard** represents a single tool in the SOC stack with its name, category, status, and a brief description of its role. Tool cards are arranged in grids, grouped by function: detection, analysis, response, and reporting.
+**PipelineStage** shows the IR pipeline as a horizontal flow. Each stage shows its name, item count, and status. It answers the question every SOC manager asks multiple times per shift: "Where is our work right now?"
 
-## Five Variants, One Layout Flow
+**ToolCard** represents a single tool with its name, category, status, and role. Cards are grouped by function: detection, analysis, response, reporting.
 
-All five variants follow the same single-page scrolling layout: Hero, Tools, Architecture, Cases, Pipeline, About. The sections scroll vertically with each section taking up at least a full viewport height. This was a deliberate design choice. SOC dashboards in the real world are typically single-screen displays. A scrolling layout mimics that "war room monitor" feel while allowing more depth than a single static screen.
+## Five Variants, Same Bones
 
-The variants differ in color palette, typography, animation intensity, card styling, and section transitions. Some are dark-themed with neon accent colors, mimicking the stereotypical SOC aesthetic. Others use cleaner, lighter designs that feel more like modern SaaS dashboards. The variety demonstrates that SOC tools do not have to look like they were designed in 2005.
+All five variants follow one layout: Hero, Tools, Architecture, Cases, Pipeline, About. Single-page vertical scroll, each section at least a full viewport height. This mimics the "war room monitor" feel of real SOC dashboards while allowing more depth.
 
-Each variant shares the same component library, which means changes to the core components propagate to all variants. This architecture kept the codebase manageable. Instead of five separate dashboards, I have one component library and five thin styling layers on top.
+The variants differ in color palette, typography, animation intensity, and card styling. Some are dark with neon accents (the stereotypical SOC look). Others use cleaner, lighter designs. The point: SOC tools don't have to look like they were designed in 2005.
 
-## Reduced-Motion Accessibility
+One component library, five thin styling layers. Changes to core components propagate everywhere.
 
-One thing I was deliberate about was reduced-motion support. SOC Showcase has a lot of animation: flowing particles, counter transitions, scroll-triggered reveals, pulsing status indicators. For users with vestibular disorders or motion sensitivity, all of that movement can cause discomfort or nausea.
+## Reduced Motion Support
 
-Every animated component in SOC Showcase respects the `prefers-reduced-motion` media query. When reduced motion is enabled, particles stop flowing, counters display their final values immediately, and section transitions switch from animated reveals to simple fades or instant appearance. The dashboard remains fully functional and informative. It just removes the motion.
+SOC Showcase has a lot of animation. Flowing particles, counter transitions, scroll-triggered reveals, pulsing indicators. For anyone with vestibular disorders or motion sensitivity, that's a problem.
 
-This was not difficult to implement, but it required thinking about it from the start. Framer Motion makes it relatively easy by supporting reduced-motion detection at the component level. The key was making sure every animation had a reduced-motion fallback, not just the obvious ones.
+Every animated component respects `prefers-reduced-motion`. Particles stop, counters show final values immediately, transitions switch to simple fades. The dashboard stays fully functional. It just stops moving.
 
-## Tool Integration Visualization
+Not hard to implement, but it required thinking about it from the start. Framer Motion supports reduced-motion detection at the component level. The key was making sure every animation had a fallback, not just the obvious ones.
 
-The ArchitectureGraph and AnimatedDataFlow components work together to answer a question that comes up in every SOC maturity assessment: "How do your tools integrate?" It is one thing to say "we use Splunk and CrowdStrike." It is another to show the data flow from CrowdStrike agents on endpoints, through a log collector, into Splunk, where correlation rules generate alerts that feed into the analyst queue.
+## The Feature That Got the Strongest Reaction
 
-SOC Showcase's architecture view makes these integrations visible. Even with sample data, it communicates the concept of a connected security stack versus a collection of disconnected tools. During conversations with security professionals about the project, this visualization consistently got the strongest reaction. People who build and manage SOCs immediately recognized the value of being able to show integration flows visually.
+The ArchitectureGraph and AnimatedDataFlow work together to answer a question that comes up in every SOC maturity assessment: "How do your tools integrate?"
 
-## What I Learned
+Saying "I use Wazuh and TheHive" is one thing. Showing the data flow from agents on endpoints, through a log collector, into the SIEM, where correlation rules generate alerts that feed into the analyst queue... that's different.
 
-SOC Showcase taught me that dashboards are harder than they look. The technical implementation is straightforward. React components, CSS grid, some animations. The hard part is information design: deciding what to show, how much to show, and how to organize it so that someone glancing at the screen gets the right information in the right order.
+When I showed this to security professionals, the architecture visualization consistently got the strongest reaction. People who build SOCs immediately got it.
 
-I also learned that animation in data-heavy interfaces walks a fine line. Too little, and the dashboard feels static and lifeless. Too much, and it becomes distracting. The right amount of animation communicates activity and draws attention to important changes without overwhelming the viewer.
+## What I Took Away
 
-Building five variants of the same dashboard was a useful exercise in component architecture. It forced me to think about what was truly shared versus what was variant-specific. The result is a clean separation between data, logic, and presentation that makes the codebase easy to extend.
+Dashboards are harder than they look. The React components and CSS grid are the easy part. The hard part is information design: what to show, how much, and how to organize it so a glance gives you the right information in the right order.
 
-SOC Showcase is on my GitHub. Whether you are studying for a security role, presenting SOC concepts to stakeholders, or just curious what a Security Operations Center looks like from the inside, check it out.
+Animation in data-heavy interfaces walks a fine line. Too little feels dead. Too much is distracting. The right amount communicates activity and draws attention to changes without overwhelming anyone.
+
+Building five variants of the same dashboard forced me into clean component architecture. It made me separate what was truly shared from what was variant-specific. That discipline is worth more than the dashboard itself.
+
+The whole project is on my GitHub.

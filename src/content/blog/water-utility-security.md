@@ -1,70 +1,65 @@
 ---
-title: "America's Water Systems Are Dangerously Vulnerable"
+title: "America's Water Infrastructure Is Held Together by Default Passwords"
 pubDate: 2025-10-20
+updatedDate: 2026-02-16
 tags: ["critical-infrastructure", "ics", "scada", "water-security", "ot-security", "research"]
 ---
 
-In February 2021, someone accessed the water treatment plant in Oldsmar, Florida via TeamViewer and tried to increase sodium hydroxide levels to 11,100 ppm-111 times the normal concentration. Lye at those levels would cause severe chemical burns to anyone who drank the water.
 
-An operator noticed the mouse moving on its own and stopped the attack in real-time.
 
-In November 2023, Iranian-linked hackers (CyberAv3ngers) compromised a Unitronics PLC at a Pennsylvania water authority using default credentials. In January 2024, Russian-linked actors caused a water tank overflow in Muleshoe, Texas by manipulating SCADA systems.
+Someone accessed the Oldsmar, Florida water treatment plant via TeamViewer and cranked sodium hydroxide to 11,100 ppm. That's 111x normal levels. Lye at that concentration causes severe chemical burns.
 
-These weren't sophisticated attacks. They exploited the most basic failures: default passwords, internet-exposed control systems, and no network segmentation.
+An operator noticed the mouse moving on its own and stopped it.
 
-## The Scale of the Problem
+That's the security model for critical infrastructure: hope someone's watching.
 
-The United States has over 50,000 community water and wastewater systems serving 324 million people-97% of the population. The daily economic impact of nationwide water disruption would exceed $43.5 billion.
+## It Keeps Happening
 
-And here's the terrifying part: **70% of these systems don't meet basic cybersecurity requirements.**
+November 2023: Iranian-linked hackers (CyberAv3ngers) compromised a Unitronics PLC at a Pennsylvania water authority. The attack vector? Default credentials. Out of the box, unchanged, sitting on the internet.
 
-90% of water systems serve fewer than 10,000 people. These small utilities often have zero dedicated IT staff, let alone security professionals. The operator who runs the pumps is usually the same person managing the network.
+January 2024: Russian-linked actors caused a water tank overflow in Muleshoe, Texas by manipulating SCADA systems.
 
-## Who's Targeting Water Systems?
+None of these were sophisticated. Default passwords, internet-exposed control systems, zero segmentation. Script-kiddie level access to systems that control what comes out of your tap.
 
-Three major threat actors have demonstrated capability and intent:
+## The Numbers Are Terrifying
 
-**Volt Typhoon (China)** - State-sponsored APT focused on pre-positioning for wartime disruption. They're not attacking now; they're establishing persistent access for potential future conflict over Taiwan.
+The US has over 50,000 community water systems serving 324 million people. Daily economic impact of nationwide water disruption: $43.5 billion.
 
-**APT44/Sandworm (Russia)** - GRU unit with a proven track record of attacking critical infrastructure. Responsible for Ukraine power grid attacks and NotPetya.
+70% of these systems don't meet basic cybersecurity requirements.
 
-**CyberAv3ngers (Iran)** - IRGC-affiliated group conducting opportunistic attacks against Israeli-made PLCs. The Pennsylvania attack specifically targeted Unitronics devices because of their Israeli origin.
+90% serve fewer than 10,000 people. These small utilities have zero dedicated IT staff, let alone security professionals. The person running the pumps is usually the same person "managing" the network. I put that in quotes because managing often means "it's plugged in and working."
 
-## The Vulnerability Landscape
+## Who's Doing This
 
-The same issues appear repeatedly:
+Three threat actors with demonstrated capability:
 
-**Authentication Failures**
-- Default credentials on PLCs and HMIs (the Pennsylvania attack)
-- Shared passwords among operators
-- No MFA on remote access (the Oldsmar attack used TeamViewer with weak authentication)
+**Volt Typhoon (China)** is pre-positioning for wartime disruption. They're not attacking now. They're establishing persistent access for a potential future conflict over Taiwan. Think of it as planting explosives you don't detonate yet.
 
-**Network Architecture Problems**
-- Flat networks with no IT/OT segmentation
-- SCADA systems directly connected to the internet
-- No firewalls between business networks and control systems
+**APT44/Sandworm (Russia)** has a proven track record of hitting critical infrastructure. Ukraine power grid. NotPetya. They know how to break things that matter.
 
-**Maintenance Gaps**
-- Unpatched PLCs running firmware from 2015
-- Windows XP still controlling pumps
-- Legacy protocols (Modbus, DNP3) with no authentication mechanisms
+**CyberAv3ngers (Iran)** is IRGC-affiliated, conducting opportunistic attacks against Israeli-made PLCs. The Pennsylvania attack specifically targeted Unitronics devices because of their Israeli origin. Geopolitics in your water system.
 
-**Monitoring Blind Spots**
-- No logging on OT networks
-- No intrusion detection
-- Operators wouldn't know they're compromised until something physically breaks
+## The Same Problems Everywhere
 
-## What Needs to Happen
+Every assessment finds the same issues:
 
-The mitigations aren't complicated. They're just not implemented:
+**Authentication**: Default creds on PLCs and HMIs. Shared passwords among operators. No MFA on remote access. The Oldsmar attacker used TeamViewer with weak authentication. That's it.
 
-1. **Change default credentials immediately** - Every PLC, HMI, router, and switch
-2. **Implement MFA on all remote access** - TeamViewer, VPN, anything externally accessible
-3. **Segment OT from IT networks** - Control systems should not be one hop from email servers
-4. **Disable unnecessary remote access** - If you don't need TeamViewer, uninstall it
-5. **Enable logging and monitoring** - You can't detect attacks you're not watching for
+**Network architecture**: Flat networks. SCADA systems on the internet. No firewalls between business and control systems.
 
-CISA offers free assessments for critical infrastructure. EPA is the designated Sector Risk Management Agency under NSM-22. The resources exist-the challenge is getting small utilities to use them.
+**Maintenance**: Unpatched PLCs running 2015 firmware. Windows XP still controlling pumps. Legacy protocols (Modbus, DNP3) with zero authentication.
+
+**Monitoring**: No logging on OT networks. No intrusion detection. Operators wouldn't know they're compromised until something physically breaks or overflows.
+
+## The Fixes Aren't Hard. They're Just Not Done.
+
+1. **Change default credentials.** Every PLC, HMI, router, switch. Today.
+2. **MFA on all remote access.** TeamViewer, VPN, anything externally reachable.
+3. **Segment OT from IT.** Control systems should not be one hop from email servers.
+4. **Kill unnecessary remote access.** If you don't need TeamViewer, uninstall it.
+5. **Turn on logging.** You can't detect what you're not watching for.
+
+CISA offers free assessments. EPA is the designated Sector Risk Management Agency under NSM-22. The resources exist. The challenge is getting small utilities with no budget and no staff to actually use them.
 
 The next Oldsmar might not have an alert operator watching the screen.
 

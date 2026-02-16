@@ -1,50 +1,53 @@
 ---
-title: "Building a Full-Stack SOC with Open Source Tools"
+title: "I'm a Lab Assistant. So I Built My Own SOC."
 pubDate: 2025-12-01
+updatedDate: 2026-02-16
 tags: ["security", "soc", "wazuh", "thehive", "cortex", "siem", "open-source"]
 ---
 
-Commercial SIEM solutions cost hundreds of thousands of dollars. Splunk, Microsoft Sentinel, IBM QRadar-they're powerful, but their licensing models assume enterprise budgets. What if you need the same capabilities for education, research, or a smaller organization?
 
-You build it yourself.
 
-## The Architecture
+Commercial SIEM solutions cost hundreds of thousands of dollars. Splunk, Microsoft Sentinel, IBM QRadar. They're powerful, but their licensing models assume you have an enterprise budget.
 
-This isn't a toy deployment. It's a production-grade Security Operations Center built entirely on open-source components:
+I'm a lab assistant at a community college. I don't have an enterprise budget. So I built the whole thing myself with open-source tools.
 
-**Wazuh** (SIEM/XDR) - The core detection engine. Host-based intrusion detection, log aggregation, file integrity monitoring, vulnerability assessment. Running on Ubuntu 24.04 with dedicated indexer, server, and dashboard components.
+## What's In the Stack
 
-**TheHive** (Incident Response) - Case management platform. When Wazuh triggers an alert, TheHive tracks the investigation through resolution. Observable extraction, playbook execution, team collaboration.
+This isn't a toy demo. It's a production-grade Security Operations Center running in a college lab environment:
 
-**Cortex** (Observable Analysis) - The automation layer. Feed an IP, hash, or domain to Cortex and it queries VirusTotal, AbuseIPDB, MISP, and dozens of other analyzers automatically. Turns 30 minutes of manual OSINT into 30 seconds.
+**Wazuh** (SIEM/XDR): The detection engine. Host-based intrusion detection, log aggregation, file integrity monitoring, vulnerability assessment. Running on Ubuntu 24.04 with dedicated indexer, server, and dashboard components.
 
-**MISP** (Threat Intelligence) - Threat intelligence platform. Ingests feeds, shares IOCs between organizations, provides context for everything Wazuh detects.
+**TheHive** (Incident Response): Case management. Wazuh triggers an alert, TheHive tracks the investigation through resolution. Observable extraction, playbook execution, the whole workflow.
 
-**Zeek + Suricata** (Network Security Monitoring) - Zeek for network metadata and protocol analysis, Suricata for signature-based IDS. Different approaches, complementary coverage.
+**Cortex** (Observable Analysis): The automation layer. Feed it an IP, hash, or domain and it queries VirusTotal, AbuseIPDB, MISP, and dozens of other analyzers automatically. Turns 30 minutes of manual OSINT into 30 seconds.
 
-## Why Ubuntu 22.04 for TheHive and Cortex?
+**MISP** (Threat Intelligence): Ingests feeds, shares IOCs between organizations, provides context for everything Wazuh detects.
 
-Here's something the documentation doesn't emphasize enough: TheHive and Cortex run on Ubuntu 22.04 LTS ("Jammy Jellyfish") specifically for compatibility with Cassandra and Elasticsearch dependencies.
+**Zeek + Suricata** (Network Monitoring): Zeek for network metadata and protocol analysis, Suricata for signature-based IDS. Different approaches, complementary coverage.
 
-Both are JVM-based applications. They allocate heap memory at startup and don't release it. You need to tune `-Xms` and `-Xmx` flags carefully-give them too little and they crash, too much and they starve other services.
+## The Ubuntu 22.04 Gotcha
 
-Jammy provides OpenSSL 3.0 and the 5.15 Linux kernel, which are crucial for running current Java versions. The LTS support until 2032 means you're not constantly chasing distribution upgrades on critical security infrastructure.
+Here's something the docs don't tell you loudly enough: TheHive and Cortex need Ubuntu 22.04 LTS specifically because of Cassandra and Elasticsearch dependencies.
 
-## The Integration Challenge
+Both are JVM-based. They grab heap memory at startup and never let go. You have to tune `-Xms` and `-Xmx` flags carefully. Too little and they crash. Too much and they starve everything else on the box.
 
-The real work isn't installing individual tools-it's making them talk to each other:
+Jammy gives you OpenSSL 3.0 and the 5.15 kernel, which matter for running current Java versions. LTS support until 2032 means I'm not chasing distro upgrades on critical security infrastructure.
 
-- Wazuh alerts → TheHive cases (via webhook integration)
-- TheHive observables → Cortex analysis (native integration)
-- Cortex queries → MISP threat intelligence (analyzer configuration)
-- Zeek/Suricata logs → Wazuh indexer (Filebeat shipping)
+## Making Everything Talk to Everything
 
-Each integration point is a potential failure. Each has its own authentication model, API versioning concerns, and configuration syntax.
+Installing individual tools is the easy part. The real work is integration:
 
-## Current Status
+- Wazuh alerts flow into TheHive cases via webhooks
+- TheHive observables go to Cortex for analysis (native integration)
+- Cortex queries MISP for threat intelligence (analyzer config)
+- Zeek and Suricata logs ship to the Wazuh indexer via Filebeat
 
-The infrastructure is deployed and operational. Wazuh is collecting logs, TheHive is tracking cases, Cortex is analyzing observables. The next phase is expanding agent deployment and tuning detection rules to reduce false positives.
+Every integration point is a potential failure. Every one has its own auth model, API versioning quirks, and config syntax. I spent more time on integration than installation by a factor of probably 3x.
 
-This is what defense looks like when you can't write a six-figure check: late nights, documentation diving, and the satisfaction of watching your own SOC detect its first real threat.
+## Where It Stands
+
+The infrastructure is deployed and operational. Wazuh is collecting logs, TheHive is tracking cases, Cortex is analyzing observables. Next phase: expanding agent deployment and tuning detection rules to cut down false positives.
+
+This is what defense looks like when you can't write a six-figure check. Late nights, documentation rabbit holes, and the satisfaction of watching your own SOC detect its first real threat.
 
 [View the full SOC architecture →](/projects/designing-and-building-an-open-source-soc)

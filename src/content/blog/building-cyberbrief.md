@@ -1,51 +1,62 @@
 ---
-title: "Building CyberBRIEF: An Automated Threat Intelligence Briefing Tool"
+title: "CyberBRIEF: Because Nobody Reads Page 8"
 pubDate: 2025-02-02
+updatedDate: 2026-02-16
 tags: ["cybersecurity", "threat-intelligence", "python", "fastapi", "react", "mitre-attack"]
 ---
 
-Threat intelligence is only useful if it reaches the right people in the right format at the right time. That sounds obvious, but most intel workflows break down at the "right format" part. Analysts drown in raw feeds, managers get 40-page PDFs they never read, and decision-makers end up relying on gut feeling because nobody distilled the signal from the noise. I built CyberBRIEF to fix that: an automated tool that researches a threat topic across multiple sources, extracts indicators of compromise, maps findings to the MITRE ATT&CK framework, and delivers everything in a clean BLUF briefing with proper citations.
 
-## Why BLUF?
 
-BLUF stands for Bottom Line Up Front. It is a communication format with deep roots in military and intelligence writing. The core idea is simple: put the conclusion first, then support it with evidence. In a traditional report, you build toward a recommendation. In a BLUF report, you lead with it. The reader knows within the first paragraph whether they need to act, and the rest of the document tells them why.
+Most threat intel reports bury the recommendation on page 8. By page 8, your CISO already closed the tab.
 
-This matters enormously in cybersecurity. When a new vulnerability drops or a threat actor campaign surfaces, the SOC lead does not have 20 minutes to read background context before finding out whether their organization is at risk. They need the answer immediately, with supporting details available if they want to dig deeper. CyberBRIEF generates reports in exactly this structure: a concise BLUF paragraph at the top, followed by categorized findings, IOC tables, ATT&CK technique mappings, and sourced citations.
+I built CyberBRIEF because I got tired of writing reports nobody reads. It's an automated tool that researches a threat topic across multiple sources, pulls out indicators of compromise, maps everything to MITRE ATT&CK, and delivers it all in a clean BLUF briefing with proper citations. The whole point is getting the answer to the top of the page.
 
-## The Multi-Source Research Approach
+## Put the Answer First
 
-One of the biggest limitations of any single threat intelligence source is coverage bias. A vendor's blog will emphasize threats relevant to their product. A government advisory will focus on critical infrastructure. An independent researcher's write-up might go deep on technical details but miss the broader campaign context. CyberBRIEF addresses this by aggregating research across multiple sources.
+BLUF (Bottom Line Up Front) comes from military and intelligence writing. The idea is dead simple: lead with the conclusion, then back it up with evidence.
 
-The backend is built with Python and FastAPI. When a user submits a research topic, the system fans out queries to multiple providers: Brave Search for broad web coverage, Perplexity for synthesized research summaries, and Google Gemini for analytical processing. Each source returns different perspectives on the same threat, and the system merges these into a unified research corpus before generating the briefing.
+Traditional reports build toward a recommendation. BLUF reports start with one. The reader knows in the first paragraph whether they need to act. Everything after that is the "why."
 
-This is not just concatenation. The aggregation pipeline deduplicates overlapping findings, identifies consensus across sources (if three independent sources flag the same IOC, that carries more weight), and flags contradictions for analyst review. The goal is to give the reader a comprehensive picture without making them visit six different websites and mentally merge the information themselves.
+This matters a lot in security. When a new vulnerability drops or a threat actor campaign shows up, the SOC lead doesn't have 20 minutes to read background before finding out if they're at risk. They need the answer now. CyberBRIEF generates exactly that structure: a concise BLUF paragraph up top, followed by categorized findings, IOC tables, ATT&CK mappings, and sourced citations.
 
-## IOC Extraction and ATT&CK Mapping
+## One Source Isn't Enough
 
-Raw intelligence is full of indicators of compromise scattered through prose paragraphs. IP addresses, domain names, file hashes, CVE identifiers. Manually extracting these from a multi-page report is tedious and error-prone. CyberBRIEF automates this with regex-based extraction patterns combined with contextual validation. An IPv4 address in a "Contact Us" footer is not the same as one identified as a C2 server. The extractor uses surrounding context to classify and tag each IOC appropriately.
+Every single threat intel source has coverage bias. A vendor's blog pushes threats their product catches. Government advisories focus on critical infrastructure. An independent researcher goes deep on the technical side but misses the broader campaign.
 
-The MITRE ATT&CK mapping was one of the more challenging features to implement well. ATT&CK is the industry standard framework for categorizing adversary tactics and techniques, and mapping threat intelligence to it makes findings immediately actionable for defensive teams. If a briefing identifies that a threat actor uses spearphishing attachments (T1566.001) for initial access and then deploys a scheduled task (T1053.005) for persistence, a defender can immediately check whether their detection rules cover those specific techniques.
+CyberBRIEF fans out queries to multiple providers: Brave Search for broad web coverage, Perplexity for synthesized research, and Google Gemini for analytical processing. Each returns different perspectives on the same threat.
 
-CyberBRIEF maps findings to ATT&CK techniques by analyzing the behavioral descriptions in the aggregated research. The system maintains a local reference of technique descriptions and uses semantic matching to identify which techniques are relevant. Each mapping includes the technique ID, name, tactic category, and the specific evidence from the research that triggered the mapping. This traceability is critical. A mapping without justification is just a guess.
+The aggregation pipeline doesn't just concatenate results. It deduplicates overlapping findings, identifies consensus (if three independent sources flag the same IOC, that carries more weight), and flags contradictions for review. The goal: a comprehensive picture without making the reader visit six websites and merge everything in their head.
 
-## Citation Formatting
+## Pulling IOCs and Mapping to ATT&CK
 
-This might seem like a minor detail, but it matters more than people think. CyberBRIEF generates citations in Chicago Notes-Bibliography format. Every claim in the briefing traces back to a specific source with a properly formatted citation. In an academic or professional intelligence context, unsourced assertions are worthless. If a briefing claims that APT29 shifted to a new infrastructure pattern, the reader needs to know whether that claim comes from a Mandiant report, a CISA advisory, or a random blog post. The source changes how much weight you give the finding.
+Indicators of compromise are scattered through prose paragraphs in every threat report. IP addresses, domains, file hashes, CVE identifiers. Manually extracting them is tedious and you will miss things.
 
-Chicago NB was chosen deliberately over APA or MLA because it is the standard in intelligence and policy writing. The footnote-style citations keep the body text readable while providing full attribution in the notes section. CyberBRIEF generates these automatically, so the analyst never has to manually format a bibliography.
+CyberBRIEF automates extraction with regex patterns plus contextual validation. An IPv4 address in a "Contact Us" footer is not the same as one identified as a C2 server. The extractor uses surrounding context to classify each IOC.
+
+The ATT&CK mapping was the hardest feature to get right. If a briefing identifies that a threat actor uses spearphishing attachments (T1566.001) for initial access and scheduled tasks (T1053.005) for persistence, a defender can immediately check whether their detection rules cover those techniques.
+
+The system maintains a local reference of technique descriptions and uses semantic matching to identify relevant techniques. Every mapping includes the technique ID, name, tactic category, and the specific evidence that triggered it. A mapping without justification is just a guess.
+
+## Citations Actually Matter
+
+This sounds minor. It's not.
+
+CyberBRIEF generates citations in Chicago Notes-Bibliography format. Every claim traces back to a specific source. If a briefing says APT29 shifted to a new infrastructure pattern, the reader needs to know if that comes from a Mandiant report, a CISA advisory, or a random blog post. The source changes how much weight you give the finding.
+
+Chicago NB was a deliberate choice over APA or MLA. It's the standard in intelligence and policy writing. Footnote-style citations keep the body readable while full attribution lives in the notes. CyberBRIEF generates these automatically, so nobody has to manually format a bibliography ever again.
 
 ## The Frontend
 
-The frontend is built with React, TypeScript, Vite, and Tailwind CSS. I built five visual variants to explore different approaches to presenting intelligence data. The interface handles topic submission, displays real-time research progress, and renders the final briefing with interactive elements. IOC tables are sortable and filterable. ATT&CK mappings link to the official MITRE pages. The HTML export produces a self-contained file that can be emailed or archived, and the Markdown export integrates with documentation systems and wikis.
+React, TypeScript, Vite, Tailwind CSS. I built five visual variants to explore different approaches to presenting intelligence data. The interface handles topic submission, shows real-time research progress, and renders the final briefing with interactive elements. IOC tables are sortable and filterable. ATT&CK mappings link to official MITRE pages. HTML export produces a self-contained file for email or archive. Markdown export plugs into wikis.
 
-Designing the UI for an intelligence product taught me a lot about information hierarchy. The most important information needs to be visually dominant. Supporting details should be accessible but not competing for attention. Color and spacing do heavy lifting when the reader is scanning under time pressure.
+The biggest design lesson: in intelligence products, the most important information needs to be visually dominant. Supporting details should be accessible but not competing for attention. Color and spacing do heavy lifting when someone is scanning under time pressure.
 
-## What I Learned
+## What Broke, What Stuck
 
-Building CyberBRIEF reinforced something I keep coming back to in cybersecurity: the gap between having information and having actionable intelligence is enormous, and most of the work is in the translation layer. The technical challenges of API integration, text extraction, and framework mapping were real, but the harder problem was always "how do I present this so a busy human can make a decision in 30 seconds?"
+The gap between having information and having actionable intelligence is enormous. Most of the work is in the translation layer. API integration and text extraction were real challenges, but the harder problem was always: "How do I present this so a busy human can make a decision in 30 seconds?"
 
-I also gained a much deeper understanding of the MITRE ATT&CK framework by building the mapping engine. Reading about ATT&CK is one thing. Building a system that has to correctly classify adversary behaviors into the right techniques forces you to understand the boundaries between similar techniques and the nuances of sub-techniques.
+Building the ATT&CK mapping engine taught me more about the framework than any certification course could. When you have to correctly classify adversary behaviors into specific techniques, you learn fast where the boundaries between similar techniques actually are.
 
-The multi-source architecture taught me practical lessons about API rate limiting, response normalization, and the reality that different providers return wildly different data structures for the same conceptual query. Building resilient aggregation pipelines is its own discipline.
+The multi-source architecture was a crash course in API rate limiting, response normalization, and the reality that different providers return wildly different data structures for the same query. Resilient aggregation pipelines are their own discipline.
 
-CyberBRIEF is the kind of tool I wish existed when I started studying threat intelligence. Not because the information is unavailable, but because the time cost of gathering, organizing, and formatting it properly is a barrier that keeps a lot of useful analysis from ever reaching the people who need it.
+CyberBRIEF is the tool I wish existed when I started studying threat intelligence. Not because the information isn't available. Because the time cost of gathering, organizing, and formatting it is a barrier that keeps useful analysis from reaching the people who need it.

@@ -27,7 +27,12 @@ function formatDate(date: Date) {
     <header class="post-header">
       <a href="/blog" class="back-link"><span class="prompt">$</span> cd ~/blog</a>
       <h1 class="post-title">{entry.data.title}</h1>
-      <p class="post-meta">{formatDate(entry.data.pubDate)}</p>
+      <p class="post-meta">
+        {formatDate(entry.data.pubDate)}
+        {entry.data.updatedDate && (
+          <span class="updated-date"> · Updated {formatDate(entry.data.updatedDate)}</span>
+        )}
+      </p>
       {
         entry.data.tags && (
           <div class="post-tags">

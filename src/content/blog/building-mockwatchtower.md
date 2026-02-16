@@ -1,59 +1,68 @@
 ---
-title: "Building MockWatchtower: A Live NOC Dashboard Demo"
+title: "MockWatchtower: Because Nobody's SSHing Into My College Network"
 pubDate: 2025-01-22
+updatedDate: 2026-02-16
 tags: ["react", "typescript", "tailwind", "framer-motion", "portfolio", "networking"]
 ---
 
-I built Watchtower as a real NOC dashboard for my college lab. It pulls live data from LibreNMS, Netdisco, and Proxmox. It works great, but there's a problem: nobody can see it unless they're on my network. So I built MockWatchtower, a fully self-contained demo version that runs anywhere, no infrastructure required.
+
+
+I built Watchtower as a real NOC dashboard for my college lab. It pulls live data from LibreNMS, Netdisco, and Proxmox. It works great.
+
+Nobody can see it.
+
+Nobody's SSHing into my college network to see Watchtower. So I built MockWatchtower: a fully self-contained demo version that runs anywhere. Same frontend, same topology canvas, same real-time updates. Just powered by simulation instead of real devices.
 
 ## The Demo Problem
 
-Portfolio projects that need backend infrastructure are invisible to recruiters. You can write a beautiful README, add screenshots, describe the architecture. But nothing beats clicking a link and seeing the thing actually work. MockWatchtower solves that by simulating an entire SMB network environment with realistic data, status changes, and alert patterns. Same frontend, same topology canvas, same real-time updates. Just powered by simulation instead of real devices.
+Portfolio projects that need backend infrastructure are invisible to recruiters. You can write a beautiful README, add screenshots, describe the architecture. But nothing beats clicking a link and seeing the thing actually work.
 
-## Simulating a Real Network
+MockWatchtower simulates an entire SMB network environment with realistic data, status changes, and alert patterns. No infrastructure required.
 
-The demo simulates a Meridian Financial Group campus network. I chose a fictional mid-size company because it gives enough complexity to be interesting without being overwhelming. The topology includes core switches, distribution layer, access switches, firewalls, servers, wireless controllers, and endpoints across multiple buildings.
+## Making Fake Data Feel Real
 
-Every device has a realistic profile: hostname following a naming convention, correct interface counts for the hardware model, appropriate VLAN assignments, and plausible traffic patterns. A core switch pushes more traffic than an access switch. A firewall shows UTM inspection metrics. The wireless controller reports client counts that fluctuate throughout the day.
+The demo simulates a Meridian Financial Group campus network. Fictional mid-size company, enough complexity to be interesting without being overwhelming. Core switches, distribution layer, access switches, firewalls, servers, wireless controllers, endpoints across multiple buildings.
 
-Status changes follow patterns too. Devices don't just randomly flip between up and down. The simulation models scenarios: a switch in Building C goes down, and the devices behind it follow. An interface starts showing CRC errors before it goes down completely. A server's CPU usage climbs gradually before triggering an alert. These cascading patterns are what make the demo feel real rather than random.
+Every device has a realistic profile. Hostnames follow naming conventions. Interface counts match the hardware model. VLANs are assigned correctly. Traffic patterns make sense: a core switch pushes more traffic than an access switch, a firewall shows UTM metrics, a wireless controller reports client counts that fluctuate throughout the day.
+
+The status simulation is what makes it feel real instead of random. A switch in Building C goes down, and the devices behind it follow. An interface shows CRC errors before it fails completely. A server's CPU climbs gradually before triggering an alert. Cascading failures, not coin flips.
 
 ## Interactive Topology
 
-The topology canvas is built with ReactFlow. Each device is a custom node component showing hostname, device type icon, and a color-coded status indicator. You can pan, zoom, and drag devices around. Clicking a node opens a detail panel with metrics, interface status, and recent alerts.
+Built with ReactFlow. Each device is a custom node showing hostname, type icon, and color-coded status. Pan, zoom, drag. Click a node and get metrics, interface status, recent alerts.
 
-The layout reflects actual network hierarchy. Core devices sit at the top, distribution in the middle, access at the edges. Connections between nodes show link status and can display bandwidth utilization. When a device goes down in the simulation, its node pulses red and the connected links dim, giving you immediate visual feedback without reading any text.
+Layout reflects actual network hierarchy. Core at the top, distribution in the middle, access at the edges. Links show status and bandwidth utilization. When a device goes down, its node pulses red and connected links dim. Immediate visual feedback without reading anything.
 
-I spent time getting the edge routing right. In a real NOC dashboard, messy overlapping lines make the topology useless. ReactFlow's edge routing handles most cases, but I added custom path logic for situations where connections would overlap or cross unnecessarily.
+I spent real time on edge routing. In a NOC dashboard, messy overlapping lines make the topology useless. ReactFlow handles most cases, but I added custom path logic where connections would overlap or cross unnecessarily.
 
 ## The Port Grid
 
-One of my favorite features is the switch port grid. Open the detail panel for any switch and you see a visual grid mimicking the physical port layout. Each port is color-coded: green for up, red for down, orange for errors, gray for admin disabled. Hover over a port and you see the connected device, VLAN, speed, and current throughput.
+Open the detail panel for any switch and you see a visual grid mimicking the physical port layout. Each port is color-coded: green for up, red for down, orange for errors, gray for admin disabled. Hover for connected device, VLAN, speed, throughput.
 
-In the real Watchtower, this data comes from LibreNMS and Netdisco APIs. In MockWatchtower, the simulation generates it. But the visual is identical. It's the kind of feature that makes network engineers nod because they immediately understand what they're looking at. No explanation needed.
+In real Watchtower, this comes from LibreNMS and Netdisco APIs. In MockWatchtower, the simulation generates it. The visual is identical.
 
-## Alert System
+It's the kind of feature that makes network engineers nod. They immediately understand what they're looking at. No explanation needed.
 
-The alert ticker runs across the top of the dashboard. Alerts come in three severities: critical (pulsing red), warning (steady amber), and informational (blue). The simulation generates alerts that match the network scenarios. When that Building C switch goes down, you see a critical alert for the device, followed by warning alerts for the downstream devices losing connectivity.
+## Alerts
 
-Alerts are also logged in a filterable table. You can filter by severity, device, time range, or acknowledgment status. It's basic incident management, enough to show the concept without building a full ticketing system.
+Alert ticker across the top. Three severities: critical (pulsing red), warning (amber), informational (blue). Alerts match the network scenarios. Building C switch goes down, you get a critical alert, followed by warnings for downstream devices losing connectivity.
 
-## Five Visual Variants
+Filterable alert table for severity, device, time range, acknowledgment status. Basic incident management, enough to show the concept.
 
-Like all my portfolio projects, MockWatchtower ships with five distinct visual themes. Each one completely changes the look while keeping the same functionality:
+## Five Themes
 
-1. **NOC Command** uses the classic dark theme with green accents that you'd see in an actual operations center
-2. **Arctic Monitor** goes light and clean with blue tones, optimized for well-lit environments
-3. **Cyber Grid** leans into the cyberpunk aesthetic with neon highlights on dark backgrounds
-4. **Blueprint** takes inspiration from engineering drawings with a technical, schematic feel
-5. **Sunset Ops** uses warm amber and orange tones for a distinctive look that's easy on the eyes during long shifts
+Each one completely changes the look, same functionality underneath:
 
-A theme picker in the top bar lets you switch instantly. Theme preference persists in localStorage.
+1. **NOC Command:** Classic dark with green accents. What you'd see in a real operations center.
+2. **Arctic Monitor:** Light and clean with blue tones. Built for well-lit environments.
+3. **Cyber Grid:** Neon on dark. The cyberpunk one.
+4. **Blueprint:** Engineering drawing aesthetic. Technical, schematic feel.
+5. **Sunset Ops:** Warm amber and orange. Easy on the eyes during long shifts.
 
-## What It Demonstrates
+Theme picker in the top bar, preference persists in localStorage.
 
-MockWatchtower isn't just a pretty dashboard. It demonstrates specific skills that matter for infrastructure and security roles:
+## What It Proves
 
-Real-time data visualization with WebSocket-style updates. Interactive topology mapping with ReactFlow. State management with Zustand for complex, frequently updating data. Responsive design that works on tablets (because NOC dashboards increasingly live on mounted tablets). Network domain knowledge reflected in realistic device modeling and alert patterns.
+MockWatchtower isn't just a pretty dashboard. It demonstrates real-time data visualization with WebSocket-style updates, interactive topology mapping with ReactFlow, state management with Zustand for complex frequently updating data, responsive design for tablet-mounted NOC displays, and network domain knowledge reflected in realistic device modeling.
 
-The demo runs at [mockwatchtower.vercel.app](https://mockwatchtower.vercel.app) if you want to see it in action. Source is on GitHub.
+Check it out at [mockwatchtower.vercel.app](https://mockwatchtower.vercel.app). Source is on GitHub.
