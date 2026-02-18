@@ -9,20 +9,24 @@ import StatusLight from "../components/StatusLight.astro";
     <div class="profile">
       <p class="prompt">$ cat ~/about.md</p>
       <h1 class="name">Solomon Neas</h1>
-      <p class="role">Infrastructure Engineer · Security Architect · Agentic Engineer</p>
+      <p class="role">Infrastructure Engineer · Security Builder · AI Toolsmith</p>
 
       <div class="profile-details">
         <div class="detail">
           <span class="detail-label">[LOCATION]</span>
-          <span class="detail-value">New Port Richey, FL</span>
+          <span class="detail-value">Central Florida</span>
         </div>
         <div class="detail">
           <span class="detail-label">[STATUS]</span>
-          <span class="detail-value green"><StatusLight status="ongoing" /> Building secure systems</span>
+          <span class="detail-value green"><StatusLight status="ongoing" /> Building things that actually work</span>
         </div>
         <div class="detail">
           <span class="detail-label">[EDUCATION]</span>
-          <span class="detail-value">M.S. Cybersecurity Intelligence @ USF (in progress)</span>
+          <span class="detail-value">M.S. Cybersecurity Intelligence @ USF · B.A.S. · A.S. NSET</span>
+        </div>
+        <div class="detail">
+          <span class="detail-label">[PREVIOUS LIFE]</span>
+          <span class="detail-value">Executive Chef (17 years)</span>
         </div>
       </div>
     </div>
@@ -30,15 +34,16 @@ import StatusLight from "../components/StatusLight.astro";
     <!-- Summary -->
     <div class="section">
       <p class="summary">
-        From DOS commands in elementary school to designing enterprise SOC architectures. My path to
-        technology wasn't a straight line, but every detour added depth to how I approach problems today.
+        I grew up one of ten kids, troubleshooting DOS while my friends were still figuring out
+        Windows 95. Spent 17 years in professional kitchens. Now I build SOC platforms and
+        infrastructure tooling. The path doesn't make sense until you walk it.
       </p>
     </div>
 
     <!-- Timeline -->
     <div class="section">
       <p class="section-header">$ cat /var/log/history.log</p>
-      <p class="section-comment">// A non-linear path to infrastructure and security</p>
+      <p class="section-comment">// It makes sense if you don't think about it too hard</p>
 
       <div class="timeline">
         <!-- Chapter 1 -->
@@ -50,15 +55,15 @@ import StatusLight from "../components/StatusLight.astro";
               <span class="entry-title">EARLY_TECH_INIT</span>
             </div>
             <p>
-              Grew up one of ten kids in a household where technology was second nature. My father, a chemical
-              engineer and software developer, had me understanding the significance of C and C++ before middle school.
-              I became the family's de facto IT department, troubleshooting DOS while other kids were still
-              figuring out Windows 95.
+              My dad was a chemical engineer and software developer. He had me understanding the
+              significance of C and C++ before middle school, and I became the family IT department
+              by default. Ten kids, one person who could fix the computer. You do the math.
             </p>
             <p>
-              That foundation led to my first ventures: a web design business during the GeoCities and Angelfire era,
-              building custom sites, migrating layouts to PHP, and helping clients claim their corner of the early web.
-              I also ran a side operation building and repairing PCs, learning hardware from the ground up.
+              That turned into a web design hustle during the GeoCities and Angelfire era. Custom sites,
+              PHP migrations, helping people claim their corner of the early web. Also ran a side gig
+              building and repairing PCs. Learned hardware from the ground up because I couldn't
+              afford not to.
             </p>
             <div class="tags">
               <span class="tag">DOS</span>
@@ -78,50 +83,87 @@ import StatusLight from "../components/StatusLight.astro";
               <span class="entry-title">CULINARY_DETOUR</span>
             </div>
             <p>
-              Life took an unexpected fork. For 17 years, I worked as a cook and chef. A career that seems worlds
-              apart from network engineering. But kitchens and server rooms share more than you'd think: both
-              demand precision under pressure, systematic thinking, and the ability to troubleshoot on the fly
-              when everything's on fire (sometimes literally).
+              Life happened. For 17 years I worked as a cook and eventually an executive chef. My best
+              year was $40K working 80-hour weeks doing prep, service, and management for kitchens
+              that burned through staff like they burned through butter. It sounds like a completely
+              different career until you realize kitchens and server rooms run on the same thing:
+              controlled chaos, troubleshooting under pressure, and knowing when something is about
+              to break before it does.
             </p>
             <p>
-              Managing kitchen operations taught me workflow optimization, resource allocation, and leading
-              teams through high-stakes situations. Skills that translate directly to incident response and
-              infrastructure management.
+              I managed teams, optimized workflows, handled vendor relationships, and ran operations
+              for a 140-student facility. When COVID shut my kitchen down in 2020, I looked at my
+              resume and thought: "I've been meaning to get out of the kitchen for years. Perfect timing."
             </p>
             <div class="tags">
               <span class="tag">Leadership</span>
               <span class="tag">Operations</span>
               <span class="tag">Crisis Management</span>
+              <span class="tag">17 Years of "Why Am I Still Doing This"</span>
             </div>
           </div>
         </div>
 
         <!-- Chapter 3 -->
+        <div class="timeline-entry">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <div class="entry-header">
+              <span class="entry-date">2021-2024</span>
+              <span class="entry-title">THREE_DEGREES_FIVE_YEARS</span>
+            </div>
+            <p>
+              Enrolled at Polk State College with 21% of a degree I'd started in high school. Drove
+              four hours round trip daily to attend classes in person. Finished an A.S. in Network Systems
+              Engineering Technology, then a B.A.S. in Supervision and Management, while working as
+              a lab assistant making $17 an hour doing the work of a full infrastructure team.
+            </p>
+            <p>
+              During that time, I migrated the department from VMware to Proxmox (saving $68K/year
+              in licensing), built a full SOC stack from scratch for students to train on, designed
+              lab environments, and automated just about everything that wasn't nailed down. The
+              department got $3 million for AI and cybersecurity. I got a pat on the back and a
+              blocked promotion. So it goes.
+            </p>
+            <div class="tags">
+              <span class="tag">Proxmox</span>
+              <span class="tag">VMware Migration</span>
+              <span class="tag">SOC Architecture</span>
+              <span class="tag">Active Directory</span>
+              <span class="tag">4hr Daily Commute</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 4 -->
         <div class="timeline-entry current">
           <div class="timeline-marker active"></div>
           <div class="timeline-content">
             <div class="entry-header">
-              <span class="entry-date">2021-PRESENT</span>
-              <span class="entry-title">RETURN_TO_ROOT</span>
+              <span class="entry-date">2025-PRESENT</span>
+              <span class="entry-title">CURRENT_STATE</span>
               <StatusLight status="ongoing" />
             </div>
             <p>
-              In 2021, I made the decision to return to my original calling. Enrolled at Polk State College
-              for Network Systems Engineering, then continued to a B.A.S. in Business Information Technology.
-              Now pursuing an M.S. in Cybersecurity Intelligence at the University of South Florida.
+              Finishing my M.S. in Cybersecurity Intelligence at USF while building the tools I
+              actually want to use. I run multi-agent AI pipelines that scaffold, build, review, and
+              deploy projects in parallel. I write MCP servers that let AI assistants talk to Wazuh,
+              TheHive, MISP, and FortiGate. I build dashboards that turn Zeek logs and Suricata
+              alerts into something a human can actually parse at 2 AM.
             </p>
             <p>
-              Currently working as a Network and Systems Engineer at Polk State, where I design lab environments,
-              manage virtualization infrastructure, and build the tools my team needs to operate. The goal:
-              bridge the gap between hands-on engineering and strategic security.
+              The through-line from kitchens to infrastructure to security to AI isn't obvious, but
+              it's there: take something messy and chaotic, build systems around it, make it
+              repeatable, and teach other people how to run it without you. That's the whole job,
+              whether you're plating 200 covers or hunting threats across a 200-endpoint network.
             </p>
             <div class="tags">
-              <span class="tag">Proxmox</span>
-              <span class="tag">Linux</span>
-              <span class="tag">Windows Server</span>
-              <span class="tag">Security</span>
-              <span class="tag">Networking</span>
-              <span class="tag">AI Pipelines</span>
+              <span class="tag">Agentic AI</span>
+              <span class="tag">MCP Servers</span>
+              <span class="tag">Threat Hunting</span>
+              <span class="tag">Security Tooling</span>
+              <span class="tag">Multi-Model Pipelines</span>
+              <span class="tag">Still Learning</span>
             </div>
           </div>
         </div>
@@ -136,26 +178,28 @@ import StatusLight from "../components/StatusLight.astro";
           <h3 class="skill-label">Infrastructure</h3>
           <div class="tags">
             <span class="tag">Proxmox VE</span>
-            <span class="tag">ESXi</span>
-            <span class="tag">Hyper-V</span>
             <span class="tag">Active Directory</span>
             <span class="tag">Samba</span>
             <span class="tag">Docker</span>
             <span class="tag">10G Networking</span>
             <span class="tag">LACP</span>
+            <span class="tag">Linux Administration</span>
+            <span class="tag">Windows Server</span>
           </div>
         </div>
         <div class="skill-group">
           <h3 class="skill-label">Security</h3>
           <div class="tags">
             <span class="tag">Wazuh</span>
-            <span class="tag">TheHive</span>
-            <span class="tag">Cortex</span>
+            <span class="tag">TheHive / Cortex</span>
             <span class="tag">MISP</span>
             <span class="tag">Zeek</span>
             <span class="tag">Suricata</span>
+            <span class="tag">Palo Alto</span>
+            <span class="tag">FortiGate</span>
             <span class="tag">MITRE ATT&CK</span>
             <span class="tag">Threat Hunting</span>
+            <span class="tag">SIGMA Rules</span>
           </div>
         </div>
         <div class="skill-group">
@@ -166,20 +210,20 @@ import StatusLight from "../components/StatusLight.astro";
             <span class="tag">Python</span>
             <span class="tag">FastAPI</span>
             <span class="tag">Astro</span>
-            <span class="tag">Vite</span>
             <span class="tag">Node.js</span>
             <span class="tag">MCP Servers</span>
+            <span class="tag">REST APIs</span>
           </div>
         </div>
         <div class="skill-group">
           <h3 class="skill-label">AI & Automation</h3>
           <div class="tags">
-            <span class="tag">Claude Opus</span>
-            <span class="tag">GPT</span>
-            <span class="tag">Gemini</span>
-            <span class="tag">Multi-Model Pipelines</span>
+            <span class="tag">Multi-Agent Orchestration</span>
+            <span class="tag">Claude / GPT / Gemini</span>
             <span class="tag">Prompt Engineering</span>
-            <span class="tag">CI/CD</span>
+            <span class="tag">Local LLMs (Ollama)</span>
+            <span class="tag">Agentic Pipelines</span>
+            <span class="tag">Code Review Automation</span>
           </div>
         </div>
       </div>
