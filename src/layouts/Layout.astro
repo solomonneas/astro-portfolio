@@ -18,6 +18,16 @@ const isDev = import.meta.env.DEV;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Solomon Neas | {pageTitle}</title>
+    <meta name="description" content="Solomon Neas — Network engineer, cybersecurity specialist, and AI agent architect. Portfolio, projects, and professional services." />
+    <meta name="author" content="Solomon Neas" />
+    <meta property="og:title" content={`Solomon Neas | ${pageTitle}`} />
+    <meta property="og:description" content="Network engineer, cybersecurity specialist, and AI agent architect. Infrastructure, security tools, and OpenClaw AI agent configuration." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={`Solomon Neas | ${pageTitle}`} />
+    <meta name="twitter:description" content="Network engineer, cybersecurity specialist, and AI agent architect." />
+    <link rel="canonical" href={Astro.url.href} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="svg-icon" />
 
     <script>
