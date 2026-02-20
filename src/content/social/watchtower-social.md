@@ -1,13 +1,13 @@
 ---
-title: "MockWatchtower Social Media Drafts"
-project: "mockwatchtower"
+title: "Watchtower Social Media Drafts"
+project: "watchtower"
 ---
 
 ## LinkedIn
 
 I wanted to know what it takes to build a NOC dashboard from scratch. Not use one. Build one.
 
-MockWatchtower is a real-time network monitoring dashboard that polls LibreNMS, Netdisco, Proxmox, and speedtest data, then displays everything on an interactive topology map with live updates via WebSockets.
+Watchtower is a real-time network monitoring dashboard that polls LibreNMS, Netdisco, Proxmox, and speedtest data, then displays everything on an interactive topology map with live updates via WebSockets.
 
 What I learned building it:
 
@@ -35,7 +35,7 @@ Source on GitHub: [link]
 
 ## Twitter/X
 
-Built MockWatchtower: a NOC-style monitoring dashboard from scratch.
+Built Watchtower: a NOC-style monitoring dashboard from scratch.
 
 Real-time WebSocket updates, ReactFlow topology map, multi-source polling (LibreNMS + Netdisco + Proxmox), port grid visualization, alert system.
 
@@ -47,7 +47,7 @@ Includes demo mode so you can see it live without my lab.
 
 ## Mastodon
 
-I built a NOC-style network monitoring dashboard called MockWatchtower. It polls LibreNMS, Netdisco, and Proxmox for device status and displays everything on an interactive topology map that updates in real time via WebSockets.
+I built a NOC-style network monitoring dashboard called Watchtower. It polls LibreNMS, Netdisco, and Proxmox for device status and displays everything on an interactive topology map that updates in real time via WebSockets.
 
 The frontend uses React with ReactFlow for the topology canvas. Custom nodes show device status at a glance, and edges change color based on link state. Zustand handles state management to keep re-renders efficient with frequent updates.
 
@@ -65,7 +65,7 @@ Python FastAPI backend, YAML configuration for topology and data sources. Source
 
 What does it take to build a NOC dashboard from scratch?
 
-MockWatchtower: real-time network monitoring with WebSocket updates, ReactFlow topology map, multi-source polling, port grid visualization, and a demo mode for portfolio showcase.
+Watchtower: real-time network monitoring with WebSocket updates, ReactFlow topology map, multi-source polling, port grid visualization, and a demo mode for portfolio showcase.
 
 Python FastAPI + React TypeScript. Source on GitHub: [link]
 
@@ -75,7 +75,7 @@ Python FastAPI + React TypeScript. Source on GitHub: [link]
 
 Walk into any Network Operations Center and the first thing you see is the wall of screens: topology maps with colored status indicators, traffic graphs, alert tickers. Those dashboards look complex, but what does it actually take to build one?
 
-I built MockWatchtower to find out. It polls real network infrastructure (LibreNMS, Netdisco, Proxmox), pushes updates to the browser via WebSockets, and renders an interactive topology map with ReactFlow.
+I built Watchtower to find out. It polls real network infrastructure (LibreNMS, Netdisco, Proxmox), pushes updates to the browser via WebSockets, and renders an interactive topology map with ReactFlow.
 
 In the full post, I cover the WebSocket architecture (including connection resilience), how ReactFlow handles interactive network topology, the challenge of normalizing data from multiple monitoring sources, and why I built a demo mode that simulates a live network for portfolio visitors.
 
