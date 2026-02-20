@@ -8,7 +8,6 @@ const isProjectPage = pathname.match(/^\/projects\/.+/);
 const showHomeLink = !isIndex && !isBlogPost && !isProjectPage;
 
 import "../styles/global.css";
-import Analytics from '@vercel/analytics/astro';
 import Analytics from "@vercel/analytics/astro";
 const isDev = import.meta.env.DEV;
 ---
@@ -359,6 +358,5 @@ const isDev = import.meta.env.DEV;
       </footer>
     </div>
     {!isDev && <Analytics />}
-  <Analytics />
   </body>
 </html>
