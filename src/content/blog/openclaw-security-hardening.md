@@ -189,11 +189,11 @@ Review these logs weekly. Look for patterns: is your agent doing things you didn
 Beyond daily backups, have a full disaster recovery plan:
 
 1. Documented restore procedure (tested quarterly)
-2. Configuration stored in version control (private repo)
-3. Encrypted offsite backup (cloud storage, separate physical location)
+2. Configuration stored in your cloud service of choice, encrypted
+3. Encrypted offsite backup (separate physical location)
 4. Recovery time objective: how fast can you rebuild from scratch?
 
-I keep my entire OpenClaw workspace in a private Git repo. If my machine explodes, I can be back up on new hardware in under an hour.
+With a solid backup strategy, you can be back up on new hardware in under an hour if something goes wrong.
 
 ## The Prompt Injection Section
 
