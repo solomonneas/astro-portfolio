@@ -1,7 +1,7 @@
 ---
 title: "OpenClaw Multi-Model Setup: Stop Burning Money on the Wrong Model"
 description: "How to orchestrate Opus, Codex, Haiku, and Ollama in one OpenClaw setup. Use the right model for each task and cut your costs without cutting quality."
-pubDate: 2026-02-18
+pubDate: 2026-02-16
 tags: ["openclaw", "multi-model", "opus", "ollama", "token-optimization"]
 ---
 
@@ -164,8 +164,4 @@ If you're running a single-model setup today:
 
 ## Or Just Let Me Do It
 
-I've been iterating on this multi-model setup for months. Every model assignment, every spawn pattern, every optimization came from real usage and real mistakes. The chain I described here took hundreds of hours to dial in.
-
-If you want this running on your machine without the trial and error, [I set up OpenClaw professionally](https://openclaw.solomonneas.dev). The Professional tier ($650) includes multi-model orchestration out of the box. The Mission Control tier ($2,000) adds local Ollama GPU models, semantic search, and the full optimization stack.
-
-Your hardware. Your data. My expertise.
+I've been iterating on this multi-model setup for months. Every model assignment, every spawn pattern, every optimization came from real usage and real mistakes. If you want help getting multi-model orchestration running on your own hardware, [reach out](https://openclaw.solomonneas.dev).

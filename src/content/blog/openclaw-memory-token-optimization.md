@@ -1,7 +1,7 @@
 ---
 title: "From 100K Token Messages to Semantic Search: How I Fixed My AI Agent's Memory"
 description: "The real story of building an AI agent memory system. From Kimi K2.5 blowing through tokens to local semantic search with Ollama. Every mistake, every fix."
-pubDate: 2026-02-18
+pubDate: 2026-02-19
 tags: ["openclaw", "memory", "tokens", "ollama", "semantic-search", "optimization"]
 ---
 
@@ -157,8 +157,4 @@ That's a 5-10x reduction in token usage with better output quality. The agent fi
 
 ## Want This Without the Learning Curve?
 
-I spent months building, breaking, and rebuilding this memory system. Every optimization came from real production use and real failures.
-
-If you want semantic memory search, token optimization, and structured extraction running on your OpenClaw setup, [I offer professional configuration services](https://openclaw.solomonneas.dev). The Professional tier ($650) includes multi-model orchestration with semantic search. Mission Control ($2,000) adds local GPU models, structured extraction, and the full optimization stack.
-
-Your hardware. Your data. My hard-won experience.
+I spent months building, breaking, and rebuilding this memory system. Every optimization came from real production use and real failures. If you want help getting semantic memory search, token optimization, or structured extraction running on your own setup, [reach out](https://openclaw.solomonneas.dev).

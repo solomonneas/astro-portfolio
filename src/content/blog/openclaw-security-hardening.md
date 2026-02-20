@@ -1,7 +1,7 @@
 ---
 title: "OpenClaw Security Hardening: From Basic to Fortress"
 description: "Your AI agent has access to your email, calendar, and files. Here's how to lock it down properly, from baseline security to zero-trust architecture."
-pubDate: 2026-02-18
+pubDate: 2026-02-13
 tags: ["openclaw", "security", "hardening", "ai-agent", "prompt-injection"]
 ---
 
@@ -212,6 +212,4 @@ Your defenses:
 
 ## Don't Do It Yourself
 
-I've spent hundreds of hours building, testing, and hardening my OpenClaw setup. Every gotcha in this guide came from real experience, usually at 2am when something broke.
-
-If you want this done right without the learning curve, [I offer professional setup services](https://openclaw.solomonneas.dev). Baseline security is included in every tier. Fortress-level hardening is available in the Mission Control package. Your data stays on your hardware. I just make sure it's locked down properly.
+I've spent hundreds of hours building, testing, and hardening my OpenClaw setup. Every gotcha in this guide came from real experience, usually at 2am when something broke. If you want help locking down your setup properly, [reach out](https://openclaw.solomonneas.dev).

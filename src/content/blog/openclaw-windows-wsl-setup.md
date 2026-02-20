@@ -1,7 +1,7 @@
 ---
 title: "How to Set Up OpenClaw on Windows with WSL2 (The Real Guide)"
 description: "A complete, battle-tested guide to running OpenClaw on Windows via WSL2. Every gotcha, every fix, every thing the docs don't tell you."
-pubDate: 2026-02-18
+pubDate: 2026-02-10
 tags: ["openclaw", "windows", "wsl2", "ai-agent", "setup-guide"]
 ---
 
@@ -236,4 +236,4 @@ Once you're running, you'll want to:
 - Configure [multi-model orchestration](/blog/openclaw-multi-model-setup) (use the right model for each task)
 - Build out your SOUL.md and workspace files
 
-Or skip all of this and [let me set it up for you](https://openclaw.solomonneas.dev). I've spent hundreds of hours optimizing my setup so you don't have to figure this out yourself. Three tiers, starting at $200, running on your hardware.
+Or skip all of this and [let me set it up for you](https://openclaw.solomonneas.dev). I've spent hundreds of hours optimizing my setup so you don't have to figure this out yourself.
