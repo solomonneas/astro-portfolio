@@ -63,7 +63,7 @@ const featuredProjects = [
     href: "/projects/linux-vm-labs-and-documentation",
     techStack: ["Linux", "Fedora", "Ubuntu", "Rocky"],
     highlight: "Course Design",
-  },
+  }
 ];
 
 // Categorized projects
@@ -117,24 +117,7 @@ const categories = [
         href: "/projects/intel-workbench",
         techStack: ["React", "TypeScript", "Zustand", "Tailwind"],
       },
-      {
-        date: "2026.01",
-        status: "completed",
-        identifier: "FortiSim_Firewall_Simulator",
-        origin: "Portfolio Project",
-        description: "FortiGate firewall simulator with CLI emulation, policy rule engine, dual-interface mode, and shadow/conflict detection.",
-        href: "/projects/fortisim",
-        techStack: ["React", "TypeScript", "Tailwind"],
-      },
-      {
-        date: "2026.01",
-        status: "completed",
-        identifier: "FortiLogForge_Log_Analyzer",
-        origin: "Portfolio Project",
-        description: "Fortinet log analyzer with multi-format parsing, pattern detection, interactive timeline visualization, and Docker deployment.",
-        href: "/projects/fortilogforge",
-        techStack: ["React", "FastAPI", "Python", "TypeScript", "Docker"],
-      },
+
       {
         date: "2026.01",
         status: "completed",
@@ -170,7 +153,7 @@ const categories = [
         description: "Researching security vulnerabilities in national critical infrastructure.",
         href: "/projects/securing-us-water-and-wastewater-utilities",
         techStack: ["Research", "Cybersecurity", "SCADA"],
-      },
+      }
     ],
   },
   {
@@ -203,7 +186,7 @@ const categories = [
         description: "Integrated monitoring stack for L2/L3 topology mapping and infrastructure visibility.",
         href: "/projects/enterprise-network-observability",
         techStack: ["Netdisco", "LibreNMS", "SNMP", "PostgreSQL"],
-      },
+      }
     ],
   },
   {
@@ -245,22 +228,14 @@ const categories = [
         description: "18-hour intensive workshop on deploying Proxmox VE 8 for NETLAB+ educational environments.",
         href: "/projects/ndg-proxmox-workshop",
         techStack: ["Proxmox VE 8", "NETLAB+", "Clustering"],
-      },
+      }
     ],
   },
   {
     name: "Developer Tools & AI",
     icon: "🔧",
     projects: [
-      {
-        date: "2026.02",
-        status: "completed",
-        identifier: "Model_Arena_LLM_Comparison",
-        origin: "Portfolio Project",
-        description: "LLM comparison dashboard with custom SVG radar charts, side-by-side model responses, and configurable evaluation criteria.",
-        href: "/projects/model-arena",
-        techStack: ["React", "TypeScript", "SVG Charts", "Tailwind"],
-      },
+
       {
         date: "2026.01",
         status: "completed",
@@ -269,7 +244,7 @@ const categories = [
         description: "Interactive terminal portfolio with virtual filesystem, real shell commands, tab completion, URL routing, and 12+ easter eggs. Navigate projects like you'd navigate a server.",
         href: "/projects/termfolio",
         techStack: ["React 19", "TypeScript", "xterm.js", "Vite"],
-      },
+      }
     ],
   },
   {
@@ -284,7 +259,7 @@ const categories = [
         description: "Modern rewrite of a legacy PHP inventory system with async FastAPI backend, multi-source device discovery from Netdisco/LibreNMS, and role-based access control.",
         href: "/projects/laim",
         techStack: ["FastAPI", "PostgreSQL", "SQLAlchemy", "Docker", "Python"],
-      },
+      }
     ],
   },
   {
@@ -308,9 +283,9 @@ const categories = [
         description: "Building a performant, content-driven portfolio website demonstrating modern web development.",
         href: "/projects/learning-astro",
         techStack: ["Astro", "Node.js", "JavaScript", "Vercel"],
-      },
+      }
     ],
-  },
+  }
 ];
 
 const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => sum + cat.projects.length, 0);
