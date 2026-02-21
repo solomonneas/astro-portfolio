@@ -1,15 +1,15 @@
 ---
 title: "Playbook Forge: Because Nobody Reads the Binder at 2 AM"
 pubDate: 2025-01-31
-updatedDate: 2026-02-16
-tags: ["incident-response", "python", "react", "cybersecurity", "fastapi", "nist"]
+updatedDate: 2026-02-21
+tags: ["incident-response", "python", "react", "typescript", "cybersecurity", "fastapi", "nist", "soar"]
 ---
 
 
 
 Every security team has incident response playbooks. Most of them live in Word docs, PDF binders, or wikis that nobody opens until something is already on fire.
 
-When a breach happens at 2 AM, scrolling through 40 pages to find the next step is not a plan. That's why I built Playbook Forge: it takes written incident response procedures and turns them into interactive visual flowcharts.
+When a breach happens at 2 AM, scrolling through 40 pages to find the next step is not a plan. That's why I built Playbook Forge: it takes written incident response procedures and turns them into interactive visual flowcharts you can actually execute step by step.
 
 ## The Problem with Text-Based Playbooks
 
@@ -19,15 +19,15 @@ Writing the playbook isn't the hard part. Making it usable under pressure is.
 
 A wall of text works fine during a Tuesday afternoon tabletop exercise. It falls apart at 3 AM when you need to know whether to isolate a host or call the CISO first. A flowchart turns sequential text into a decision tree you can follow in real time. That's a fundamentally different tool.
 
-## Two Halves
+## Two Halves, One Workflow
 
-Python FastAPI backend handles parsing. React frontend handles visualization.
+Python FastAPI backend handles parsing, storage, and AI generation. React frontend handles visualization and execution.
 
 The backend ingests playbooks in two formats: Markdown and Mermaid. Most teams write procedures as numbered lists with headers for each phase. The parser reads document structure, identifies phase boundaries from headers, extracts steps from list items, and detects decision points from conditional language ("if," "when," "depending on"). Then it builds a graph with nodes and edges for the frontend.
 
 Mermaid support was a natural addition since a lot of technical teams already use it in their docs. If someone already has a Mermaid flowchart for their IR procedure, Playbook Forge ingests it directly.
 
-FastAPI's automatic OpenAPI docs were a bonus. I could test parsing endpoints straight from the browser during development.
+The backend also handles full CRUD with SQLite and SQLAlchemy. Playbooks persist, get versioned, and can be categorized by type: Vulnerability Response, Incident Response, Threat Hunting. No more lost procedures.
 
 ## Custom Nodes in ReactFlow
 
@@ -45,29 +45,45 @@ The frontend is where it gets interesting. ReactFlow handles rendering, and I bu
 
 Auto-layout uses a dagre-based algorithm so parsed playbooks arrange themselves in a readable top-to-bottom flow without manual positioning. You can still drag nodes around if you want.
 
-## Parsing Was the Hard Part
+## Execution Engine
 
-The visualization was straightforward. The parsing was not.
+This is what turned Playbook Forge from a visualization tool into something you actually run during an incident.
 
-Written playbooks are wildly inconsistent. Some teams use strict numbered lists. Others mix bullet points with paragraphs. Decision points might be explicit ("If X, then Y") or buried in prose ("For production systems, prioritize..."). Nested procedures, cross-references, inline notes. It's messy.
+The execution engine lets you step through a playbook in real time. Each step gets a status: pending, in progress, completed, skipped. Timestamps track when each action was taken. Decision nodes pause and wait for input before branching. The full execution history is saved so you can review what happened, who did what, and how long each phase took.
 
-I built the Markdown parser in three layers. First pass: identify structural elements (headers, lists, paragraphs). Second pass: classify each element as phase, step, decision, or annotation using keywords and patterns. Third pass: build the graph by connecting nodes and creating branches at decision points.
+Post-incident reviews become trivial. Instead of trying to reconstruct a timeline from Slack messages and memory, you have a timestamped record of every step.
 
-It's not perfect. Ambiguous language still trips it up, and heavily narrative playbooks with few structural markers are tough. But for reasonably structured Markdown, it produces clean, accurate flowcharts.
+## AI Playbook Generation
 
-## Five Variants
+Describe an incident in plain English, and Playbook Forge generates a complete playbook with phases, steps, decisions, and execution nodes. It's not magic. It maps your description against NIST 800-61 patterns and produces a structured starting point.
 
-Five visual variants, same core parsing and rendering logic. Different color schemes, typography, layout density, component styling. What works on a large monitor in a SOC might not work on a laptop during field response.
+The generated playbooks aren't perfect out of the box. They're drafts. But they cut the initial authoring time from hours to minutes, and you can edit the result in the visual editor before saving it to your library.
 
-I used a custom hash router instead of React Router. Hash routing keeps everything client-side with no server-side route handling needed. Switching between variants is instant, no page reload.
+MCP (Model Context Protocol) hooks are built in for AI-assisted execution, so the tool can integrate with AI agents that help analysts work through complex procedures.
+
+## SOAR Integration
+
+The built-in action library connects to real response platforms. This isn't a standalone diagram tool anymore. It's a lightweight SOAR engine.
+
+When a playbook step says "isolate the host," you can wire that to an actual API call. When it says "check reputation," it can query your threat intel platforms. The gap between "what the playbook says to do" and "actually doing it" gets smaller.
+
+## Export and Sharing
+
+Playbooks export to Markdown, Mermaid, and JSON. Import works the same way, including bulk import for teams migrating existing procedure libraries. Share links let you hand a playbook to someone without giving them access to the full system. Print CSS makes hard copies readable if someone still wants a binder (I won't judge).
+
+## Five Visual Themes
+
+SOC, Analyst, Terminal, Command, Cyber. Different color schemes, typography, layout density. What works on a large monitor in a SOC might not work on a laptop during field response.
+
+Keyboard shortcuts switch between them instantly. No page reload, no settings menu. Hit a number key and the whole interface re-skins.
 
 ## Why I Actually Built This
 
-The deeper reason is accessibility. Not visual accessibility (though the variants do consider contrast). I mean making incident response knowledge accessible to people who need it most.
+The deeper reason is accessibility. Not visual accessibility (though the themes do consider contrast). I mean making incident response knowledge accessible to people who need it most.
 
 Junior analysts, new team members, small organizations without dedicated IR staff. A flowchart communicates hierarchy, sequence, and decision logic in ways prose can't match. You trace a path through a flowchart in seconds. The same path through a document takes minutes of careful reading.
 
-NIST 800-61 is an excellent framework, but it's written for people who already understand the concepts. Playbook Forge bridges the gap between the framework and the humans executing procedures. Turning the abstract lifecycle into concrete visual steps helps teams actually follow their playbooks instead of just having them.
+NIST 800-61 is an excellent framework, but it's written for people who already understand the concepts. Playbook Forge bridges the gap between the framework and the humans executing procedures. Turning the abstract lifecycle into concrete visual steps, with a real execution engine behind them, helps teams actually follow their playbooks instead of just having them.
 
 ## What I Learned
 
@@ -75,6 +91,8 @@ The gap between documentation and usability is where most teams struggle. The kn
 
 Text parsing, even semi-structured text, is messier than you'd expect. Real-world playbook documents have edge cases I never would have anticipated.
 
-ReactFlow is excellent for this use case. The custom node system is flexible enough for domain-specific concepts without fighting the framework. And FastAPI continues to be my go-to for Python APIs. Type hints, automatic validation, built-in docs. Hard to beat.
+Building the execution engine changed the entire tool. A static flowchart is nice. A flowchart you can run, track, and review is a different category of useful.
 
-Playbook Forge is on my GitHub. If your team has incident response playbooks gathering dust on a shared drive, try running one through it. Seeing your procedures as a flowchart might change how you think about them.
+ReactFlow is excellent for this use case. The custom node system is flexible enough for domain-specific concepts without fighting the framework. FastAPI continues to be my go-to for Python APIs. Type hints, automatic validation, built-in docs. And adding SQLite persistence with SQLAlchemy was straightforward enough that there was no reason to leave playbooks as ephemeral artifacts.
+
+Playbook Forge is on [my GitHub](https://github.com/solomonneas/playbook-forge). If your team has incident response playbooks gathering dust on a shared drive, try running one through it. Seeing your procedures as a live, executable flowchart might change how you think about them.
