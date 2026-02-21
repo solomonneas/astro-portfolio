@@ -7,7 +7,7 @@ tags: ["react", "typescript", "fastapi", "librenms", "networking", "noc", "monit
 
 
 
-The first time I had to do disaster recovery at Polk State, someone cut our fiber.
+The first time I had to do disaster recovery in Polk State College's Network Systems Engineering Technology (NSET) department, someone cut our fiber.
 
 Not metaphorically. Physically severed. One moment the network was fine, the next moment half the campus dropped. Phones, Wi-Fi, wired connections, servers behind affected switches. All down. And I'm standing in the server room trying to figure out where the failure actually is.
 
@@ -19,7 +19,7 @@ We figured it out eventually. You always do. But it took longer than it should h
 
 ## The Gold Mine in the Server Rack
 
-When I got to Polk State, one of the first things I did was deploy LibreNMS. Standard network monitoring. SNMP polling, device discovery, interface stats, uptime tracking. I configured it, pointed it at our infrastructure, and let it run.
+When I first joined the NSET department, one of the first things I did was deploy LibreNMS. Standard network monitoring. SNMP polling, device discovery, interface stats, uptime tracking. I configured it, pointed it at our infrastructure, and let it run.
 
 And then it just sat there. Polling away in the darkness of the server rack. Collecting data nobody was looking at.
 
