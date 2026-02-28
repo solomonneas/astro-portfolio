@@ -4,173 +4,106 @@ import StatusLight from "../components/StatusLight.astro";
 ---
 
 <Layout pageTitle="Contact">
-  <section class="contact-terminal">
-    <header class="terminal-header">
-      <div class="header-left">
-        <StatusLight status="completed" />
-        <span class="status-text">LISTENING</span>
-      </div>
-      <h1>$ cat ~/contacts.txt</h1>
+  <section class="contact-page">
+    <header class="page-header">
+      <h1>Contact</h1>
     </header>
 
-    <div class="terminal-body">
-      <!-- Contact Card -->
-      <div class="contact-card">
-        <p class="card-intro"># Available contact methods:</p>
+    <div class="contact-card">
+      <p class="card-intro">Available contact methods:</p>
 
-        <ul class="contact-list">
-          <li>
-            <a href="mailto:me@solomonneas.dev" class="contact-link">
-              <span class="prompt">$</span>
-              <span class="command">open</span>
-              <span class="arg">email</span>
-              <span class="comment"># me@solomonneas.dev</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://www.linkedin.com/in/solomon-neas/" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">visit</span>
-              <span class="arg">linkedin</span>
-              <span class="comment"># Professional profile</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://github.com/solomonneas" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">visit</span>
-              <span class="arg">github</span>
-              <span class="comment"># Code repositories</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://x.com/solomonneas" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">visit</span>
-              <span class="arg">x</span>
-              <span class="comment"># @solomonneas</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://bsky.app/profile/solomonneas.dev" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">visit</span>
-              <span class="arg">bluesky</span>
-              <span class="comment"># solomonneas.dev</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://substack.com/@solomonneas?" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">visit</span>
-              <span class="arg">substack</span>
-              <span class="comment"># Newsletter & writing</span>
-            </a>
-          </li>
-          <li>
-            <a href="mailto:me@solomonneas.dev" class="contact-link">
-              <span class="prompt">$</span>
-              <span class="command">email</span>
-              <span class="arg">me@solomonneas.dev</span>
-              <span class="comment"># Let's talk</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://ko-fi.com/solomonneas" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">support</span>
-              <span class="arg">ko-fi</span>
-              <span class="comment"># Buy me a coffee</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://linktr.ee/solomonneas" class="contact-link" target="_blank">
-              <span class="prompt">$</span>
-              <span class="command">visit</span>
-              <span class="arg">linktree</span>
-              <span class="comment"># All links</span>
-            </a>
-          </li>
-        </ul>
-      </div>
+      <ul class="contact-list">
+        <li>
+          <a href="mailto:me@solomonneas.dev" class="contact-link">
+            <span class="link-label">Email</span>
+            <span class="link-value">me@solomonneas.dev</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/solomon-neas/" class="contact-link" target="_blank">
+            <span class="link-label">LinkedIn</span>
+            <span class="link-value">Professional profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/solomonneas" class="contact-link" target="_blank">
+            <span class="link-label">GitHub</span>
+            <span class="link-value">Code repositories</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://x.com/solomonneas" class="contact-link" target="_blank">
+            <span class="link-label">X</span>
+            <span class="link-value">@solomonneas</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://bsky.app/profile/solomonneas.dev" class="contact-link" target="_blank">
+            <span class="link-label">Bluesky</span>
+            <span class="link-value">solomonneas.dev</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://substack.com/@solomonneas?" class="contact-link" target="_blank">
+            <span class="link-label">Substack</span>
+            <span class="link-value">Newsletter & writing</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://ko-fi.com/solomonneas" class="contact-link" target="_blank">
+            <span class="link-label">Ko-fi</span>
+            <span class="link-value">Buy me a coffee</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://linktr.ee/solomonneas" class="contact-link" target="_blank">
+            <span class="link-label">Linktree</span>
+            <span class="link-value">All links</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-      <!-- Navigation -->
-      <div class="nav-section">
-        <p class="nav-comment">// Continue exploring</p>
-        <div class="nav-links">
-          <a href="/hire" class="nav-link">$ cd /hire</a>
-          <a href="/about" class="nav-link">$ cd /about</a>
-          <a href="/projects" class="nav-link">$ cd /projects</a>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="terminal-footer">
-        <span class="cursor-blink">█</span> EOF
+    <div class="nav-section">
+      <div class="nav-links">
+        <a href="/hire" class="nav-link">Hire Me</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/projects" class="nav-link">Projects</a>
       </div>
     </div>
   </section>
 </Layout>
 
 <style>
-  /* Terminal Wrapper */
-  .contact-terminal {
+  .contact-page {
     font-family: "IBM Plex Mono", monospace;
     max-width: 42rem;
     margin: 0 auto;
   }
 
-  .terminal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
+  .page-header {
+    margin-bottom: 2rem;
   }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .status-text {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    color: #10b981;
-  }
-
-  .terminal-header h1 {
-    font-size: 1rem;
-    font-weight: 500;
+  .page-header h1 {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
     margin: 0;
-    opacity: 0.8;
+    color: var(--primary);
+    line-height: 1.1;
   }
 
-  .terminal-body {
-    padding: 1.5rem 1.25rem 1.25rem;
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-    background: color-mix(in srgb, currentColor 2%, transparent);
-  }
-
-  /* Contact Card */
   .contact-card {
     padding: 1.25rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    border-radius: 4px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     margin-bottom: 2rem;
   }
 
   .card-intro {
     margin: 0 0 1.25rem 0;
-    opacity: 0.6;
+    color: var(--text-muted);
     font-size: 0.85rem;
   }
 
@@ -197,23 +130,16 @@ import StatusLight from "../components/StatusLight.astro";
   .contact-list li:nth-child(6) { animation-delay: 0.3s; }
   .contact-list li:nth-child(7) { animation-delay: 0.35s; }
   .contact-list li:nth-child(8) { animation-delay: 0.4s; }
-  .contact-list li:nth-child(9) { animation-delay: 0.45s; }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateX(-5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-5px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 
   .contact-link {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
+    gap: 1rem;
     padding: 0.5rem 0.75rem;
     border-radius: 3px;
     font-size: 0.85rem;
@@ -225,41 +151,23 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   .contact-link:hover {
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border-color: color-mix(in srgb, currentColor 15%, transparent);
+    background: var(--card-bg);
+    border-color: var(--border);
   }
 
-  .prompt {
-    opacity: 0.5;
+  .link-label {
+    color: var(--primary);
     font-weight: 600;
+    min-width: 80px;
   }
 
-  .command {
-    color: #10b981;
-    font-weight: 600;
+  .link-value {
+    color: var(--text-muted);
   }
 
-  .arg {
-    opacity: 0.9;
-  }
-
-  .comment {
-    opacity: 0.45;
-    font-style: italic;
-    margin-left: auto;
-  }
-
-  /* Navigation */
   .nav-section {
     padding-top: 1rem;
-    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
-  }
-
-  .nav-comment {
-    font-size: 0.75rem;
-    opacity: 0.5;
-    margin: 0 0 0.75rem 0;
-    font-style: italic;
+    border-top: 1px dashed var(--border);
   }
 
   .nav-links {
@@ -270,9 +178,8 @@ import StatusLight from "../components/StatusLight.astro";
 
   .nav-link {
     font-size: 0.8rem;
-    color: inherit;
+    color: var(--text-muted);
     text-decoration: none;
-    opacity: 0.6;
     transition: all 0.2s ease;
     padding: 0.4rem 0.75rem;
     border: 1px solid transparent;
@@ -280,43 +187,18 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   .nav-link:hover {
-    opacity: 1;
-    color: #10b981;
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
-    background: color-mix(in srgb, #10b981 5%, transparent);
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
   }
 
-  /* Footer */
-  .terminal-footer {
-    margin-top: 1.5rem;
-    font-size: 0.8rem;
-    opacity: 0.5;
-  }
-
-  .cursor-blink {
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  /* Responsive */
   @media (max-width: 640px) {
-    .terminal-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-
     .contact-link {
       flex-wrap: wrap;
     }
 
-    .comment {
+    .link-value {
       width: 100%;
-      margin-left: 0;
       margin-top: 0.25rem;
     }
 

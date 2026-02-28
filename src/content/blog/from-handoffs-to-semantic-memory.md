@@ -13,7 +13,7 @@ I fixed this with a local GPU, Ollama, and a tiny embedding model. No cloud APIs
 
 ## The Handoff Letter Era
 
-I run [OpenClaw](https://openclaw.dev), an AI assistant framework that orchestrates multiple models (Claude Opus 4.6, GPT 5.3, Gemini, local Ollama). My main agent, clawdbot, handles everything from code reviews to portfolio management across 30+ projects. The problem: every new session starts from zero.
+I run [OpenClaw](https://openclaw.dev), an AI assistant framework that orchestrates multiple models (Claude Opus 4.6, GPT 5.3, Gemini, local Ollama). My main agent, [redacted-host], handles everything from code reviews to portfolio management across 30+ projects. The problem: every new session starts from zero.
 
 My workaround was handoff letters. End of session, I'd generate a structured markdown doc summarizing everything. Next session, paste it back in. The AI reads it and picks up where it left off.
 
@@ -33,7 +33,7 @@ None of these felt right. I needed fast, local, and persistent.
 
 ## The Fix: Ollama + nomic-embed-text
 
-I already had Ollama installed for local chat models. The key insight: Ollama exposes an OpenAI-compatible API at `localhost:11434/v1/`. Any tool expecting OpenAI's embedding endpoint can point at Ollama instead.
+I already had Ollama installed for local chat models. The key insight: Ollama exposes an OpenAI-compatible API at `[redacted-service]/v1/`. Any tool expecting OpenAI's embedding endpoint can point at Ollama instead.
 
 Pulled `nomic-embed-text` (274MB), updated the config:
 
@@ -46,7 +46,7 @@ agents:
     memorySearch:
       provider: "openai"
       remote:
-        baseUrl: "http://localhost:11434/v1/"
+        baseUrl: "http://[redacted-service]/v1/"
       model: "nomic-embed-text"
       fallback: "none"
 ```

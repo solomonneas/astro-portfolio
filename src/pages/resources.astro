@@ -129,13 +129,13 @@ import Layout from "../layouts/Layout.astro";
 <style>
   table.resources {
     font-size: 0.8rem;
-    color: #655a3d;
+    color: var(--text);
     border-collapse: collapse;
     width: 100%;
     margin-top: 1.563rem;
   }
   .resources tr + tr {
-    border-top: 1px dotted #655a3d;
+    border-top: 1px dotted var(--border);
   }
   .resources td {
     padding: 0.4rem;
@@ -156,7 +156,8 @@ import Layout from "../layouts/Layout.astro";
     display: inline;
     font-size: 0.64rem;
     border-radius: 1rem;
-    border: 1px dotted #655a3d;
+    border: 1px dotted var(--border);
+    color: var(--text-muted);
     padding: 0 0.512rem;
     white-space: nowrap;
     text-decoration: none;

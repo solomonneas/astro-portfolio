@@ -133,7 +133,7 @@ sudo systemctl start openclaw
 
 This is where most Windows guides stop and most people get stuck. Your phone needs to reach your OpenClaw instance over the local network.
 
-WSL2 ports auto-forward to `localhost` on Windows. But to access from your phone (or any other device on your network), you need Windows to listen on its actual network IP.
+WSL2 ports auto-forward to `[redacted-service]` on Windows. But to access from your phone (or any other device on your network), you need Windows to listen on its actual network IP.
 
 Find your Windows host IP:
 
@@ -142,18 +142,18 @@ Find your Windows host IP:
 ipconfig
 ```
 
-Look for your Wi-Fi or Ethernet adapter's IPv4 address (e.g., `192.168.1.100`).
+Look for your Wi-Fi or Ethernet adapter's IPv4 address (e.g., `[redacted-ip]`).
 
 Set up port forwarding (PowerShell as Admin):
 
 ```powershell
-netsh interface portproxy add v4tov4 listenport=3000 listenaddress=0.0.0.0 connectport=3000 connectaddress=localhost
+netsh interface portproxy add v4tov4 listenport=3000 listenaddress=0.0.0.0 connectport=3000 connectaddress=[redacted-service]
 ```
 
 Add a firewall rule:
 
 ```powershell
-New-NetFirewallRule -DisplayName "OpenClaw" -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName "OpenClaw" -Direction Inbound -Localport [redacted] -Protocol TCP -Action Allow
 ```
 
 Replace `3000` with whatever port OpenClaw is using.
@@ -205,10 +205,10 @@ If you're running a dev server and switch git branches, the working directory Py
 
 ### BIND_HOST for Cross-WSL Access
 
-If you're running any API service inside WSL that needs to be accessible from Windows (or your phone), make sure it binds to `0.0.0.0`, not `127.0.0.1`. For FastAPI/Uvicorn:
+If you're running any API service inside WSL that needs to be accessible from Windows (or your phone), make sure it binds to `0.0.0.0`, not `[redacted-ip]`. For FastAPI/Uvicorn:
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn main:app --host 0.0.0.0 --port [redacted]
 ```
 
 For Vite dev servers, use `--host` flag:
@@ -227,7 +227,7 @@ ollama pull nomic-embed-text
 ollama pull qwen2.5:14b
 ```
 
-Ollama runs on port 11434 by default. OpenClaw can use it as an OpenAI-compatible endpoint at `http://localhost:11434/v1/`.
+Ollama runs on port [redacted] by default. OpenClaw can use it as an OpenAI-compatible endpoint at `http://[redacted-service]/v1/`.
 
 ## What's Next
 

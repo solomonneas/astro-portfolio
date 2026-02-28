@@ -66,7 +66,7 @@ const skillsGained = [
 ---
 
 <ProjectLayout frontmatter={frontmatter}>
-  <h2>// Overview</h2>
+  <h2>Overview</h2>
   <p>
     Led the complete infrastructure migration of our educational lab environment from VMware ESXi to Proxmox VE.
     This wasn't a team effort with delegated tasks; I was the workhorse. I physically installed hardware, configured
@@ -75,7 +75,7 @@ const skillsGained = [
   </p>
 
   <!-- The Crisis -->
-  <h2>// The Catalyst: Broadcom's VMware Acquisition</h2>
+  <h2>The Catalyst: Broadcom's VMware Acquisition</h2>
   <p class="section-intro">
     In November 2023, Broadcom completed its $61 billion acquisition of VMware and immediately began dismantling
     the licensing models that educational institutions depended on:
@@ -129,7 +129,7 @@ const skillsGained = [
   </div>
 
   <!-- Cost Savings -->
-  <h2>// The Numbers: Cost Avoidance</h2>
+  <h2>The Numbers: Cost Avoidance</h2>
   <p class="section-intro">
     The financial impact of staying on VMware was incompatible with educational IT budgets:
   </p>
@@ -202,7 +202,7 @@ const skillsGained = [
   </div>
 
   <!-- Infrastructure -->
-  <h2>// Infrastructure Architecture</h2>
+  <h2>Infrastructure Architecture</h2>
   <p class="section-intro">
     The migration involved a 6-node enterprise server cluster running educational lab environments for NETLAB+:
   </p>
@@ -254,7 +254,7 @@ const skillsGained = [
   </div>
 
   <!-- Network Redesign -->
-  <h2>// Network Architecture Redesign</h2>
+  <h2>Network Architecture Redesign</h2>
   <p class="section-intro">
     The migration wasn't just a hypervisor swap. I redesigned the entire network architecture to eliminate
     bandwidth bottlenecks and segregate management traffic:
@@ -311,7 +311,7 @@ const skillsGained = [
   </div>
 
   <!-- Project Phases -->
-  <h2>// Migration Phases</h2>
+  <h2>Migration Phases</h2>
   <p class="section-intro">
     The project spanned several months with distinct phases. Each phase built on the previous; failures meant rebuilding:
   </p>
@@ -336,7 +336,7 @@ const skillsGained = [
   </div>
 
   <!-- NETLAB+ Integration -->
-  <h2>// NETLAB+ Integration</h2>
+  <h2>NETLAB+ Integration</h2>
   <p>
     The end goal was full integration with NDG's NETLAB+ platform for educational lab delivery. This involved
     restoring VM images from NDG's distribution system, configuring the NETLAB-VE management appliance,
@@ -345,7 +345,7 @@ const skillsGained = [
   </p>
 
   <!-- Lessons Learned -->
-  <h2>// Lessons Learned (The Hard Way)</h2>
+  <h2>Lessons Learned (The Hard Way)</h2>
   <p class="section-intro">
     Building production infrastructure means breaking things. These are the moments that taught me the most:
   </p>
@@ -403,7 +403,7 @@ const skillsGained = [
   </div>
 
   <!-- Skills Gained -->
-  <h2>// Skills & Knowledge Gained</h2>
+  <h2>Skills & Knowledge Gained</h2>
   <p class="section-intro">
     This project was a crash course in enterprise infrastructure. I went from VMware familiarity to deep
     Proxmox and Linux networking expertise:
@@ -423,7 +423,7 @@ const skillsGained = [
   </div>
 
   <!-- Status -->
-  <h2>// Project Status</h2>
+  <h2>Project Status</h2>
   <div class="status-block">
     <div class="status-indicator completed">
       <div class="status-pulse"></div>
@@ -443,7 +443,7 @@ const skillsGained = [
 
   <!-- Sources -->
   <div id="sources" class="sources-section">
-    <h2>// Sources & References</h2>
+    <h2>Sources & References</h2>
     <p class="section-intro">
       The cost estimates on this page are based on publicly documented Broadcom VMware pricing (196 cores × $350/core/year = $68,600 annually).
       The following sources document VMware's licensing changes under Broadcom:
@@ -457,6 +457,66 @@ const skillsGained = [
         </a>
       ))}
     </div>
+  </div>
+
+  <!-- NDG Workshop Training -->
+  <h2>NDG Proxmox VE 8 Workshop</h2>
+  <p>
+    Completed an intensive 18-hour workshop conducted by Network Development Group (NDG) covering 
+    Proxmox VE 8 deployment for NETLAB+ educational lab environments. This training directly informed 
+    the migration strategy and cluster architecture.
+  </p>
+
+  <div class="workshop-grid">
+    <div class="workshop-stat">
+      <span class="ws-value">18 hours</span>
+      <span class="ws-label">Training (3 days, July 8-10 2025)</span>
+    </div>
+    <div class="workshop-stat">
+      <span class="ws-value">Jason Zeller</span>
+      <span class="ws-label">Lead Instructor (FHSU)</span>
+    </div>
+    <div class="workshop-stat">
+      <span class="ws-value">3 Scenarios</span>
+      <span class="ws-label">Fresh Install · Migration · Hybrid</span>
+    </div>
+  </div>
+
+  <h3>Key Technical Insights</h3>
+  <div class="insights-compact">
+    <div class="insight-row">
+      <span class="insight-topic">Storage</span>
+      <span class="insight-text">15TB NVMe on user servers. HBA mode over RAID controllers. Linked clones can't span storage pools.</span>
+    </div>
+    <div class="insight-row">
+      <span class="insight-topic">Networking</span>
+      <span class="insight-text">Separate management, cluster, and storage traffic. 10G recommended for cluster network (VM migration/replication).</span>
+    </div>
+    <div class="insight-row">
+      <span class="insight-topic">Windows 11</span>
+      <span class="insight-text">CPU type must be 'Host'. VirtIO drivers pre-installed or injected via WinRE before first boot.</span>
+    </div>
+    <div class="insight-row">
+      <span class="insight-topic">Cloning</span>
+      <span class="insight-text">Never use Proxmox's default cloning for NETLAB pods. Use NETLAB's own pod management and linked clone system.</span>
+    </div>
+    <div class="insight-row">
+      <span class="insight-topic">SPICE</span>
+      <span class="insight-text">All VMs should use SPICE for remote access. Enables copy/paste, multi-monitor, better performance than VNC.</span>
+    </div>
+    <div class="insight-row">
+      <span class="insight-topic">Backups</span>
+      <span class="insight-text">Run PBS on older hardware. Stop VMs before backup for consistency. Use vzdump for snapshots.</span>
+    </div>
+  </div>
+
+  <h3>Workshop Resources</h3>
+  <div class="resource-links">
+    <a href="https://netlab-docs.netdevgroup.com/" target="_blank" class="resource-chip">NDG Documentation →</a>
+    <a href="https://netlab-docs.netdevgroup.com/vmi/proxmox/install/" target="_blank" class="resource-chip">Proxmox Deployment Guide →</a>
+    <a href="https://portal.netdevgroup.com/learn/pve8-sm-training" target="_blank" class="resource-chip">Setup & Management Course →</a>
+    <a href="https://portal.netdevgroup.com/learn/pve8-aao-training" target="_blank" class="resource-chip">Advanced Administration →</a>
+    <a href="https://community-scripts.github.io/ProxmoxVE/scripts" target="_blank" class="resource-chip">Community Scripts →</a>
   </div>
 </ProjectLayout>
 
@@ -1182,6 +1242,103 @@ const skillsGained = [
 
   .source-link:hover .source-arrow {
     opacity: 1;
+  }
+
+  /* Workshop Section */
+  .workshop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+
+  .workshop-stat {
+    padding: 1rem;
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  .ws-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary, #10b981);
+    display: block;
+  }
+
+  .ws-label {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  .insights-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .insight-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 6%, transparent);
+    font-size: 0.8rem;
+    transition: background 0.15s ease;
+  }
+
+  .insight-row:last-child {
+    border-bottom: none;
+  }
+
+  .insight-row:hover {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+  }
+
+  .insight-row .insight-topic {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--primary, #10b981);
+  }
+
+  .insight-row .insight-text {
+    color: var(--text-muted, inherit);
+    opacity: 0.8;
+    line-height: 1.5;
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  .resource-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .resource-chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .resource-chip:hover {
+    border-color: var(--primary, #10b981);
+    color: var(--primary, #10b981);
+    background: color-mix(in srgb, currentColor 3%, transparent);
   }
 
   /* Responsive */

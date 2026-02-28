@@ -2,10 +2,7 @@
 const { pageTitle } = Astro.props;
 const pathname = Astro.url.pathname;
 
-const isIndex = pathname === "/";
 const isBlogPost = pathname.match(/^\/blog\/.+/);
-const isProjectPage = pathname.match(/^\/projects\/.+/);
-const showHomeLink = !isIndex && !isBlogPost && !isProjectPage;
 
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
@@ -13,7 +10,7 @@ const isDev = import.meta.env.DEV;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,123 +27,31 @@ const isDev = import.meta.env.DEV;
     <link rel="canonical" href={Astro.url.href} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="svg-icon" />
 
-    <script>
-      let darkmode = false;
-      let themeIndex = 0;
-      const svgIcon = document.getElementById("svg-icon");
-
-      // Curated hue rotations that maintain good contrast (WCAG AA 4.5:1+)
-      // Each has been tested with base colors #fff2d1 (bg) and #655a3d (text)
-      // in both light mode (invert=0) and dark mode (invert=100)
-      const curatedThemes = [
-        0,    // Original warm cream/brown
-        25,   // Soft peach/coral
-        45,   // Golden amber
-        70,   // Olive/sage green
-        95,   // Forest/moss green
-        125,  // Teal green
-        155,  // Cool cyan
-        180,  // Ocean blue
-        200,  // Sky blue
-        225,  // Periwinkle/lavender
-        255,  // Purple/violet
-        280,  // Magenta
-        305,  // Rose pink
-        330,  // Warm coral pink
-        350   // Salmon/blush
-      ];
-
-      function getNextTheme() {
-        themeIndex = (themeIndex + 1) % curatedThemes.length;
-        return curatedThemes[themeIndex];
-      }
-
-      function shuffleStartIndex() {
-        themeIndex = Math.floor(Math.random() * curatedThemes.length);
-      }
-
-      function applyTheme(inverted, hueRotation) {
-        const isInverted = inverted === true || inverted === "true";
-        const a = isInverted ? 100 : 0;
-        let style = document.getElementById("theme-style");
-        if (!style) {
-          style = document.createElement("style");
-          style.id = "theme-style";
-          document.head.append(style);
-        }
-
-        style.innerText = `
- #filter { backdrop-filter:hue-rotate(${hueRotation}deg) invert(${a}%); }
- :root { --theme-hue: ${hueRotation}; --theme-invert: ${a}; }
- .flag-preserve { filter: hue-rotate(-${hueRotation}deg) invert(${a}%); }
- `;
-
-        const svgContent = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='none' /><text x='10' y='65' font-family='"IBM Plex Mono", monospace' font-weight='bold' font-size='70' fill='#e0e0e0'>&gt;_</text><style>svg{filter:hue-rotate(${hueRotation}deg) invert(${a}%25);}</style></svg>`;
-        const o = `data:image/svg+xml,${encodeURIComponent(svgContent)}`;
-        svgIcon.setAttribute("href", o);
-        saveThemeToLocalStorage(isInverted, hueRotation);
-      }
-
-      function saveThemeToLocalStorage(inverted, hueRotation) {
-        if (!localStorage) return;
-        localStorage.setItem("inverted", inverted ? "true" : "false");
-        localStorage.setItem("hueRotation", hueRotation);
-      }
-
-      function getThemeFromLocalStorage() {
-        if (!localStorage) return;
-        let inverted = localStorage.getItem("inverted");
-        const hueRotation = localStorage.getItem("hueRotation");
-
-        if (inverted === "true") {
-          darkmode = true;
-        }
-
-        if (hueRotation) {
-          // Find closest curated theme index for saved rotation
-          const savedHue = parseInt(hueRotation, 10);
-          let closestIdx = 0;
-          let closestDiff = 360;
-          curatedThemes.forEach((h, i) => {
-            const d = Math.abs(h - savedHue);
-            const diff = Math.min(d, 360 - d);
-            if (diff < closestDiff) {
-              closestDiff = diff;
-              closestIdx = i;
-            }
-          });
-          themeIndex = closestIdx;
-          applyTheme(inverted, hueRotation);
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.getElementById("color");
-        btn.addEventListener("click", () => {
-          darkmode = !darkmode;
-          const hue = getNextTheme();
-          applyTheme(darkmode, hue);
-        });
-
-        // Start at a random position in the curated list
-        shuffleStartIndex();
-        getThemeFromLocalStorage();
-
-        const animationStyle = document.createElement("style");
-        document.head.append(animationStyle);
-
-        setTimeout(() => {
-          animationStyle.innerText = `* {
-            transition-property:filter, backdrop-filter;
-            transition-duration: 1s;
-          }`;
-        }, 1);
-      });
+    <script is:inline>
+      // Apply theme immediately to prevent flash
+      (function() {
+        const saved = localStorage.getItem('theme');
+        const theme = saved === 'light' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
     </script>
 
     <style>
-      .back-link,
-      .home-link {
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .back-link {
         font-family: "IBM Plex Mono", monospace;
         font-size: 0.8rem;
         color: var(--text);
@@ -159,59 +64,84 @@ const isDev = import.meta.env.DEV;
         border: 1px solid transparent;
       }
 
-      .back-link:hover,
-      .home-link:hover {
-        background: rgba(0, 0, 0, 0.05);
-        border-color: var(--text);
-        color: var(--text);
-        transform: translateY(-1px);
+      .back-link:hover {
+        color: var(--primary);
+        border-color: var(--border);
       }
 
-      .home-link .mono::after {
-        content: "█";
-        animation: blink 1s step-end infinite;
-        color: var(--text);
-        opacity: 0.7;
-        margin-left: 5px;
+      /* Mobile hamburger */
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.4rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
       }
 
-      .mono {
-        font-family: "IBM Plex Mono", monospace;
+      .mobile-menu-toggle svg {
+        width: 18px;
+        height: 18px;
       }
 
-      @keyframes blink {
-        from,
-        to {
-          opacity: 1;
+      @media (max-width: 768px) {
+        .mobile-menu-toggle {
+          display: inline-flex;
         }
-        50% {
-          opacity: 0;
-        }
-      }
-    </style>
 
-    <style is:global>
-      .back-link,
-      .home-link {
-        font-family: "IBM Plex Mono", monospace !important;
+        .nav-links ul {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .nav-links ul.open {
+          display: flex;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="filter"></div>
     <div class="site-wrapper">
       <a href="#main-content" id="skip-link">Skip to content</a>
       <nav>
-        <div class="title-container">
+        <div class="site-header">
           <span class="site-title">
-            root@<span class="user-host">solomon.neas</span>:~#
+            <a href="/">Solomon Neas</a>
           </span>
-          <button id="color" class="theme-btn">
-            Random Theme
-          </button>
+          <div class="header-right">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+              <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="nav-links">
-          <ul>
+          <ul id="navMenu">
             <li>
               <a href="/" class={pathname === "/" ? "current-link" : ""}>Home</a>
             </li>
@@ -230,7 +160,6 @@ const isDev = import.meta.env.DEV;
             <li>
               <a href="/blog" class={pathname.startsWith("/blog") ? "current-link" : ""}>Blog</a>
             </li>
-            <li><a href="/rss.xml" target="_blank">RSS</a></li>
             <li>
               <a href="/contact" class={pathname.startsWith("/contact") ? "current-link" : ""}>Contact</a>
             </li>
@@ -242,35 +171,10 @@ const isDev = import.meta.env.DEV;
       </main>
       <footer id="footer">
         {
-          pathname.startsWith("/blog/") && (
+          isBlogPost && (
             <div class="text-center" style="margin-bottom: 2rem;">
               <a href="/blog" class="back-link">
-                ← Back
-              </a>
-            </div>
-          )
-        }
-        {
-          showHomeLink && (
-            <div class="text-center" style="margin-bottom: 2rem;">
-              <a href="/" class="home-link">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  style="vertical-align: middle; margin-right: 8px;">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-                <span class="mono">
-                  root@<span style="font-weight: 700;">solomon.neas</span>:{pathname}: $ cd ~
-                </span>
+                ← Back to Blog
               </a>
             </div>
           )
@@ -357,6 +261,46 @@ const isDev = import.meta.env.DEV;
         </div>
       </footer>
     </div>
+
+    <script is:inline>
+      // Theme toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        var toggle = document.getElementById('themeToggle');
+        var sunIcon = toggle.querySelector('.sun-icon');
+        var moonIcon = toggle.querySelector('.moon-icon');
+        var menuToggle = document.getElementById('mobileMenuToggle');
+        var navMenu = document.getElementById('navMenu');
+
+        function updateIcons() {
+          var theme = document.documentElement.getAttribute('data-theme');
+          if (theme === 'dark') {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+          } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+          }
+        }
+
+        updateIcons();
+
+        toggle.addEventListener('click', function() {
+          var current = document.documentElement.getAttribute('data-theme');
+          var next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+          updateIcons();
+        });
+
+        // Mobile menu toggle
+        if (menuToggle && navMenu) {
+          menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('open');
+          });
+        }
+      });
+    </script>
+
     {!isDev && <Analytics />}
   </body>
 </html>

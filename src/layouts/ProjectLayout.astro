@@ -7,34 +7,34 @@ const { frontmatter } = Astro.props;
 <Layout pageTitle={frontmatter.title}>
   <article class="project-page">
     <header class="project-header">
+      <a href="/projects" class="back-link">← Projects</a>
       <h1 class="project-title">{frontmatter.title}</h1>
       
       <div class="project-meta">
         <span class="meta-item">
-          <span class="meta-label">[+] Status:</span>
-          <span class="meta-value">{frontmatter.status || "In Progress"}</span>
-          <StatusLight status={frontmatter.statusType || "ongoing"} />
+          <span class="meta-label">Status:</span>
+          <span class="meta-value">
+            <StatusLight status={frontmatter.statusType || "ongoing"} />
+            {frontmatter.status || "In Progress"}
+          </span>
         </span>
         <span class="meta-item">
-          <span class="meta-label">[+] Origin:</span>
+          <span class="meta-label">Origin:</span>
           <span class="meta-value">{frontmatter.origin || frontmatter.description}</span>
         </span>
         {frontmatter.date && (
           <span class="meta-item">
-            <span class="meta-label">[+] Date:</span>
+            <span class="meta-label">Since:</span>
             <span class="meta-value">{frontmatter.date}</span>
           </span>
         )}
       </div>
 
       {frontmatter.techStack && (
-        <div class="tech-stack">
-          <span class="stack-label">>> TECH_STACK:</span>
-          <div class="stack-badges">
-            {frontmatter.techStack.map((tech) => (
-              <span class="tech-badge">[{tech}]</span>
-            ))}
-          </div>
+        <div class="tech-badges">
+          {frontmatter.techStack.map((tech) => (
+            <span class="badge">{tech}</span>
+          ))}
         </div>
       )}
     </header>
@@ -44,120 +44,131 @@ const { frontmatter } = Astro.props;
     </div>
 
     <footer class="project-footer">
-      <a href="/projects" class="back-link"><span class="prompt">$</span> cd ~/projects/</a>
+      <a href="/projects" class="back-link">← All Projects</a>
     </footer>
   </article>
 </Layout>
 
 <style>
   .project-page {
-    padding: 2rem 0;
-  }
-
-  .project-header {
-    margin-bottom: 2rem;
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
   }
 
   .back-link {
     display: inline-block;
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.85rem;
-    color: currentColor;
+    font-size: 0.8rem;
+    color: var(--text-muted);
     text-decoration: none;
-    opacity: 0.7;
-    margin-bottom: 1rem;
-    transition: opacity 0.2s ease;
+    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.2s ease;
   }
 
   .back-link:hover {
-    opacity: 1;
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
   }
 
-  .prompt {
-    color: #10b981;
-    font-weight: 600;
+  .project-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
   }
 
   .project-title {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin: 0.5rem 0;
-    line-height: 1.3;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 1rem;
+    line-height: 1.2;
   }
 
   .project-meta {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin: 1rem 0;
-    font-family: "IBM Plex Mono", monospace;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
     font-size: 0.8rem;
   }
 
   .meta-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-  }
-
-  .meta-label {
-    color: #10b981;
-    font-weight: 500;
-  }
-
-  .meta-value {
-    opacity: 0.85;
-  }
-
-  .tech-stack {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-  }
-
-  .stack-label {
-    color: #10b981;
-    font-weight: 500;
-  }
-
-  .stack-badges {
-    display: flex;
-    flex-wrap: wrap;
     gap: 0.4rem;
   }
 
-  .tech-badge {
-    font-size: 0.7rem;
-    opacity: 0.7;
-    padding: 0.1rem 0.3rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border-radius: 2px;
+  .meta-label {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--text-muted);
+  }
+
+  .meta-value {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .tech-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
   }
 
   .project-content {
-    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
-    padding-top: 2rem;
+    padding-top: 0;
   }
 
   .project-content :global(h2) {
     font-family: "IBM Plex Mono", monospace;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #10b981;
-    margin: 2rem 0 0.75rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1rem 0;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--primary);
   }
 
   .project-content :global(h2:first-child) {
     margin-top: 0;
   }
 
+  .project-content :global(h3) {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem 0;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--secondary);
+  }
+
+  .project-content :global(h4) {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 1.25rem 0 0.5rem 0;
+    color: var(--text-muted);
+  }
+
   .project-content :global(p) {
     margin-bottom: 1rem;
-    line-height: 1.7;
+    line-height: 1.75;
+    text-align: left;
   }
 
   .project-content :global(ul),
@@ -171,13 +182,21 @@ const { frontmatter } = Astro.props;
     line-height: 1.6;
   }
 
+  .project-content :global(li::marker) {
+    color: var(--primary);
+  }
+
   .project-content :global(pre) {
     font-family: "IBM Plex Mono", monospace;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    padding: 1rem;
-    border-radius: 4px;
-    overflow-x: auto;
-    margin: 1rem 0;
+    background: var(--code-bg);
+    border-left: 3px solid var(--border);
+    padding: 1rem 1.25rem;
+    border-radius: 0;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: visible;
   }
 
   .project-content :global(code) {
@@ -185,9 +204,81 @@ const { frontmatter } = Astro.props;
     font-size: 0.9em;
   }
 
+  .project-content :global(:not(pre) > code) {
+    color: var(--primary);
+    background: var(--code-bg);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+  }
+
+  .project-content :global(a) {
+    color: var(--link, var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
+    font-size: inherit;
+    border-bottom: none;
+  }
+
+  .project-content :global(a:hover) {
+    text-decoration-color: var(--primary);
+    background: transparent;
+    color: var(--primary);
+  }
+
+  .project-content :global(blockquote) {
+    border-left: 3px solid var(--tertiary);
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+    background: var(--blockquote-bg);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .project-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+  }
+
+  .project-content :global(th) {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--primary);
+    text-align: left;
+    padding: 0.5rem;
+    border-bottom: 2px solid var(--border);
+    font-size: 0.8rem;
+  }
+
+  .project-content :global(td) {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project-content :global(strong) {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] .project-content :global(strong) {
+    color: #fff;
+  }
+
   .project-footer {
     margin-top: 3rem;
-    padding-top: 1rem;
-    border-top: 1px dotted color-mix(in srgb, currentColor 15%, transparent);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .project-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .project-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
   }
 </style>

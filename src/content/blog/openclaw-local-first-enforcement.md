@@ -15,9 +15,9 @@ Here's what worked, what didn't, and what I learned about enforcing model behavi
 
 I run several local APIs on my workstation:
 
-- **Code Search** (localhost:5204): Semantic search across 40+ repos using nomic-embed-text embeddings. Zero cloud costs.
-- **Prompt Library** (localhost:5202): Reusable prompt templates so I don't rewrite the same instructions every session.
-- **Agent Intel** (localhost:8005): A knowledge base my agent should check before answering questions from scratch.
+- **Code Search** ([redacted-service]): Semantic search across 40+ repos using nomic-embed-text embeddings. Zero cloud costs.
+- **Prompt Library** ([redacted-service]): Reusable prompt templates so I don't rewrite the same instructions every session.
+- **Agent Intel** ([redacted-service]): A knowledge base my agent should check before answering questions from scratch.
 
 The agent (Claude Opus 4.6) kept skipping all of them. It would run `grep` across codebases instead of hitting the code search API. It would write prompts from scratch instead of checking the library. It would answer knowledge questions from its training data instead of checking what I'd already curated in Agent Intel.
 
@@ -58,8 +58,8 @@ The injected `LOCAL_FIRST_RULES.md` enforces five behaviors. Getting all five to
 
 Concrete, unambiguous instructions landed on the first try:
 
-1. **Code Search first**: "Before ANY codebase question, `curl localhost:5204`." Passed immediately.
-2. **Prompt Library first**: "Before writing ANY prompt, check `localhost:5202`." Passed immediately.
+1. **Code Search first**: "Before ANY codebase question, `curl [redacted-service]`." Passed immediately.
+2. **Prompt Library first**: "Before writing ANY prompt, check `[redacted-service]`." Passed immediately.
 3. **No web search for indexed code**: "NEVER use Brave for questions about code in indexed projects." Passed immediately.
 
 These rules succeeded because they're binary. There's no judgment call. The model sees "before X, do Y" and does Y.
@@ -68,7 +68,7 @@ These rules succeeded because they're binary. There's no judgment call. The mode
 
 Rules that required the model to override its own instincts failed:
 
-4. **Agent Intel check**: The model skipped localhost:8005 for "general knowledge" questions like caching best practices, reasoning that it already knew the answer. It had to be told explicitly: *"This includes questions you think you 'already know.' You MUST check first. No exceptions. Even for 'general knowledge' topics."* That fixed it in v2.
+4. **Agent Intel check**: The model skipped [redacted-service] for "general knowledge" questions like caching best practices, reasoning that it already knew the answer. It had to be told explicitly: *"This includes questions you think you 'already know.' You MUST check first. No exceptions. Even for 'general knowledge' topics."* That fixed it in v2.
 
 5. **Coder delegation**: The model was supposed to delegate file operations (grep, find, cat) to a cheaper sub-agent. Instead, it ran them directly as Opus. Took until v3 to fix.
 

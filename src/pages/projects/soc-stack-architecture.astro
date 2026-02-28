@@ -94,6 +94,12 @@ const mcpServers = [
         </svg>
         <span>View Repository</span>
       </a>
+            <a href="https://github.com/solomonneas/soc-stack#readme" target="_blank" class="github-btn readme">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>README</span>
+        </a>
       <a href="https://github.com/solomonneas/soc-stack/stargazers" target="_blank" class="github-btn star">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
           <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
@@ -103,7 +109,7 @@ const mcpServers = [
     </div>
   </div>
 
-  <h2>// Overview</h2>
+  <h2>Overview</h2>
   <p>
     This is the architecture deep-dive for a production Security Operations Center built entirely with open-source
     tools. While the <a href="/projects/designing-and-building-an-open-source-soc">companion project page</a> covers
@@ -138,7 +144,7 @@ const mcpServers = [
   </div>
 
   <!-- Tech Stack -->
-  <h2>// Stack Components</h2>
+  <h2>Stack Components</h2>
   <p class="section-intro">Each tool serves a specific role in the data flow pipeline:</p>
   <div class="stack-grid">
     {stackComponents.map((comp, i) => (
@@ -154,7 +160,7 @@ const mcpServers = [
   </div>
 
   <!-- Flow Visualization -->
-  <h2>// The Data Flow</h2>
+  <h2>The Data Flow</h2>
   <p class="section-intro">
     Follow a suspicious packet from the wire to a closed case. Every arrow represents an automated,
     API-driven handoff with no manual intervention required.
@@ -247,7 +253,7 @@ const mcpServers = [
   </div>
 
   <!-- Walkthrough -->
-  <h2>// Alert Lifecycle: Packet to Closed Case</h2>
+  <h2>Alert Lifecycle: Packet to Closed Case</h2>
   <p class="section-intro">
     Here is what happens when a compromised endpoint attempts a Command and Control callback:
   </p>
@@ -317,7 +323,7 @@ const mcpServers = [
   </div>
 
   <!-- MCP Integration -->
-  <h2>// MCP Integration Layer</h2>
+  <h2>MCP Integration Layer</h2>
   <p class="section-intro">
     Nine MCP servers transform the entire SOC stack into a conversational interface.
     Each server wraps a platform's REST API into structured tools that any LLM can invoke.
@@ -336,7 +342,7 @@ const mcpServers = [
   </div>
 
   <div class="mcp-examples">
-    <h3>// What This Looks Like in Practice</h3>
+    <h3>What This Looks Like in Practice</h3>
     <div class="example-grid">
       <div class="example-card">
         <div class="example-prompt">
@@ -369,7 +375,7 @@ const mcpServers = [
   </div>
 
   <!-- Technical Highlights -->
-  <h2>// Architecture Decisions</h2>
+  <h2>Architecture Decisions</h2>
   <div class="highlights-grid">
     {highlights.map((item, i) => (
       <div class="highlight-card" style={`--delay: ${i * 0.1}s`}>
@@ -396,7 +402,7 @@ const mcpServers = [
   </div>
 
   <!-- Skills -->
-  <h2>// Skills Demonstrated</h2>
+  <h2>Skills Demonstrated</h2>
   <div class="skills-grid">
     {skills.map((skill) => (
       <div class="skill-card">
@@ -413,7 +419,7 @@ const mcpServers = [
   </div>
 
   <!-- Status -->
-  <h2>// Project Status</h2>
+  <h2>Project Status</h2>
   <div class="status-block">
     <div class="status-indicator complete">
       <div class="status-pulse"></div>
@@ -846,4 +852,15 @@ const mcpServers = [
     border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent); color: #f59e0b;
   }
   .github-btn.star:hover { background: color-mix(in srgb, #f59e0b 25%, transparent); border-color: #f59e0b; }
+
+  .github-btn.readme {
+    background: color-mix(in srgb, #6e5494 15%, transparent);
+    border: 1px solid color-mix(in srgb, #6e5494 30%, transparent);
+    color: #6e5494;
+  }
+
+  .github-btn.readme:hover {
+    background: color-mix(in srgb, #6e5494 25%, transparent);
+    border-color: #6e5494;
+  }
 </style>

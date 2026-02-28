@@ -128,18 +128,15 @@ const certifications = [
 
 <Layout pageTitle="Experience">
   <section class="experience">
-    <!-- Header -->
     <div class="page-header">
-      <p class="prompt">$ cat /proc/career</p>
       <h1 class="page-title">Experience</h1>
       <div class="resume-cta">
         <a href="/hire" class="resume-btn">↓ Download Resume</a>
       </div>
     </div>
 
-    <!-- Education -->
     <div class="section">
-      <p class="section-header">$ tree ~/education</p>
+      <h2 class="section-header">Education</h2>
       <div class="edu-grid">
         {education.map((item) => (
           <div class={`edu-card ${item.status === 'ongoing' ? 'current' : ''}`}>
@@ -154,9 +151,8 @@ const certifications = [
       </div>
     </div>
 
-    <!-- Certifications -->
     <div class="section">
-      <p class="section-header">$ ls ~/certifications</p>
+      <h2 class="section-header">Certifications</h2>
       <div class="cert-row">
         {certifications.map((cert) => (
           <div class="cert-card">
@@ -168,10 +164,9 @@ const certifications = [
       </div>
     </div>
 
-    <!-- Experience Timeline -->
     <div class="section">
-      <p class="section-header">$ tail -f /var/log/experience.log</p>
-      <p class="section-comment">// {experienceData.length} entries</p>
+      <h2 class="section-header">Work History</h2>
+      <p class="section-comment">{experienceData.length} entries</p>
 
       <div class="timeline">
         {experienceData.map((job) => (
@@ -191,7 +186,7 @@ const certifications = [
             <ul class="job-items">
               {job.description.map((item) => (
                 <li>
-                  <span class="item-marker">[+]</span>
+                  <span class="item-marker">+</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -217,19 +212,12 @@ const certifications = [
       </div>
     </div>
 
-    <!-- Navigation -->
     <div class="section nav-section">
-      <p class="section-comment">// Continue exploring</p>
       <div class="nav-links">
-        <a href="/about" class="nav-link">$ cd /about</a>
-        <a href="/projects" class="nav-link">$ cd /projects</a>
-        <a href="/hire" class="nav-link">$ cd /hire</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/projects" class="nav-link">Projects</a>
+        <a href="/hire" class="nav-link">Hire Me</a>
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="terminal-footer">
-      <span class="cursor-blink">█</span> EOF
     </div>
   </section>
 </Layout>
@@ -241,17 +229,10 @@ const certifications = [
     margin: 0 auto;
   }
 
-  /* Page Header */
   .page-header {
     margin-bottom: 2.5rem;
     padding-bottom: 2rem;
-    border-bottom: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
-  }
-
-  .prompt {
-    font-size: 0.8rem;
-    opacity: 0.4;
-    margin: 0 0 0.5rem 0;
+    border-bottom: 1px dashed var(--border);
   }
 
   .page-title {
@@ -259,7 +240,7 @@ const certifications = [
     font-weight: 700;
     margin: 0 0 1rem 0;
     line-height: 1.1;
-    color: #10b981;
+    color: var(--primary);
   }
 
   .resume-cta {
@@ -269,9 +250,9 @@ const certifications = [
   .resume-btn {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.8rem;
-    color: #10b981;
-    background: color-mix(in srgb, #10b981 8%, transparent);
-    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
     padding: 0.6rem 1.25rem;
     border-radius: 3px;
     text-decoration: none;
@@ -280,32 +261,29 @@ const certifications = [
   }
 
   .resume-btn:hover {
-    background: color-mix(in srgb, #10b981 15%, transparent);
-    border-color: #10b981;
-    box-shadow: 0 0 12px color-mix(in srgb, #10b981 20%, transparent);
-    color: #10b981;
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+    border-color: var(--primary);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--primary) 20%, transparent);
+    color: var(--primary);
   }
 
-  /* Sections */
   .section {
     margin-bottom: 2.5rem;
   }
 
   .section-header {
-    font-size: 1rem;
+    font-size: 1.25rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
-    opacity: 0.9;
   }
 
   .section-comment {
     font-size: 0.75rem;
-    opacity: 0.45;
+    color: var(--text-muted);
     margin: 0 0 1.25rem 0;
     font-style: italic;
   }
 
-  /* Education Grid */
   .edu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -315,8 +293,8 @@ const certifications = [
 
   .edu-card {
     padding: 1rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -325,12 +303,11 @@ const certifications = [
   }
 
   .edu-card:hover {
-    border-color: color-mix(in srgb, currentColor 20%, transparent);
-    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: var(--text-muted);
   }
 
   .edu-card.current {
-    border-color: color-mix(in srgb, #10b981 25%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   .edu-top {
@@ -342,22 +319,21 @@ const certifications = [
   .edu-degree {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #10b981;
+    color: var(--primary);
     line-height: 1.3;
   }
 
   .edu-school {
     font-size: 0.75rem;
-    opacity: 0.7;
+    color: var(--text-muted);
   }
 
   .edu-focus {
     font-size: 0.7rem;
-    opacity: 0.5;
+    color: var(--text-muted);
     font-style: italic;
   }
 
-  /* Certifications */
   .cert-row {
     display: flex;
     flex-wrap: wrap;
@@ -367,8 +343,8 @@ const certifications = [
 
   .cert-card {
     padding: 0.75rem 1rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -378,20 +354,19 @@ const certifications = [
   .cert-name {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #10b981;
+    color: var(--primary);
   }
 
   .cert-meta {
     font-size: 0.7rem;
-    opacity: 0.7;
+    color: var(--text-muted);
   }
 
   .cert-id {
     font-size: 0.65rem;
-    opacity: 0.4;
+    color: var(--text-muted);
   }
 
-  /* Experience Timeline */
   .timeline {
     display: flex;
     flex-direction: column;
@@ -400,19 +375,18 @@ const certifications = [
 
   .job-card {
     padding: 1.25rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     transition: all 0.2s ease;
   }
 
   .job-card:hover {
-    border-color: color-mix(in srgb, currentColor 20%, transparent);
-    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: var(--text-muted);
   }
 
   .job-card.active {
-    border-color: color-mix(in srgb, #10b981 25%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   .job-header {
@@ -429,7 +403,7 @@ const certifications = [
   .job-date {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #10b981;
+    color: var(--primary);
   }
 
   .job-badge {
@@ -437,7 +411,7 @@ const certifications = [
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    opacity: 0.7;
+    color: var(--text-muted);
   }
 
   .job-role {
@@ -449,13 +423,13 @@ const certifications = [
 
   .job-company {
     font-size: 0.8rem;
-    opacity: 0.6;
+    color: var(--text-muted);
     display: block;
   }
 
   .job-subtitle {
     font-size: 0.7rem;
-    opacity: 0.45;
+    color: var(--text-muted);
     display: block;
     font-style: italic;
     margin-top: 0.2rem;
@@ -477,14 +451,12 @@ const certifications = [
     font-family: "IBM Plex Sans", sans-serif;
     font-size: 0.8rem;
     line-height: 1.6;
-    opacity: 0.75;
   }
 
   .item-marker {
     font-family: "IBM Plex Mono", monospace;
-    color: #10b981;
+    color: var(--primary);
     flex-shrink: 0;
-    opacity: 0.6;
     font-size: 0.75rem;
     padding-top: 0.1rem;
   }
@@ -494,7 +466,7 @@ const certifications = [
     flex-wrap: wrap;
     gap: 0.5rem;
     padding-top: 0.75rem;
-    border-top: 1px dashed color-mix(in srgb, currentColor 10%, transparent);
+    border-top: 1px dashed var(--border);
   }
 
   .project-tag {
@@ -503,31 +475,28 @@ const certifications = [
     gap: 0.3rem;
     font-size: 0.7rem;
     padding: 0.25rem 0.6rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 3px;
     text-decoration: none;
-    color: inherit;
-    opacity: 0.7;
+    color: var(--text-muted);
     transition: all 0.2s ease;
   }
 
   .project-tag:hover {
-    opacity: 1;
-    background: color-mix(in srgb, #10b981 8%, transparent);
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
-    color: #10b981;
+    color: var(--primary);
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
   }
 
   .tag-arrow {
-    color: #10b981;
+    color: var(--primary);
     font-size: 0.65rem;
   }
 
-  /* Nav */
   .nav-section {
     padding-top: 1rem;
-    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    border-top: 1px dashed var(--border);
   }
 
   .nav-links {
@@ -538,9 +507,8 @@ const certifications = [
 
   .nav-link {
     font-size: 0.8rem;
-    color: inherit;
+    color: var(--text-muted);
     text-decoration: none;
-    opacity: 0.6;
     transition: all 0.2s ease;
     padding: 0.4rem 0.75rem;
     border: 1px solid transparent;
@@ -548,29 +516,11 @@ const certifications = [
   }
 
   .nav-link:hover {
-    opacity: 1;
-    color: #10b981;
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
-    background: color-mix(in srgb, #10b981 5%, transparent);
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
   }
 
-  /* Footer */
-  .terminal-footer {
-    margin-top: 1rem;
-    font-size: 0.8rem;
-    opacity: 0.5;
-  }
-
-  .cursor-blink {
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  /* Responsive */
   @media (max-width: 640px) {
     .page-title {
       font-size: 2rem;

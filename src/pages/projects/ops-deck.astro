@@ -1,0 +1,1308 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import StatusLight from "../../components/StatusLight.astro";
+// Data flow layers
+const dataFlow = [
+  { name: "Ollama GPU", type: "Model Server", provides: "Embeddings, summaries, structured output", color: "#22c55e" },
+  { name: "Code Repos", type: "Source Code", provides: "40+ repositories, auto-discovered changes", color: "#3b82f6" },
+  { name: "Agent Sessions", type: "AI Workflows", provides: "Queries, tool calls, memory reads", color: "#f59e0b" },
+  { name: "Content Pipeline", type: "Publishing", provides: "Blog posts, social drafts, documentation", color: "#8b5cf6" },
+];
+
+// Tech decisions
+const techDecisions = [
+  { decision: "SQLite over PostgreSQL", reason: "Single-user workload. No connection pooling, no daemon, no config. Just a file." },
+  { decision: "Ollama over cloud embeddings", reason: "Embeddings run thousands of times during re-index. Cloud APIs would cost $5-10/index cycle." },
+  { decision: "FastAPI for all services", reason: "Async by default, auto-generated OpenAPI docs, consistent patterns across services." },
+  { decision: "PM2 over systemd", reason: "Faster iteration: restart, logs, env vars, ecosystem file. systemd for production, PM2 for dev." },
+  { decision: "Hybrid search over pure vector", reason: "Pure vector misses exact matches. Pure keyword misses semantic similarity. Combine both." },
+  { decision: "nomic-embed-text (768d)", reason: "Best embedding quality that fits in 16GB VRAM alongside generation models. 274MB footprint." },
+  { decision: "Regex scrubber over LLM scrubber", reason: "Deterministic, auditable, fast. LLM scrubbing would miss edge cases and cost tokens." },
+  { decision: "System prompt enforcement over tool restrictions", reason: "Tool-level blocks would break legitimate use. Prompt rules preserve flexibility while enforcing priorities." },
+];
+
+// Development phases
+const phases = [
+  { phase: 1, name: "Code Search API", status: "completed", items: ["File chunking", "nomic-embed-text embeddings", "Hybrid search", "SQLite storage"] },
+  { phase: 2, name: "Prompt Library", status: "completed", items: ["CRUD API", "Version control", "Variable substitution", "Category/tag system"] },
+  { phase: 3, name: "Agent Intel", status: "completed", items: ["Knowledge base API", "System prompt enforcement", "Living document updates"] },
+  { phase: 4, name: "Dev Tools Hub", status: "completed", items: ["Dashboard UI", "Port registry", "Preflight endpoint", "Project cards"] },
+  { phase: 5, name: "Local-First Enforcement", status: "completed", items: ["OpenClaw hook", "Rule injection", "Keyword blocklist", "Delegation routing"] },
+  { phase: 6, name: "Content Pipeline", status: "completed", items: ["Content scrubber CLI", "Social media templates", "Blog integration"] },
+  { phase: 7, name: "AI Summary Layer", status: "completed", items: ["qwen2.5 summaries per chunk", "Nightly re-index cron", "Summary search mode"] },
+  { phase: 8, name: "Usage Analytics", status: "completed", items: ["Token tracking per model", "Cost attribution", "Usage dashboard (Usage Tracker)"] },
+  { phase: 9, name: "Multi-Agent Routing", status: "completed", items: ["Opus 4.6 orchestrator", "Haiku 4.5 for scanning", "GPT 5.3 Codex for builds", "Local Ollama for mechanical tasks", "Task-based model selection"] },
+  { phase: 10, name: "Continuous Optimization", status: "ongoing", items: ["Model fleet tuning", "VRAM allocation optimization", "Prompt template refinement", "Enforcement rule iteration", "New local model evaluation"] },
+];
+---
+
+<Layout pageTitle="Ops Deck: Developer Infrastructure Platform">
+  <article class="project-page">
+    <header class="project-header">
+      <a href="/projects" class="back-link">← Projects</a>
+      <h1 class="project-title">Ops Deck</h1>
+      <p class="project-subtitle">Developer Infrastructure Platform</p>
+
+      <div class="project-meta">
+        <span class="meta-item">
+          <span class="meta-label">Status:</span>
+          <span class="meta-value"><StatusLight status="ongoing" /> Active</span>
+        </span>
+        <span class="meta-item">
+          <span class="meta-label">Origin:</span>
+          <span class="meta-value">Personal Infrastructure</span>
+        </span>
+        <span class="meta-item">
+          <span class="meta-label">Since:</span>
+          <span class="meta-value">2026.02</span>
+        </span>
+      </div>
+
+      <div class="tech-badges">
+        {["FastAPI", "Python", "SQLite", "Ollama", "nomic-embed-text", "qwen2.5", "PM2", "Caddy"].map(t => (
+          <span class="badge">{t}</span>
+        ))}
+      </div>
+    </header>
+
+    <!-- Overview -->
+    <section class="content-section">
+      <h2>Overview</h2>
+      <p>
+        The Ops Deck is a suite of local-first backend APIs that power my AI agent (Rocinante), development workflow, and content pipeline. Every service runs on my workstation, uses local GPU models for embeddings and summaries, and costs zero cloud tokens for routine operations.
+      </p>
+      <p>
+        The core principle: if the data is local, the processing should be local. Cloud APIs are for reasoning and generation. Everything else (search, templates, knowledge retrieval, content publishing) runs on-premises with no external dependencies.
+      </p>
+    </section>
+
+    <!-- Architecture -->
+    <section class="content-section">
+      <h2>Architecture</h2>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3>Process Management</h3>
+          <p>All services managed via PM2 with auto-restart, log rotation, and crash recovery. Single <code>ecosystem.config.cjs</code> defines every service with environment variables, working directories, and health checks.</p>
+          <div class="arch-detail">
+            <span class="detail-label">Runtime:</span> Node.js + Python (FastAPI)
+          </div>
+          <div class="arch-detail">
+            <span class="detail-label">Reverse Proxy:</span> Caddy with automatic HTTPS for external services
+          </div>
+        </div>
+        <div class="arch-card">
+          <h3>GPU Layer</h3>
+          <p>Ollama serves local models on a single GPU. Embedding requests (nomic-embed-text) and summary generation (qwen2.5) run entirely on-device. No API keys, no rate limits, no per-token costs.</p>
+          <div class="arch-detail">
+            <span class="detail-label">VRAM:</span> 16GB (shared across active models)
+          </div>
+          <div class="arch-detail">
+            <span class="detail-label">Throughput:</span> ~33-43 tokens/sec depending on model
+          </div>
+        </div>
+        <div class="arch-card">
+          <h3>Storage</h3>
+          <p>SQLite databases per service. No PostgreSQL overhead for single-user workloads. Each service owns its schema. Nightly cron re-indexes the code search database with fresh summaries.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="content-section">
+      <h2>Services</h2>
+
+      <!-- Code Search API -->
+      <div class="service-block">
+        <div class="service-header">
+          <h3>Code Search API</h3>
+          <span class="service-badge">Semantic + Keyword Hybrid</span>
+        </div>
+        <p>
+          Semantic search across 40+ repositories using nomic-embed-text embeddings. Every file is chunked, summarized by qwen2.5 locally, and embedded into a vector index. Search modes: <code>hybrid</code> (default, combines vector similarity with keyword matching), <code>code</code> (raw text matches), and <code>summary</code> (natural language queries against AI-generated summaries).
+        </p>
+
+        <div class="feature-list">
+          <div class="feature">
+            <span class="feature-name">Hybrid Search</span>
+            <span class="feature-desc">Combines cosine similarity on embeddings with keyword scoring. Best of both worlds: finds semantically related code even when terminology differs, but also respects exact matches.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">AI Summaries</span>
+            <span class="feature-desc">Every code chunk gets a natural language summary generated by qwen2.5 running locally. "What does this function do?" queries match against summaries, not just raw code.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Nightly Re-index</span>
+            <span class="feature-desc">4am cron job crawls all tracked repos, detects changed files, re-chunks and re-embeds. Index stays fresh without manual intervention.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Project Filtering</span>
+            <span class="feature-desc">Filter results by project name, set minimum similarity scores, control result count. Queries scoped to a single repo return in under 100ms.</span>
+          </div>
+        </div>
+
+        <div class="tech-detail">
+          <h4>How It Works</h4>
+          <p>
+            On index, each file is split into semantic chunks (by function, class, or logical block). Each chunk is sent to nomic-embed-text (768-dimensional embeddings) and qwen2.5 (generates a 2-3 sentence summary). Both the embedding vector and summary are stored in SQLite alongside the raw code.
+          </p>
+          <p>
+            On search, the query is embedded with the same model, then cosine similarity is computed against all stored vectors. In hybrid mode, keyword matches boost the similarity score. Results are ranked by combined score and returned with file path, project name, chunk content, and summary.
+          </p>
+        </div>
+
+        <div class="stack-row">
+          <span class="micro-badge">FastAPI</span>
+          <span class="micro-badge">SQLite</span>
+          <span class="micro-badge">nomic-embed-text</span>
+          <span class="micro-badge">qwen2.5</span>
+        </div>
+      </div>
+
+      <!-- Prompt Library -->
+      <div class="service-block">
+        <div class="service-header">
+          <h3>Prompt Library</h3>
+          <span class="service-badge">Template Management</span>
+        </div>
+        <p>
+          A versioned library of reusable prompt templates. Instead of rewriting the same instructions every session, the AI agent checks the library first and adapts existing templates. Currently holds 30+ templates across categories: build prompts, content generation, code review, system operations, and analysis.
+        </p>
+
+        <div class="feature-list">
+          <div class="feature">
+            <span class="feature-name">Variable Substitution</span>
+            <span class="feature-desc">Templates use <code>{"{{variable_name}}"}</code> placeholders with typed definitions. The agent fills in project-specific values at runtime.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Version Control</span>
+            <span class="feature-desc">Every template edit creates a new version. Roll back to any previous version without losing history.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Category + Tag Search</span>
+            <span class="feature-desc">Templates organized by category (build-prompts, content-prompts, review-prompts, system-prompts, automation) with freeform tags for cross-cutting concerns.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Agent Integration</span>
+            <span class="feature-desc">The AI agent is instructed to check the library before writing any prompt from scratch. If a matching template exists, it adapts rather than reinvents. Saves tokens and ensures consistency.</span>
+          </div>
+        </div>
+
+        <div class="tech-detail">
+          <h4>Template Categories</h4>
+          <div class="category-grid">
+            <div class="cat-item">
+              <span class="cat-name">Build Prompts</span>
+              <span class="cat-desc">PRD specs, variant builds, project scaffolding, sub-agent pipelines</span>
+            </div>
+            <div class="cat-item">
+              <span class="cat-name">Content Prompts</span>
+              <span class="cat-desc">Blog posts, social media, multi-platform publishing</span>
+            </div>
+            <div class="cat-item">
+              <span class="cat-name">Review Prompts</span>
+              <span class="cat-desc">Code review checklists, polish passes, CodeRabbit workflows</span>
+            </div>
+            <div class="cat-item">
+              <span class="cat-name">System Prompts</span>
+              <span class="cat-desc">Model assignment rules, pickup protocols, agent patterns</span>
+            </div>
+            <div class="cat-item">
+              <span class="cat-name">Analysis</span>
+              <span class="cat-desc">Threat reports, malware analysis, vendor risk, server logs</span>
+            </div>
+            <div class="cat-item">
+              <span class="cat-name">Automation</span>
+              <span class="cat-desc">Obsidian notes, repo hygiene, inbox organization</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack-row">
+          <span class="micro-badge">FastAPI</span>
+          <span class="micro-badge">SQLite</span>
+          <span class="micro-badge">Jinja2</span>
+        </div>
+      </div>
+
+      <!-- Agent Intel -->
+      <div class="service-block">
+        <div class="service-header">
+          <h3>Agent Intel</h3>
+          <span class="service-badge">Knowledge Base</span>
+        </div>
+        <p>
+          A curated knowledge base the AI agent checks before answering questions from its training data. Contains project-specific context, infrastructure details, workflow decisions, and accumulated lessons that a foundation model wouldn't know. The agent is instructed to check this API before every knowledge question, even ones it thinks it already knows the answer to.
+        </p>
+
+        <div class="feature-list">
+          <div class="feature">
+            <span class="feature-name">Curated Over Generated</span>
+            <span class="feature-desc">Every entry is manually reviewed. This isn't auto-scraped documentation. It's the stuff that matters: architecture decisions, gotchas, port assignments, credential locations, and workflow rules.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Enforcement via System Prompt</span>
+            <span class="feature-desc">The agent's system prompt includes a hard rule: "NEVER answer knowledge questions before checking Agent Intel." This prevents the model from hallucinating project-specific details it doesn't actually know.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Living Document</span>
+            <span class="feature-desc">Updated as infrastructure changes. When a port moves, a service is added, or a workflow changes, Agent Intel gets updated so the agent's answers stay accurate.</span>
+          </div>
+        </div>
+
+        <div class="stack-row">
+          <span class="micro-badge">FastAPI</span>
+          <span class="micro-badge">JSON</span>
+        </div>
+      </div>
+
+      <!-- Dev Tools API -->
+      <div class="service-block">
+        <div class="service-header">
+          <h3>Dev Tools API</h3>
+          <span class="service-badge">Central Hub</span>
+        </div>
+        <p>
+          The main orchestration API that ties everything together. Serves the developer dashboard, manages project metadata, tracks port assignments, and provides the preflight endpoint that the AI agent hits before every task.
+        </p>
+
+        <div class="feature-list">
+          <div class="feature">
+            <span class="feature-name">Preflight Check</span>
+            <span class="feature-desc">Single endpoint the agent calls before any work. Returns relevant context from all local APIs in one shot: matching code search results, applicable prompt templates, and related intel entries.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Developer Dashboard</span>
+            <span class="feature-desc">Web UI showing all running services, project cards with status and links, port map, and quick-access to each tool's interface.</span>
+          </div>
+          <div class="feature">
+            <span class="feature-name">Port Registry</span>
+            <span class="feature-desc">Central source of truth for which service runs on which port. Prevents collisions when spinning up new dev servers.</span>
+          </div>
+        </div>
+
+        <div class="stack-row">
+          <span class="micro-badge">FastAPI</span>
+          <span class="micro-badge">React</span>
+          <span class="micro-badge">Vite</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Local-First Enforcement -->
+    <section class="content-section">
+      <h2>Local-First Enforcement</h2>
+      <p>
+        Having local APIs is only useful if the AI agent actually uses them. I built a system prompt injection hook that enforces five rules on every session:
+      </p>
+      <ol class="enforcement-list">
+        <li><strong>Code Search first:</strong> Before any codebase question or file operation, hit the Code Search API. If it returns results, use them. No manual grep.</li>
+        <li><strong>Prompt Library first:</strong> Before writing any prompt or template, check the library. If a matching template exists, adapt it.</li>
+        <li><strong>Agent Intel first:</strong> Before answering any knowledge question (even "obvious" ones), check the knowledge base.</li>
+        <li><strong>No web search for indexed code:</strong> Never use external search engines for questions about code in indexed repositories.</li>
+        <li><strong>Delegate file operations:</strong> Route mechanical file scanning (grep, find, cat) to a cheaper sub-agent model instead of burning expensive orchestrator tokens.</li>
+      </ol>
+      <p>
+        Rules 1-3 worked on the first attempt because they're binary: "before X, do Y." Rule 5 (delegation) required keyword blocklists and pre-empted rationalizations because the model kept finding excuses to run commands directly. The enforcement rules are injected via an OpenClaw lifecycle hook on every <code>agent:bootstrap</code> event.
+      </p>
+    </section>
+
+    <!-- Model Fleet -->
+    <section class="content-section">
+      <h2>Local Model Fleet</h2>
+      <p>
+        Ollama serves a curated set of models on 16GB VRAM. Each model has a specific job. After testing 12+ models, I trimmed the fleet to 4 that actually earn their VRAM allocation.
+      </p>
+
+      <div class="model-table-wrapper">
+        <table class="model-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Size</th>
+              <th>Speed</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>nomic-embed-text</code></td>
+              <td>274MB</td>
+              <td>N/A</td>
+              <td>Embeddings for code search, memory search, semantic similarity</td>
+            </tr>
+            <tr>
+              <td><code>gemma2:9b</code></td>
+              <td>5.4GB</td>
+              <td>33.9 t/s</td>
+              <td>S-tier for structured output: git commits, cron triage, formatting</td>
+            </tr>
+            <tr>
+              <td><code>qwen2.5:7b</code></td>
+              <td>4.7GB</td>
+              <td>43.3 t/s</td>
+              <td>Code summaries, documentation generation, bulk text processing</td>
+            </tr>
+            <tr>
+              <td><code>qwen2.5-coder:14b</code></td>
+              <td>8.9GB</td>
+              <td>~20 t/s</td>
+              <td>Code-specific tasks when cloud models aren't needed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Key lesson: local models on 16GB VRAM are excellent for mechanical tasks (embeddings, formatting, triage) and completely inadequate for reasoning, creative work, or complex code generation. The model chain routes accordingly: local GPU for scanning, cloud APIs for thinking.
+      </p>
+    </section>
+
+    <!-- Content Pipeline -->
+    <section class="content-section">
+      <h2>Content Pipeline</h2>
+      <p>
+        The Ops Deck includes a content publishing pipeline with a security boundary. A content scrubber script runs before any content leaves the machine, stripping internal infrastructure details (IP addresses, port numbers, hostnames) from blog posts, social media drafts, and documentation.
+      </p>
+      <div class="feature-list">
+        <div class="feature">
+          <span class="feature-name">Content Scrubber</span>
+          <span class="feature-desc">Regex-based CLI tool that catches RFC 1918 addresses, localhost references, internal hostnames, SSH targets, and known service ports. Runs in preview mode (shows diff) or apply mode (edits in-place).</span>
+        </div>
+        <div class="feature">
+          <span class="feature-name">Social Media Pipeline</span>
+          <span class="feature-desc">Draft, review, and schedule posts across LinkedIn, X, Bluesky, and Mastodon. Multi-platform templates adapt content to each platform's character limits and conventions.</span>
+        </div>
+        <div class="feature">
+          <span class="feature-name">Blog Integration</span>
+          <span class="feature-desc">Blog posts written in Markdown, built with Astro, deployed via Vercel. The scrubber runs against the blog content directory as a preflight step before any push.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Token Economics -->
+    <section class="content-section">
+      <h2>Token Economics</h2>
+      <p>
+        The entire Ops Deck exists to answer one question: what's worth paying cloud API prices for, and what can run locally for free?
+      </p>
+      <div class="econ-grid">
+        <div class="econ-card free">
+          <h4>$0 (Local GPU)</h4>
+          <ul>
+            <li>Code search across 40+ repos</li>
+            <li>Embedding generation</li>
+            <li>Code summaries</li>
+            <li>Git commit messages</li>
+            <li>Cron job triage</li>
+            <li>Content formatting</li>
+          </ul>
+        </div>
+        <div class="econ-card cheap">
+          <h4>~$0.001/task (Haiku 4.5)</h4>
+          <ul>
+            <li>File scanning and grep</li>
+            <li>Bulk code search</li>
+            <li>Boilerplate generation</li>
+            <li>Simple data extraction</li>
+          </ul>
+        </div>
+        <div class="econ-card premium">
+          <h4>$200/mo (Opus 4.6)</h4>
+          <ul>
+            <li>Architecture and planning</li>
+            <li>Creative writing</li>
+            <li>Security analysis</li>
+            <li>Complex reasoning</li>
+            <li>Orchestration decisions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Flow Architecture -->
+    <section class="content-section">
+      <h2>Data Flow</h2>
+      <div class="architecture">
+        <div class="arch-layer">
+          <span class="layer-label">DATA SOURCES</span>
+          <div class="source-grid">
+            {dataFlow.map((src) => (
+              <div class="source-card" style={`--accent: ${src.color}`}>
+                <span class="source-name">{src.name}</span>
+                <span class="source-type">{src.type}</span>
+                <span class="source-provides">{src.provides}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="connector-arrows"><span>▼</span><span>▼</span><span>▼</span><span>▼</span></div>
+          <span class="connector-label">Local APIs (zero cloud cost)</span>
+        </div>
+
+        <div class="arch-layer">
+          <span class="layer-label">PROCESSING</span>
+          <div class="backend-flow">
+            <div class="backend-box">
+              <span class="box-title">Chunk + Embed</span>
+              <span class="box-desc">nomic-embed-text (768d vectors)</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="backend-box">
+              <span class="box-title">Summarize</span>
+              <span class="box-desc">qwen2.5 (local GPU)</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="backend-box">
+              <span class="box-title">Index</span>
+              <span class="box-desc">SQLite per service</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="backend-box">
+              <span class="box-title">Serve</span>
+              <span class="box-desc">FastAPI endpoints</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="connector-arrows"><span>▼</span></div>
+          <span class="connector-label">System Prompt Injection (OpenClaw Hook)</span>
+        </div>
+
+        <div class="arch-layer">
+          <span class="layer-label">CONSUMERS</span>
+          <div class="consumer-grid">
+            <div class="consumer-box">
+              <span class="consumer-name">Rocinante (Opus 4.6)</span>
+              <span class="consumer-desc">Orchestrator queries before every task</span>
+            </div>
+            <div class="consumer-box">
+              <span class="consumer-name">Sub-Agents</span>
+              <span class="consumer-desc">Haiku, Codex receive delegated file ops</span>
+            </div>
+            <div class="consumer-box">
+              <span class="consumer-name">Cron Jobs</span>
+              <span class="consumer-desc">Nightly re-index, content scrubbing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Decisions -->
+    <section class="content-section">
+      <h2>Technical Decisions</h2>
+      <div class="decisions-table">
+        <div class="decision-header">
+          <span class="dh-decision">Decision</span>
+          <span class="dh-reason">Reasoning</span>
+        </div>
+        {techDecisions.map((td) => (
+          <div class="decision-row">
+            <span class="dr-decision">{td.decision}</span>
+            <span class="dr-reason">{td.reason}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Development Phases -->
+    <section class="content-section">
+      <h2>Development Timeline</h2>
+      <div class="phases-list">
+        {phases.map((p) => (
+          <div class={`phase-item ${p.status}`}>
+            <div class="phase-header">
+              <span class="phase-num">Phase {p.phase}</span>
+              <span class="phase-name">{p.name}</span>
+              <span class={`phase-status ${p.status}`}>
+                {p.status === "completed" ? "✓" : "○"} {p.status}
+              </span>
+            </div>
+            <div class="phase-items">
+              {p.items.map((item) => (
+                <span class="phase-tag">{item}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Links -->
+    <section class="content-section">
+      <div class="project-links">
+        <a href="/blog" class="project-link">Read the Blog Posts →</a>
+        <a href="/projects" class="project-link secondary">← All Projects</a>
+      </div>
+    </section>
+  </article>
+</Layout>
+
+<style>
+  .project-page {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
+  }
+
+  .project-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 0.25rem;
+    line-height: 1.1;
+  }
+
+  .project-subtitle {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .meta-label {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--text-muted);
+  }
+
+  .meta-value {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .tech-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
+  }
+
+  /* Content Sections */
+  .content-section {
+    margin-bottom: 3rem;
+  }
+
+  .content-section h2 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--primary);
+  }
+
+  .content-section p {
+    line-height: 1.75;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .content-section code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85em;
+    color: var(--primary);
+    background: var(--code-bg);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  .content-section h3 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--secondary);
+  }
+
+  .content-section h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 1.25rem 0 0.5rem;
+    color: var(--text-muted);
+  }
+
+  /* Architecture Grid */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .arch-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+  }
+
+  .arch-card h3 {
+    border-left: none;
+    padding-left: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-card p {
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .arch-detail {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+  }
+
+  .detail-label {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Service Blocks */
+  .service-block {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .service-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .service-header h3 {
+    border-left: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .service-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+    border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+
+  .service-block p {
+    font-size: 0.9rem;
+  }
+
+  /* Feature Lists */
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .feature:last-child {
+    border-bottom: none;
+  }
+
+  .feature-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .feature-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .tech-detail {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+  }
+
+  .tech-detail p {
+    font-size: 0.85rem;
+  }
+
+  .stack-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .micro-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-muted);
+  }
+
+  /* Category Grid */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .cat-item {
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .cat-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--secondary);
+    display: block;
+  }
+
+  .cat-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* Enforcement List */
+  .enforcement-list {
+    padding-left: 1.25rem;
+    margin: 1rem 0;
+  }
+
+  .enforcement-list li {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .enforcement-list strong {
+    color: var(--primary);
+  }
+
+  /* Model Table */
+  .model-table-wrapper {
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .model-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .model-table th {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--primary);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .model-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .model-table code {
+    font-size: 0.8rem;
+  }
+
+  /* Economics Grid */
+  .econ-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .econ-card {
+    padding: 1.25rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+  }
+
+  .econ-card h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem;
+  }
+
+  .econ-card.free h4 { color: var(--primary); }
+  .econ-card.cheap h4 { color: var(--secondary); }
+  .econ-card.premium h4 { color: var(--tertiary); }
+
+  .econ-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .econ-card li {
+    font-size: 0.8rem;
+    padding: 0.25rem 0;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .econ-card li:last-child {
+    border-bottom: none;
+  }
+
+  .econ-card li::before {
+    content: "→ ";
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  /* Project Links */
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .project-link {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid;
+  }
+
+  .project-link:not(.secondary) {
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  .project-link:not(.secondary):hover {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+
+  .project-link.secondary {
+    color: var(--text-muted);
+    border-color: var(--border);
+    background: var(--card-bg);
+  }
+
+  .project-link.secondary:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+  }
+
+  /* Architecture Diagram */
+  .architecture {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 1rem;
+  }
+
+  .arch-layer {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+  }
+
+  .layer-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .source-card {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .source-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+  }
+
+  .source-type {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .source-provides {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .arch-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+
+  .connector-arrows {
+    display: flex;
+    gap: 2rem;
+    color: var(--primary);
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+
+  .connector-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .backend-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .backend-box {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .box-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: block;
+  }
+
+  .box-desc {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 0.15rem;
+  }
+
+  .flow-arrow {
+    color: var(--primary);
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .consumer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .consumer-box {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .consumer-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: block;
+    color: var(--tertiary);
+  }
+
+  .consumer-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  /* Tech Decisions Table */
+  .decisions-table {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+
+  .decision-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    background: var(--card-bg);
+    border-bottom: 2px solid var(--border);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .decision-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    transition: background 0.15s ease;
+  }
+
+  .decision-row:last-child {
+    border-bottom: none;
+  }
+
+  .decision-row:hover {
+    background: var(--card-bg);
+  }
+
+  .dr-decision {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .dr-reason {
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Development Phases */
+  .phases-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .phase-item {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+
+  .phase-item.completed {
+    border-left: 3px solid var(--primary);
+  }
+
+  .phase-item.ongoing {
+    border-left: 3px solid var(--tertiary);
+  }
+
+  .phase-item.pending {
+    border-left: 3px solid var(--text-muted);
+    opacity: 0.7;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .phase-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    min-width: 55px;
+  }
+
+  .phase-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .phase-status {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .phase-status.completed {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  .phase-status.ongoing {
+    color: var(--tertiary);
+    background: color-mix(in srgb, var(--tertiary) 10%, transparent);
+  }
+
+  .phase-status.pending {
+    color: var(--text-muted);
+    background: var(--card-bg);
+  }
+
+  .phase-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+  }
+
+  .phase-tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .project-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .project-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .service-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .arch-grid,
+    .econ-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .category-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .source-grid,
+    .consumer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .backend-flow {
+      flex-direction: column;
+    }
+
+    .flow-arrow {
+      transform: rotate(90deg);
+    }
+
+    .decision-header,
+    .decision-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .phase-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+  }
+</style>

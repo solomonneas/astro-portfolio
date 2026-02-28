@@ -2,7 +2,6 @@
 import Layout from "../layouts/Layout.astro";
 import StatusLight from "../components/StatusLight.astro";
 
-// Featured projects (top showcase for recruiters)
 const featuredProjects = [
   {
     date: "2025.12",
@@ -23,6 +22,26 @@ const featuredProjects = [
     href: "/projects/watchtower-noc-dashboard",
     techStack: ["FastAPI", "React", "ReactFlow", "Redis", "WebSocket"],
     highlight: "Cost Savings: $110K–$150K",
+  },
+  {
+    date: "2026.02",
+    status: "ongoing",
+    identifier: "Rocinante:_AI_Agent_Orchestration_Platform",
+    origin: "Personal Infrastructure",
+    description: "Multi-model AI agent with semantic memory, local-first APIs, and automated task routing. Opus 4.6 orchestrator with local Ollama models for embeddings and triage, GPT 5.3 Codex for code generation.",
+    href: "/blog",
+    techStack: ["OpenClaw", "Claude Opus 4.6", "Ollama", "FastAPI", "Semantic Search"],
+    highlight: "Multi-Model Orchestration",
+  },
+  {
+    date: "2026.02",
+    status: "ongoing",
+    identifier: "Ops_Deck:_Developer_Infrastructure_Platform",
+    origin: "Personal Infrastructure",
+    description: "Suite of local-first backend APIs powering AI agent workflows: semantic code search across 40+ repos, versioned prompt library, agent knowledge base, and content pipeline with security scrubbing.",
+    href: "/projects/ops-deck",
+    techStack: ["FastAPI", "SQLite", "Ollama", "nomic-embed-text", "PM2", "Caddy"],
+    highlight: "Zero-Token Local APIs",
   },
   {
     date: "2025.08",
@@ -66,7 +85,6 @@ const featuredProjects = [
   }
 ];
 
-// Categorized projects
 const categories = [
   {
     name: "Security & Threat Intelligence",
@@ -117,7 +135,6 @@ const categories = [
         href: "/projects/intel-workbench",
         techStack: ["React", "TypeScript", "Zustand", "Tailwind"],
       },
-
       {
         date: "2026.01",
         status: "completed",
@@ -220,22 +237,21 @@ const categories = [
         href: "/projects/vmware-to-proxmox-migration",
         techStack: ["VMware", "Proxmox", "Linux"],
       },
-      {
-        date: "2025.07",
-        status: "completed",
-        identifier: "NDG_Proxmox_Workshop",
-        origin: "Network Development Group",
-        description: "18-hour intensive workshop on deploying Proxmox VE 8 for NETLAB+ educational environments.",
-        href: "/projects/ndg-proxmox-workshop",
-        techStack: ["Proxmox VE 8", "NETLAB+", "Clustering"],
-      }
     ],
   },
   {
     name: "Developer Tools & AI",
     icon: "🔧",
     projects: [
-
+      {
+        date: "2026.02",
+        status: "ongoing",
+        identifier: "Ops_Deck:_Developer_Infrastructure_Platform",
+        origin: "Personal Infrastructure",
+        description: "Suite of local-first backend APIs: semantic code search across 40+ repos, versioned prompt library, agent knowledge base, content pipeline with security scrubbing, and multi-model orchestration.",
+        href: "/projects/ops-deck",
+        techStack: ["FastAPI", "SQLite", "Ollama", "nomic-embed-text", "PM2", "Caddy"],
+      },
       {
         date: "2026.01",
         status: "completed",
@@ -294,12 +310,10 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 <Layout pageTitle="Projects">
   <section class="cards-page">
     <header class="page-header">
-      <p class="prompt">$ ls ~/projects</p>
       <h1>Projects</h1>
       <p class="subtitle">{totalProjects} projects across security, infrastructure, and development</p>
     </header>
 
-    <!-- Featured Projects -->
     <div class="featured-section">
       <h2 class="section-title">Featured Work</h2>
       <hr class="section-rule" />
@@ -332,7 +346,6 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
       </div>
     </div>
 
-    <!-- Categorized Projects -->
     {categories.map((category) => (
       <div class="category-section">
         <h2 class="section-title">
@@ -362,7 +375,7 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
                     <span class="tech-pill">{tech}</span>
                   ))}
                 </div>
-                <span class="card-link">View Case Study &rarr;</span>
+                <span class="card-link">View Case Study →</span>
               </a>
             ) : (
               <div class="project-card">
@@ -391,25 +404,17 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
       </div>
     ))}
 
-    <!-- Navigation -->
     <nav class="nav-section">
-      <p class="nav-label">// Continue exploring</p>
       <div class="page-nav-links">
-        <a href="/experience" class="page-nav-link">$ cd /experience</a>
-        <a href="/hire" class="page-nav-link">$ cd /hire</a>
-        <a href="/blog" class="page-nav-link">$ cd /blog</a>
+        <a href="/experience" class="page-nav-link">Experience</a>
+        <a href="/hire" class="page-nav-link">Hire Me</a>
+        <a href="/blog" class="page-nav-link">Blog</a>
       </div>
     </nav>
-
-    <!-- Footer -->
-    <div class="terminal-footer">
-      <span class="cursor-blink">█</span> EOF
-    </div>
   </section>
 </Layout>
 
 <style>
-  /* Reset global styles that leak into card layout */
   .cards-page a,
   .cards-page a:visited {
     font-size: inherit;
@@ -437,19 +442,11 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     max-width: 64rem;
     margin: 0 auto;
     padding: 2rem 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
   }
 
-  /* Page Header */
   .page-header {
     margin-bottom: 3rem;
-  }
-
-  .prompt {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-    opacity: 0.4;
-    margin: 0 0 0.5rem 0;
   }
 
   .page-header h1 {
@@ -457,17 +454,16 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 700;
     margin: 0 0 0.5rem 0;
-    color: #10b981;
+    color: var(--primary);
     line-height: 1.1;
   }
 
   .subtitle {
     font-size: 0.9rem;
-    opacity: 0.6;
+    color: var(--text-muted);
     margin: 0;
   }
 
-  /* Section Headers */
   .section-title {
     font-size: 1.25rem;
     font-weight: 600;
@@ -483,11 +479,10 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 
   .section-rule {
     border: none;
-    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-top: 1px solid var(--border);
     margin: 0 0 1.5rem 0;
   }
 
-  /* Featured Grid */
   .featured-section {
     margin-bottom: 3rem;
   }
@@ -498,13 +493,12 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     gap: 1.5rem;
   }
 
-  /* Hero Card */
   .hero-card {
     display: flex;
     flex-direction: column;
     padding: 1.75rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 12px;
     text-decoration: none;
     color: inherit;
@@ -514,8 +508,7 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
   .hero-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    border-color: color-mix(in srgb, currentColor 20%, transparent);
-    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: var(--primary);
   }
 
   .hero-top {
@@ -537,23 +530,22 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
   }
 
   .highlight-badge.savings {
-    background: color-mix(in srgb, #f59e0b 15%, transparent);
-    color: #d97706;
+    background: var(--blockquote-bg);
+    color: var(--tertiary);
   }
 
   .highlight-badge.label {
-    background: color-mix(in srgb, #3b82f6 12%, transparent);
-    color: #3b82f6;
+    background: color-mix(in srgb, var(--secondary) 12%, transparent);
+    color: var(--secondary);
   }
 
-  /* Status Badge */
   .status-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     font-size: 0.7rem;
     font-weight: 500;
-    opacity: 0.7;
+    color: var(--text-muted);
   }
 
   .status-badge.small {
@@ -568,13 +560,13 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
   }
 
   .status-dot.ongoing {
-    background: #10b981;
-    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    background: var(--primary);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--primary) 60%, transparent);
     animation: pulse 2s ease-in-out infinite;
   }
 
   .status-check {
-    color: #10b981;
+    color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 700;
   }
@@ -593,25 +585,24 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 
   .hero-origin {
     font-size: 0.8rem;
-    opacity: 0.5;
+    color: var(--text-muted);
     margin: 0 0 0.75rem 0;
   }
 
   .hero-description {
     font-size: 0.85rem;
     line-height: 1.6;
-    opacity: 0.75;
+    color: var(--text-muted);
     margin: 0 0 1rem 0;
     flex: 1;
   }
 
   .hero-date {
     font-size: 0.75rem;
-    opacity: 0.4;
+    color: var(--text-muted);
     margin-top: 0.75rem;
   }
 
-  /* Tech Pills */
   .tech-pills {
     display: flex;
     flex-wrap: wrap;
@@ -623,30 +614,27 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     font-weight: 500;
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
-    background: color-mix(in srgb, #10b981 10%, transparent);
-    color: #10b981;
-    border: 1px solid color-mix(in srgb, #10b981 20%, transparent);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   }
 
-  /* Category Section */
   .category-section {
     margin-bottom: 2.5rem;
   }
 
-  /* Card Grid */
   .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
   }
 
-  /* Project Card */
   .project-card {
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
-    background: color-mix(in srgb, currentColor 2%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 10px;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -655,14 +643,13 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
   }
 
   .project-card:hover {
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border-color: color-mix(in srgb, currentColor 15%, transparent);
+    border-color: var(--primary);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     transform: translateY(-2px);
   }
 
   .project-card:hover .card-title {
-    color: #10b981;
+    color: var(--primary);
   }
 
   .card-header {
@@ -674,7 +661,7 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 
   .card-date {
     font-size: 0.7rem;
-    opacity: 0.4;
+    color: var(--text-muted);
   }
 
   .card-title {
@@ -687,14 +674,14 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
 
   .card-origin {
     font-size: 0.75rem;
-    opacity: 0.5;
+    color: var(--text-muted);
     margin: 0 0 0.5rem 0;
   }
 
   .card-description {
     font-size: 0.8rem;
     line-height: 1.5;
-    opacity: 0.7;
+    color: var(--text-muted);
     margin: 0 0 1rem 0;
     flex: 1;
   }
@@ -704,7 +691,7 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     margin-top: 0.75rem;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #10b981;
+    color: var(--primary);
     text-decoration: none;
     transition: opacity 0.2s ease;
   }
@@ -713,20 +700,10 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
     opacity: 0.8;
   }
 
-  /* Navigation */
   .nav-section {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    text-align: center;
-  }
-
-  .nav-label {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.75rem;
-    opacity: 0.45;
-    margin: 0 0 0.75rem 0;
-    font-style: italic;
+    border-top: 1px solid var(--border);
   }
 
   .page-nav-links {
@@ -738,39 +715,20 @@ const totalProjects = featuredProjects.length + categories.reduce((sum, cat) => 
   .page-nav-link {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.8rem;
-    color: inherit;
+    color: var(--text-muted);
     text-decoration: none;
     padding: 0.4rem 0.75rem;
     border: 1px solid transparent;
     border-radius: 3px;
     transition: all 0.2s ease;
-    opacity: 0.6;
   }
 
   .page-nav-link:hover {
-    opacity: 1;
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
-    color: #10b981;
-    background: color-mix(in srgb, #10b981 5%, transparent);
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
   }
 
-  .terminal-footer {
-    font-family: "IBM Plex Mono", monospace;
-    margin-top: 1rem;
-    font-size: 0.8rem;
-    opacity: 0.5;
-  }
-
-  .cursor-blink {
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  /* Mobile */
   @media (max-width: 640px) {
     .cards-page {
       padding: 1.5rem 1rem;

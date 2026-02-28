@@ -42,7 +42,7 @@ Configure OpenClaw to use Ollama as an OpenAI-compatible endpoint:
 memorySearch:
   provider: openai
   remote:
-    baseUrl: http://localhost:11434/v1/
+    baseUrl: http://[redacted-service]/v1/
   model: nomic-embed-text
 ```
 

@@ -80,7 +80,7 @@ OpenClaw has built-in memory search support. Configure it to use Ollama:
 memorySearch:
   provider: openai
   remote:
-    baseUrl: http://localhost:11434/v1/
+    baseUrl: http://[redacted-service]/v1/
   model: nomic-embed-text
   fallback: none
 ```

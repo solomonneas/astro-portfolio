@@ -5,29 +5,26 @@ import StatusLight from "../components/StatusLight.astro";
 
 <Layout pageTitle="About Me">
   <section class="about">
-    <!-- Profile -->
     <div class="profile">
-      <p class="prompt">$ cat ~/about.md</p>
       <h1 class="name">Solomon Neas</h1>
       <p class="role">Infrastructure Engineer · Security Architect · Agentic Engineer</p>
 
       <div class="profile-details">
         <div class="detail">
-          <span class="detail-label">[LOCATION]</span>
+          <span class="detail-label">Location</span>
           <span class="detail-value">New Port Richey, FL</span>
         </div>
         <div class="detail">
-          <span class="detail-label">[STATUS]</span>
+          <span class="detail-label">Status</span>
           <span class="detail-value green"><StatusLight status="ongoing" /> Building secure systems</span>
         </div>
         <div class="detail">
-          <span class="detail-label">[EDUCATION]</span>
+          <span class="detail-label">Education</span>
           <span class="detail-value">M.S. Cybersecurity Intelligence @ USF (in progress)</span>
         </div>
       </div>
     </div>
 
-    <!-- Summary -->
     <div class="section">
       <p class="summary">
         From DOS commands in elementary school to designing enterprise SOC architectures. My path to
@@ -35,19 +32,17 @@ import StatusLight from "../components/StatusLight.astro";
       </p>
     </div>
 
-    <!-- Timeline -->
     <div class="section">
-      <p class="section-header">$ cat /var/log/history.log</p>
-      <p class="section-comment">// A non-linear path to infrastructure and security</p>
+      <h2 class="section-header">History</h2>
+      <p class="section-comment">A non-linear path to infrastructure and security</p>
 
       <div class="timeline">
-        <!-- Chapter 1 -->
         <div class="timeline-entry">
           <div class="timeline-marker"></div>
           <div class="timeline-content">
             <div class="entry-header">
               <span class="entry-date">~1995-2005</span>
-              <span class="entry-title">EARLY_TECH_INIT</span>
+              <span class="entry-title">Early Tech</span>
             </div>
             <p>
               Grew up one of ten kids in a household where technology was second nature. My father, a chemical
@@ -69,13 +64,12 @@ import StatusLight from "../components/StatusLight.astro";
           </div>
         </div>
 
-        <!-- Chapter 2 -->
         <div class="timeline-entry">
           <div class="timeline-marker"></div>
           <div class="timeline-content">
             <div class="entry-header">
               <span class="entry-date">2005-2021</span>
-              <span class="entry-title">CULINARY_DETOUR</span>
+              <span class="entry-title">Culinary Detour</span>
             </div>
             <p>
               Life took an unexpected fork. For 17 years, I worked as a cook and chef. A career that seems worlds
@@ -96,13 +90,12 @@ import StatusLight from "../components/StatusLight.astro";
           </div>
         </div>
 
-        <!-- Chapter 3 -->
         <div class="timeline-entry current">
           <div class="timeline-marker active"></div>
           <div class="timeline-content">
             <div class="entry-header">
-              <span class="entry-date">2021-PRESENT</span>
-              <span class="entry-title">RETURN_TO_ROOT</span>
+              <span class="entry-date">2021-Present</span>
+              <span class="entry-title">Return to Root</span>
               <StatusLight status="ongoing" />
             </div>
             <p>
@@ -128,9 +121,8 @@ import StatusLight from "../components/StatusLight.astro";
       </div>
     </div>
 
-    <!-- Skills -->
     <div class="section">
-      <p class="section-header">$ cat ~/skills.json</p>
+      <h2 class="section-header">Skills</h2>
       <div class="skills-grid">
         <div class="skill-group">
           <h3 class="skill-label">Infrastructure</h3>
@@ -185,19 +177,12 @@ import StatusLight from "../components/StatusLight.astro";
       </div>
     </div>
 
-    <!-- Navigation -->
     <div class="section nav-section">
-      <p class="section-comment">// Continue exploring</p>
       <div class="nav-links">
-        <a href="/experience" class="nav-link">$ cd /experience</a>
-        <a href="/projects" class="nav-link">$ cd /projects</a>
-        <a href="/hire" class="nav-link">$ cd /hire</a>
+        <a href="/experience" class="nav-link">Experience</a>
+        <a href="/projects" class="nav-link">Projects</a>
+        <a href="/hire" class="nav-link">Hire Me</a>
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="terminal-footer">
-      <span class="cursor-blink">█</span> EOF
     </div>
   </section>
 </Layout>
@@ -209,17 +194,10 @@ import StatusLight from "../components/StatusLight.astro";
     margin: 0 auto;
   }
 
-  /* Profile */
   .profile {
     margin-bottom: 2rem;
     padding-bottom: 2rem;
-    border-bottom: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
-  }
-
-  .prompt {
-    font-size: 0.8rem;
-    opacity: 0.4;
-    margin: 0 0 0.75rem 0;
+    border-bottom: 1px dashed var(--border);
   }
 
   .name {
@@ -227,13 +205,13 @@ import StatusLight from "../components/StatusLight.astro";
     font-weight: 700;
     margin: 0 0 0.5rem 0;
     line-height: 1.1;
-    color: #10b981;
+    color: var(--primary);
   }
 
   .role {
     font-family: "IBM Plex Sans", sans-serif;
     font-size: clamp(0.85rem, 2vw, 1rem);
-    opacity: 0.65;
+    color: var(--text-muted);
     margin: 0 0 1.5rem 0;
   }
 
@@ -252,54 +230,45 @@ import StatusLight from "../components/StatusLight.astro";
 
   .detail-label {
     font-size: 0.7rem;
-    opacity: 0.45;
+    color: var(--text-muted);
     letter-spacing: 0.05em;
     min-width: 100px;
     flex-shrink: 0;
   }
 
-  .detail-value {
-    opacity: 0.8;
-  }
-
   .detail-value.green {
-    color: #10b981;
+    color: var(--primary);
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
   }
 
-  /* Summary */
   .summary {
     font-family: "IBM Plex Sans", sans-serif;
     font-size: 1rem;
     line-height: 1.7;
     margin: 0;
-    opacity: 0.85;
     max-width: 58ch;
     text-align: left;
   }
 
-  /* Sections */
   .section {
     margin-bottom: 2.5rem;
   }
 
   .section-header {
-    font-size: 1rem;
+    font-size: 1.25rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
-    opacity: 0.9;
   }
 
   .section-comment {
     font-size: 0.75rem;
-    opacity: 0.45;
+    color: var(--text-muted);
     margin: 0 0 1.25rem 0;
     font-style: italic;
   }
 
-  /* Timeline */
   .timeline {
     position: relative;
     padding-left: 2rem;
@@ -312,7 +281,7 @@ import StatusLight from "../components/StatusLight.astro";
     top: 8px;
     bottom: 8px;
     width: 1px;
-    background: color-mix(in srgb, currentColor 15%, transparent);
+    background: var(--border);
   }
 
   .timeline-entry {
@@ -331,32 +300,31 @@ import StatusLight from "../components/StatusLight.astro";
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
-    background: var(--background, #fff2d1);
+    border: 2px solid var(--border);
+    background: var(--bg);
     z-index: 1;
   }
 
   .timeline-marker.active {
-    border-color: #10b981;
-    background: color-mix(in srgb, #10b981 20%, transparent);
-    box-shadow: 0 0 8px color-mix(in srgb, #10b981 30%, transparent);
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--primary) 30%, transparent);
   }
 
   .timeline-content {
     padding: 1rem 1.25rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     transition: all 0.2s ease;
   }
 
   .timeline-content:hover {
-    border-color: color-mix(in srgb, currentColor 20%, transparent);
-    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-color: var(--text-muted);
   }
 
   .timeline-entry.current .timeline-content {
-    border-color: color-mix(in srgb, #10b981 25%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   .entry-header {
@@ -370,14 +338,14 @@ import StatusLight from "../components/StatusLight.astro";
   .entry-date {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #10b981;
+    color: var(--primary);
   }
 
   .entry-title {
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.03em;
-    opacity: 0.7;
+    color: var(--text-muted);
   }
 
   .timeline-content p {
@@ -385,7 +353,6 @@ import StatusLight from "../components/StatusLight.astro";
     font-size: 0.85rem;
     line-height: 1.7;
     margin: 0 0 0.75rem 0;
-    opacity: 0.8;
     max-width: 58ch;
     text-align: left;
   }
@@ -394,7 +361,6 @@ import StatusLight from "../components/StatusLight.astro";
     margin-bottom: 0.75rem;
   }
 
-  /* Tags */
   .tags {
     display: flex;
     flex-wrap: wrap;
@@ -404,14 +370,13 @@ import StatusLight from "../components/StatusLight.astro";
   .tag {
     font-size: 0.65rem;
     padding: 0.2rem 0.5rem;
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 3px;
-    opacity: 0.7;
+    color: var(--text-muted);
     letter-spacing: 0.02em;
   }
 
-  /* Skills Grid */
   .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -420,8 +385,8 @@ import StatusLight from "../components/StatusLight.astro";
 
   .skill-group {
     padding: 1rem;
-    background: color-mix(in srgb, currentColor 3%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
   }
 
@@ -429,14 +394,13 @@ import StatusLight from "../components/StatusLight.astro";
     font-size: 0.75rem;
     font-weight: 600;
     margin: 0 0 0.75rem 0;
-    color: #10b981;
+    color: var(--primary);
     letter-spacing: 0.03em;
   }
 
-  /* Nav */
   .nav-section {
     padding-top: 1rem;
-    border-top: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+    border-top: 1px dashed var(--border);
   }
 
   .nav-links {
@@ -447,9 +411,8 @@ import StatusLight from "../components/StatusLight.astro";
 
   .nav-link {
     font-size: 0.8rem;
-    color: inherit;
+    color: var(--text-muted);
     text-decoration: none;
-    opacity: 0.6;
     transition: all 0.2s ease;
     padding: 0.4rem 0.75rem;
     border: 1px solid transparent;
@@ -457,29 +420,11 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   .nav-link:hover {
-    opacity: 1;
-    color: #10b981;
-    border-color: color-mix(in srgb, #10b981 30%, transparent);
-    background: color-mix(in srgb, #10b981 5%, transparent);
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
   }
 
-  /* Footer */
-  .terminal-footer {
-    margin-top: 1rem;
-    font-size: 0.8rem;
-    opacity: 0.5;
-  }
-
-  .cursor-blink {
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  /* Responsive */
   @media (max-width: 640px) {
     .name {
       font-size: 2rem;

@@ -83,10 +83,10 @@ const skills = [
         </div>
       </div>
     </div>
-    <p class="retro-tagline">// Intentionally classic. Deliberately secure.</p>
+    <p class="retro-tagline">Intentionally classic. Deliberately secure.</p>
   </div>
 
-  <h2>// Overview</h2>
+  <h2>Overview</h2>
   <p>
     I built this hardware inventory management system as my capstone project for the Bachelor of Applied Science
     in Supervision and Management (Business Information Technology) at Polk State College. It's a complete CRUD
@@ -112,7 +112,7 @@ const skills = [
   </div>
 
   <!-- What It Does -->
-  <h2>// What It Does</h2>
+  <h2>What It Does</h2>
   <div class="features-grid">
     {features.map((feature) => (
       <div class="feature-card">
@@ -126,8 +126,8 @@ const skills = [
   </div>
 
   <!-- Tech Stack -->
-  <h2>// Tech Stack</h2>
-  <p class="section-comment">// Classic LAMP stack demonstrating server-side fundamentals</p>
+  <h2>Tech Stack</h2>
+  <p class="section-comment">Classic LAMP stack demonstrating server-side fundamentals</p>
 
   <div class="stack-grid">
     {stackComponents.map((comp, i) => (
@@ -143,7 +143,7 @@ const skills = [
   </div>
 
   <!-- Architecture -->
-  <h2>// System Architecture</h2>
+  <h2>System Architecture</h2>
   <div class="architecture-diagram">
     <div class="arch-layer">
       <span class="layer-label">AUTHENTICATION FLOW</span>
@@ -178,23 +178,23 @@ const skills = [
       <span class="layer-label">FILE STRUCTURE</span>
       <div class="file-tree">
         <div class="file-item folder">Capstone/</div>
-        <div class="file-item">├── index.php <span class="file-desc">// Login + inventory display</span></div>
-        <div class="file-item">├── db.php <span class="file-desc">// PDO connection</span></div>
-        <div class="file-item">├── add.php <span class="file-desc">// Add equipment popup</span></div>
-        <div class="file-item">├── edit.php <span class="file-desc">// Edit equipment popup</span></div>
-        <div class="file-item">├── update.php <span class="file-desc">// CRUD processor</span></div>
-        <div class="file-item">├── delete.php <span class="file-desc">// Delete handler</span></div>
-        <div class="file-item">├── export.php <span class="file-desc">// CSV export</span></div>
-        <div class="file-item">├── register.php <span class="file-desc">// User registration</span></div>
-        <div class="file-item">├── reset_password.php <span class="file-desc">// Token-based reset</span></div>
-        <div class="file-item">└── logout.php <span class="file-desc">// Session termination</span></div>
+        <div class="file-item">├── index.php <span class="file-desc">Login + inventory display</span></div>
+        <div class="file-item">├── db.php <span class="file-desc">PDO connection</span></div>
+        <div class="file-item">├── add.php <span class="file-desc">Add equipment popup</span></div>
+        <div class="file-item">├── edit.php <span class="file-desc">Edit equipment popup</span></div>
+        <div class="file-item">├── update.php <span class="file-desc">CRUD processor</span></div>
+        <div class="file-item">├── delete.php <span class="file-desc">Delete handler</span></div>
+        <div class="file-item">├── export.php <span class="file-desc">CSV export</span></div>
+        <div class="file-item">├── register.php <span class="file-desc">User registration</span></div>
+        <div class="file-item">├── reset_password.php <span class="file-desc">Token-based reset</span></div>
+        <div class="file-item">└── logout.php <span class="file-desc">Session termination</span></div>
       </div>
     </div>
   </div>
 
   <!-- Security Implementation -->
-  <h2>// Security Implementation</h2>
-  <p class="section-comment">// OWASP Top 10 awareness built into every layer</p>
+  <h2>Security Implementation</h2>
+  <p class="section-comment">OWASP Top 10 awareness built into every layer</p>
 
   <div class="security-table">
     <div class="security-header">
@@ -212,7 +212,7 @@ const skills = [
   </div>
 
   <!-- Code Deep-Dive -->
-  <h2>// How I Built It</h2>
+  <h2>How I Built It</h2>
 
   <div class="impl-section">
     <h3 class="impl-title">
@@ -226,14 +226,14 @@ const skills = [
           <code>session_start();</code>
           <code>include 'db.php';</code>
           <code></code>
-          <code>// Secure session cookie settings</code>
+          <code>Secure session cookie settings</code>
           <code>session_set_cookie_params([</code>
           <code>    'secure' =&gt; true,</code>
           <code>    'httponly' =&gt; true,</code>
           <code>    'samesite' =&gt; 'Strict'</code>
           <code>]);</code>
           <code></code>
-          <code>// Check login attempts (max 5)</code>
+          <code>Check login attempts (max 5)</code>
           <code>$_SESSION["login_attempts"] = ($_SESSION["login_attempts"] ?? 0) + 1;</code>
           <code>if ($_SESSION["login_attempts"] > 5) {</code>
           <code>    die("Too many login attempts.");</code>
@@ -243,14 +243,14 @@ const skills = [
       <div class="impl-block">
         <h4>Password Verification</h4>
         <div class="code-block">
-          <code>// Prepared statement prevents SQL injection</code>
+          <code>Prepared statement prevents SQL injection</code>
           <code>$stmt = $pdo-&gt;prepare(</code>
           <code>    "SELECT id, password_hash FROM users WHERE username = ?"</code>
           <code>);</code>
           <code>$stmt-&gt;execute([$username]);</code>
           <code>$user = $stmt-&gt;fetch(PDO::FETCH_ASSOC);</code>
           <code></code>
-          <code>// bcrypt comparison (timing-safe)</code>
+          <code>bcrypt comparison (timing-safe)</code>
           <code>if ($user && password_verify($password, $user["password_hash"])) {</code>
           <code>    $_SESSION["login_attempts"] = 0;  // Reset on success</code>
           <code>    $_SESSION["user_id"] = $user["id"];</code>
@@ -269,7 +269,7 @@ const skills = [
       <div class="impl-block full-width">
         <h4>WHERE 1=1 Pattern for Dynamic Filtering</h4>
         <div class="code-block">
-          <code>// Base query allows appending conditions with AND</code>
+          <code>Base query allows appending conditions with AND</code>
           <code>$query = "SELECT * FROM hardware WHERE 1=1";</code>
           <code></code>
           <code>if (!empty($search)) {</code>
@@ -285,7 +285,7 @@ const skills = [
           <code>    $query .= " AND category = :category";</code>
           <code>}</code>
           <code></code>
-          <code>// Named parameters prevent SQL injection</code>
+          <code>Named parameters prevent SQL injection</code>
           <code>$stmt-&gt;bindValue(':search', "%$search%", PDO::PARAM_STR);</code>
         </div>
       </div>
@@ -306,7 +306,7 @@ const skills = [
       <div class="impl-block full-width">
         <h4>Single-Use Token Pattern</h4>
         <div class="code-block">
-          <code>// Verify token exists in database</code>
+          <code>Verify token exists in database</code>
           <code>$stmt = $pdo-&gt;prepare("SELECT id FROM users WHERE reset_token = ?");</code>
           <code>$stmt-&gt;execute([$token]);</code>
           <code>$user = $stmt-&gt;fetch(PDO::FETCH_ASSOC);</code>
@@ -332,7 +332,7 @@ const skills = [
   </div>
 
   <!-- Database Schema -->
-  <h2>// Database Schema</h2>
+  <h2>Database Schema</h2>
   <div class="schema-diagram">
     <div class="table-card users">
       <div class="table-header">
@@ -386,8 +386,8 @@ const skills = [
   </div>
 
   <!-- Growth Comparison -->
-  <h2>// Growth: Capstone → LAIM</h2>
-  <p class="section-comment">// From manual CRUD to automated network discovery</p>
+  <h2>Growth: Capstone → LAIM</h2>
+  <p class="section-comment">From manual CRUD to automated network discovery</p>
 
   <div class="comparison-visual">
     <div class="compare-side capstone-side">
@@ -457,7 +457,7 @@ const skills = [
   </div>
 
   <!-- Skills Demonstrated -->
-  <h2>// Skills Demonstrated</h2>
+  <h2>Skills Demonstrated</h2>
   <div class="skills-grid">
     {skills.map((skill) => (
       <div class="skill-card">
@@ -474,7 +474,7 @@ const skills = [
   </div>
 
   <!-- Design Philosophy -->
-  <h2>// Why Retro?</h2>
+  <h2>Why Retro?</h2>
   <div class="philosophy-card">
     <div class="philosophy-content">
       <p>
@@ -492,7 +492,7 @@ const skills = [
   </div>
 
   <!-- Project Status -->
-  <h2>// Project Status</h2>
+  <h2>Project Status</h2>
   <div class="status-block">
     <div class="status-indicator completed">
       <div class="status-pulse"></div>

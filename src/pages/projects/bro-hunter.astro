@@ -1,238 +1,495 @@
 ---
-import ProjectLayout from "../../layouts/ProjectLayout.astro";
+import Layout from "../../layouts/Layout.astro";
+import StatusLight from "../../components/StatusLight.astro";
 
-const frontmatter = {
-  title: "Bro Hunter: Network Threat Hunting Platform",
-  status: "Complete",
-  statusType: "complete",
-  origin: "Portfolio Project",
-  date: "2026.01",
-  techStack: ["React", "TypeScript", "Tailwind CSS", "Zustand", "Vite"],
+// Data sources
+const dataSources = [
+  { name: "Zeek", type: "Network Metadata", provides: "Connection logs, DNS queries, HTTP headers, TLS certificates, file hashes", color: "#22c55e" },
+  { name: "Suricata", type: "IDS/IPS Alerts", provides: "EVE JSON alerts, signature matches, protocol anomalies", color: "#3b82f6" },
+];
+
+// Core analysis engines
+const engines = [
+  { name: "Beacon Analyzer", desc: "Detects C2 beaconing patterns using interval regularity, jitter analysis, and payload consistency scoring", icon: "📡" },
+  { name: "DNS Threat Engine", desc: "DGA entropy detection, tunneling analysis, fast-flux identification, and NXDOMAIN pattern matching", icon: "🔍" },
+  { name: "HTTP Analysis", desc: "User-agent anomaly detection, URI pattern analysis, header fingerprinting, and exfiltration indicators", icon: "🌐" },
+  { name: "TLS Intelligence", desc: "Certificate chain validation, JA3/JA3S fingerprinting, expired cert detection, self-signed identification", icon: "🔐" },
+  { name: "Lateral Movement", desc: "Internal scan detection, port sweep analysis, east-west traffic anomalies, credential abuse patterns", icon: "↔️" },
+  { name: "Session Reconstructor", desc: "Full connection timeline reconstruction with packet-level detail and flow correlation", icon: "🔗" },
+];
+
+// Features by phase
+const phases = [
+  { phase: 1, name: "Core Platform", status: "completed", items: ["Zeek/Suricata ingest", "Threat scoring engine", "Beacon detection", "DNS analysis", "5 UI theme variants"] },
+  { phase: 2, name: "SOC Dashboard", status: "completed", items: ["Professional dashboard", "Light/dark themes", "Mobile responsive", "Demo data mode"] },
+  { phase: 3, name: "Forensics & Cases", status: "completed", items: ["Case management", "Analyst annotations", "Hunt hypotheses", "Evidence timeline"] },
+  { phase: 4, name: "Detection Rules", status: "completed", items: ["Custom rule builder", "Sigma import", "Rule testing", "Baseline management"] },
+  { phase: 5, name: "Reporting & Workflow", status: "completed", items: ["PDF/HTML/JSON reports", "Report history", "Analyst workflow wizard", "Host ranking + deep dive"] },
+  { phase: 6, name: "Detection Depth", status: "completed", items: ["HTTP analysis", "TLS intelligence", "Lateral movement", "Trend tracking"] },
+  { phase: 7, name: "Integrations", status: "completed", items: ["TheHive case export", "Wazuh IOC correlation", "MISP enrichment", "Webhook management"] },
+  { phase: 8, name: "Live Operations", status: "completed", items: ["Live Zeek ingest", "Live Suricata ingest", "Incremental event feed", "Dashboard auto-refresh"] },
+  { phase: 9, name: "Agent Integration", status: "pending", items: ["MCP server wrapper", "Live Zeek tailing", "Multi-sensor support", "Collaborative workflows"] },
+];
+
+// Tech decisions
+const techDecisions = [
+  { decision: "FastAPI over Flask", reason: "Async by default, Pydantic validation, auto-generated OpenAPI docs. Essential for concurrent log processing." },
+  { decision: "React 18 + TanStack Query", reason: "Server state management with automatic cache invalidation. Live refresh without manual polling logic." },
+  { decision: "Recharts over D3", reason: "React-native charting with less boilerplate. D3 is overkill for dashboard charts." },
+  { decision: "5 theme variants", reason: "Built during design phase to find the right SOC aesthetic. V3 (professional light) became the primary." },
+  { decision: "Offline-first demo mode", reason: "Loads bundled log files so the platform works without a live network. Critical for portfolio demos." },
+  { decision: "xhtml2pdf for reports", reason: "Server-side PDF generation from HTML templates. No browser dependency for report export." },
+  { decision: "Sigma rule import", reason: "Industry standard detection format. Import existing community rules instead of writing from scratch." },
+];
+
+// Integration endpoints
+const integrations = [
+  { name: "TheHive", type: "Case Export", desc: "Export threat findings as TheHive cases with observables, TLP marking, and severity mapping", color: "#f59e0b" },
+  { name: "Wazuh", type: "IOC Correlation", desc: "Cross-reference detected IOCs against Wazuh agent alerts for host-level correlation", color: "#22c55e" },
+  { name: "MISP", type: "Enrichment", desc: "Enrich IPs, domains, and hashes against MISP threat intelligence feeds", color: "#3b82f6" },
+  { name: "Webhooks", type: "Notifications", desc: "Configurable webhook delivery for alerts, with history tracking and test capability", color: "#8b5cf6" },
+];
+
+// Stats
+const stats = {
+  files: "430+",
+  frontendLoc: "25K+",
+  backendLoc: "21K+",
+  commits: "59+",
+  apiRouters: "30+",
+  components: "50+",
 };
-
-const stackComponents = [
-  { name: "React + TypeScript", role: "Component Framework", purpose: "Component architecture with type-safe log parsing and analysis models for Zeek and Suricata telemetry", color: "#61dafb" },
-  { name: "Zustand", role: "State Management", purpose: "Lightweight state management for hunt sessions, filter state, playbook progress, and analysis results", color: "#a855f7" },
-  { name: "Tailwind CSS", role: "Styling", purpose: "Dark-first SOC-appropriate design with status color semantics and data-dense layouts for analyst workflows", color: "#38bdf8" },
-  { name: "Vite", role: "Build Tooling", purpose: "Fast hot module replacement for iterative development of complex detection interfaces and data visualization components", color: "#f59e0b" },
-];
-
-const highlights = [
-  {
-    category: "Detection Algorithm",
-    title: "Statistical Beaconing Detection",
-    scenario: "Signature-based IDS cannot detect C2 beacons that use legitimate protocols and vary their timing slightly",
-    solution: "Built a statistical analyzer that processes Zeek conn.log entries, groups connections by destination, calculates interval consistency scores and jitter metrics. Connections with high regularity scores and low jitter relative to mean interval get flagged as potential beacons",
-    impact: "Catches C2 callbacks that Suricata signatures miss entirely, especially encrypted beacons over HTTPS",
-  },
-  {
-    category: "Analysis",
-    title: "DGA Domain Detection via Entropy Scoring",
-    scenario: "Domain Generation Algorithms produce random-looking domains that bypass static blocklists. Analysts cannot manually review thousands of DNS queries",
-    solution: "Calculates Shannon entropy for each queried domain name. High-entropy names above 3.5 bits per character with no matching Alexa or Tranco top-1M entry get flagged. Combined with subdomain length analysis to catch DNS tunneling payloads",
-    impact: "Automated detection of algorithmically generated domains reduces analyst review time from hours to seconds",
-  },
-  {
-    category: "Workflow",
-    title: "Guided Hunt Playbooks",
-    scenario: "Junior analysts lack the experience to know which log fields to examine and in what order when investigating network anomalies",
-    solution: "Created step-by-step playbooks that chain analysis tools together. The Find C2 Beacons playbook runs beaconing detection, cross-references flagged IPs against threat intelligence, checks for matching Suricata alerts, and generates a summary report",
-    impact: "Standardizes threat hunting methodology across skill levels while teaching analysts the investigation logic",
-  },
-];
-
-const skills = [
-  { name: "Threat Hunting", items: ["Beaconing detection", "C2 identification", "DNS analysis", "Log correlation"] },
-  { name: "Network Analysis", items: ["Zeek log parsing", "Protocol metadata", "Connection patterns", "Traffic baselines"] },
-  { name: "Detection Engineering", items: ["Statistical analysis", "Entropy scoring", "Jitter calculation", "Threshold tuning"] },
-  { name: "MITRE ATT&CK", items: ["Technique mapping", "Tactic classification", "Detection coverage", "Gap analysis"] },
-];
 ---
 
-<ProjectLayout frontmatter={frontmatter}>
-  <h2>// Overview</h2>
-  <p>
-    Bro Hunter is a network threat hunting platform built for analyzing Zeek and Suricata log pipelines. It gives
-    analysts a focused workspace to detect stealthy command-and-control activity, investigate suspicious DNS behavior,
-    and pivot from detection output into raw telemetry. Core workflows combine statistical beaconing analytics,
-    entropy-driven DNS anomaly checks, and MITRE ATT&CK technique mapping.
-  </p>
-  <p>
-    The platform is designed for practical SOC hunting, not static reporting. Analysts can run guided hunt playbooks,
-    inspect parsed conn.log and dns.log records in a searchable log viewer, and correlate findings across multiple
-    detections before triage. This approach improves detection depth for behaviors that often evade pure signature
-    coverage, including low-and-slow HTTPS beaconing and DGA-driven DNS infrastructure.
-  </p>
+<Layout pageTitle="Bro Hunter: Threat Hunting Platform">
+  <article class="project-page">
+    <header class="project-header">
+      <a href="/projects" class="back-link">← Projects</a>
+      <h1 class="project-title">Bro Hunter</h1>
+      <p class="project-subtitle">Zeek + Suricata Threat Hunting Platform</p>
 
-  <!-- GitHub Callout -->
-  <div class="github-callout">
-    <div class="github-content">
-      <div class="github-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-        </svg>
+      <div class="project-meta">
+        <span class="meta-item">
+          <span class="meta-label">Status:</span>
+          <span class="meta-value"><StatusLight status="ongoing" /> Active Development</span>
+        </span>
+        <span class="meta-item">
+          <span class="meta-label">Origin:</span>
+          <span class="meta-value">Portfolio Project</span>
+        </span>
+        <span class="meta-item">
+          <span class="meta-label">Since:</span>
+          <span class="meta-value">2026.02</span>
+        </span>
       </div>
-      <div class="github-text">
-        <span class="github-label">Open Source</span>
-        <p class="github-desc">Threat hunting platform for Zeek and Suricata log analysis</p>
+
+      <div class="tech-badges">
+        {["React 18", "TypeScript", "FastAPI", "Python", "TanStack Query", "Recharts", "Tailwind CSS", "Vite", "Pydantic"].map(t => (
+          <span class="badge">{t}</span>
+        ))}
+      </div>
+    </header>
+
+    <!-- GitHub Callout -->
+    <div class="github-callout">
+      <div class="github-content">
+        <div class="github-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+          </svg>
+        </div>
+        <div class="github-text">
+          <span class="github-label">Open Source</span>
+          <p class="github-desc">Full-stack threat hunting platform on GitHub</p>
+        </div>
+      </div>
+      <div class="github-actions">
+        <a href="https://github.com/solomonneas/bro-hunter" target="_blank" class="github-btn repo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+          </svg>
+          <span>View Repository</span>
+        </a>
+        <a href="https://brohunter.solomonneas.dev" target="_blank" class="github-btn demo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+          </svg>
+          <span>Live Demo</span>
+        </a>
+        <a href="https://github.com/solomonneas/bro-hunter#readme" target="_blank" class="github-btn readme">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>README</span>
+        </a>
+        <a href="https://github.com/solomonneas/bro-hunter/stargazers" target="_blank" class="github-btn star">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+            <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+          </svg>
+          <span>Star on GitHub</span>
+        </a>
       </div>
     </div>
-    <div class="github-actions">
-      <a href="https://brohunter.solomonneas.dev" target="_blank" class="github-btn demo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-        </svg>
-        <span>Live Demo</span>
-      </a>
-      <a href="https://github.com/solomonneas/bro-hunter" target="_blank" class="github-btn repo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-        </svg>
-        <span>View Repository</span>
-      </a>
-      <a href="https://github.com/solomonneas/bro-hunter/commits" target="_blank" class="github-btn commits">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"/>
-        </svg>
-        <span>29 Commits</span>
-      </a>
-      <a href="https://github.com/solomonneas/bro-hunter/stargazers" target="_blank" class="github-btn star">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
-        </svg>
-        <span>Star on GitHub</span>
-      </a>
-    </div>
-  </div>
 
-  <!-- Tech Stack -->
-  <h2>// Stack Architecture</h2>
-  <p class="section-intro">Threat hunting frontend focused on detection workflows, telemetry analysis, and analyst usability:</p>
-  <div class="stack-grid">
-    {stackComponents.map((comp, i) => (
-      <div class="stack-card" style={`--accent: ${comp.color}; --delay: ${i * 0.1}s`}>
-        <div class="stack-header">
-          <span class="stack-indicator"></span>
-          <span class="stack-name">{comp.name}</span>
-        </div>
-        <div class="stack-role">{comp.role}</div>
-        <p class="stack-purpose">{comp.purpose}</p>
+    <!-- Stats Bar -->
+    <section class="content-section">
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-val">{stats.files}</span><span class="stat-lbl">Files</span></div>
+        <div class="stat"><span class="stat-val">{stats.frontendLoc}</span><span class="stat-lbl">Frontend LOC</span></div>
+        <div class="stat"><span class="stat-val">{stats.backendLoc}</span><span class="stat-lbl">Backend LOC</span></div>
+        <div class="stat"><span class="stat-val">{stats.commits}</span><span class="stat-lbl">Commits</span></div>
+        <div class="stat"><span class="stat-val">{stats.apiRouters}</span><span class="stat-lbl">API Routers</span></div>
+        <div class="stat"><span class="stat-val">{stats.components}</span><span class="stat-lbl">Components</span></div>
       </div>
-    ))}
-  </div>
+    </section>
 
-  <!-- Technical Highlights -->
-  <h2>// Key Highlights</h2>
-  <div class="highlights-grid">
-    {highlights.map((item, i) => (
-      <div class="highlight-card" style={`--delay: ${i * 0.1}s`}>
-        <div class="highlight-header">
-          <span class="highlight-category">{item.category}</span>
-          <span class="highlight-title">{item.title}</span>
-        </div>
-        <div class="highlight-body">
-          <div class="highlight-row">
-            <span class="row-label">Problem:</span>
-            <span class="row-value">{item.scenario}</span>
-          </div>
-          <div class="highlight-row">
-            <span class="row-label">Solution:</span>
-            <span class="row-value">{item.solution}</span>
-          </div>
-          <div class="highlight-row impact">
-            <span class="row-label">Result:</span>
-            <span class="row-value">{item.impact}</span>
+    <!-- Overview -->
+    <section class="content-section">
+      <h2>Overview</h2>
+      <p>
+        Bro Hunter is a full-stack threat hunting platform that ingests Zeek network metadata and Suricata IDS alerts, 
+        applies explainable threat scoring with MITRE ATT&CK mapping, and provides SOC analysts with an interactive 
+        investigation workflow. Every detection includes a human-readable explanation of why it scored the way it did.
+      </p>
+      <p>
+        The platform operates in two modes: offline demo mode (bundled log files for portfolio demonstrations) and 
+        live operations mode (real-time ingest from production Zeek/Suricata sensors with incremental event streaming 
+        to the dashboard).
+      </p>
+    </section>
+
+    <!-- Architecture -->
+    <section class="content-section">
+      <h2>Architecture</h2>
+      <div class="architecture">
+        <div class="arch-layer">
+          <span class="layer-label">DATA SOURCES</span>
+          <div class="source-grid">
+            {dataSources.map((src) => (
+              <div class="source-card" style={`--accent: ${src.color}`}>
+                <span class="source-name">{src.name}</span>
+                <span class="source-type">{src.type}</span>
+                <span class="source-provides">{src.provides}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    ))}
-  </div>
 
-  <!-- Skills -->
-  <h2>// Skills Demonstrated</h2>
-  <div class="skills-grid">
-    {skills.map((skill) => (
-      <div class="skill-card">
-        <div class="skill-header">
-          <span class="skill-name">{skill.name}</span>
+        <div class="arch-connector">
+          <div class="connector-arrows"><span>▼</span><span>▼</span></div>
+          <span class="connector-label">Log Parsing + Normalization</span>
         </div>
-        <ul class="skill-items">
-          {skill.items.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      </div>
-    ))}
-  </div>
 
-  <!-- Status -->
-  <h2>// Current Status</h2>
-  <div class="status-block">
-    <div class="status-indicator complete">
-      <div class="status-pulse"></div>
-      <span>Complete</span>
-    </div>
-    <ul class="status-list">
-      <li><span class="check">&#10003;</span> Statistical C2 beaconing detection on Zeek conn.log</li>
-      <li><span class="check">&#10003;</span> DNS anomaly analysis with entropy and tunneling indicators</li>
-      <li><span class="check">&#10003;</span> MITRE ATT&CK technique mapping for hunt findings</li>
-      <li><span class="check">&#10003;</span> Searchable log viewer for Zeek and Suricata telemetry</li>
-      <li><span class="check">&#10003;</span> Guided hunt playbooks for repeatable investigations</li>
-      <li><span class="check">&#10003;</span> SOC-focused UI built with React, TypeScript, and Tailwind CSS</li>
-    </ul>
-  </div>
-</ProjectLayout>
+        <div class="arch-layer">
+          <span class="layer-label">ANALYSIS PIPELINE</span>
+          <div class="backend-flow">
+            <div class="backend-box">
+              <span class="box-title">Ingest</span>
+              <span class="box-desc">Zeek/Suricata parsers</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="backend-box">
+              <span class="box-title">Threat Engine</span>
+              <span class="box-desc">Unified scoring + ATT&CK</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="backend-box">
+              <span class="box-title">Enrichment</span>
+              <span class="box-desc">MISP + Wazuh correlation</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="backend-box">
+              <span class="box-title">API Layer</span>
+              <span class="box-desc">30+ FastAPI routers</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="connector-arrows"><span>▼</span></div>
+          <span class="connector-label">REST + Live Event Stream</span>
+        </div>
+
+        <div class="arch-layer">
+          <span class="layer-label">FRONTEND</span>
+          <div class="consumer-grid">
+            <div class="consumer-box">
+              <span class="consumer-name">SOC Dashboard</span>
+              <span class="consumer-desc">Real-time threat overview, heatmaps, score gauges</span>
+            </div>
+            <div class="consumer-box">
+              <span class="consumer-name">Investigation Tools</span>
+              <span class="consumer-desc">Session viewer, packet inspector, host deep dive</span>
+            </div>
+            <div class="consumer-box">
+              <span class="consumer-name">Case Management</span>
+              <span class="consumer-desc">Evidence collection, annotations, hypothesis tracking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analysis Engines -->
+    <section class="content-section">
+      <h2>Analysis Engines</h2>
+      <div class="engine-grid">
+        {engines.map((e) => (
+          <div class="engine-card">
+            <div class="engine-header">
+              <span class="engine-icon">{e.icon}</span>
+              <span class="engine-name">{e.name}</span>
+            </div>
+            <p class="engine-desc">{e.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Integrations -->
+    <section class="content-section">
+      <h2>SOC Integrations</h2>
+      <p>
+        Bro Hunter integrates with the broader SOC stack, exporting findings to case management platforms 
+        and enriching detections against threat intelligence feeds.
+      </p>
+      <div class="integration-grid">
+        {integrations.map((i) => (
+          <div class="integration-card" style={`--accent: ${i.color}`}>
+            <div class="int-header">
+              <span class="int-name">{i.name}</span>
+              <span class="int-type">{i.type}</span>
+            </div>
+            <p class="int-desc">{i.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- API Surface -->
+    <section class="content-section">
+      <h2>API Surface</h2>
+      <p>
+        The FastAPI backend exposes 30+ routers covering the full threat hunting workflow. All endpoints 
+        include auto-generated OpenAPI documentation.
+      </p>
+      <div class="api-grid">
+        <div class="api-group">
+          <h4>Core Analysis</h4>
+          <div class="api-chips">
+            {["logs", "ingest", "hunt", "dns_threat", "analysis", "search"].map(r => (
+              <span class="api-chip">{r}</span>
+            ))}
+          </div>
+        </div>
+        <div class="api-group">
+          <h4>Detection & Rules</h4>
+          <div class="api-chips">
+            {["rules", "sigma", "baseline", "anomalies", "hosts"].map(r => (
+              <span class="api-chip">{r}</span>
+            ))}
+          </div>
+        </div>
+        <div class="api-group">
+          <h4>Investigation</h4>
+          <div class="api-chips">
+            {["cases", "hypotheses", "annotations", "sessions", "packets"].map(r => (
+              <span class="api-chip">{r}</span>
+            ))}
+          </div>
+        </div>
+        <div class="api-group">
+          <h4>Protocol Analysis</h4>
+          <div class="api-chips">
+            {["tls", "http_analysis", "lateral", "intel"].map(r => (
+              <span class="api-chip">{r}</span>
+            ))}
+          </div>
+        </div>
+        <div class="api-group">
+          <h4>Operations</h4>
+          <div class="api-chips">
+            {["live_ops", "integrations", "webhooks", "reports", "trends", "analytics", "capture"].map(r => (
+              <span class="api-chip">{r}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Decisions -->
+    <section class="content-section">
+      <h2>Technical Decisions</h2>
+      <div class="decisions-table">
+        <div class="decision-header">
+          <span class="dh-decision">Decision</span>
+          <span class="dh-reason">Reasoning</span>
+        </div>
+        {techDecisions.map((td) => (
+          <div class="decision-row">
+            <span class="dr-decision">{td.decision}</span>
+            <span class="dr-reason">{td.reason}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Development Phases -->
+    <section class="content-section">
+      <h2>Development Timeline</h2>
+      <div class="phases-list">
+        {phases.map((p) => (
+          <div class={`phase-item ${p.status}`}>
+            <div class="phase-header">
+              <span class="phase-num">Phase {p.phase}</span>
+              <span class="phase-name">{p.name}</span>
+              <span class={`phase-status ${p.status}`}>
+                {p.status === "completed" ? "✓" : p.status === "ongoing" ? "◉" : "○"} {p.status}
+              </span>
+            </div>
+            <div class="phase-items">
+              {p.items.map((item) => (
+                <span class="phase-tag">{item}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Links -->
+    <section class="content-section">
+      <div class="project-links">
+        <a href="https://brohunter.solomonneas.dev" target="_blank" class="project-link">Live Demo →</a>
+        <a href="https://github.com/solomonneas/bro-hunter" target="_blank" class="project-link">GitHub Repository →</a>
+        <a href="/projects" class="project-link secondary">← All Projects</a>
+      </div>
+    </section>
+  </article>
+</Layout>
 
 <style>
-  .section-intro { opacity: 0.85; margin-bottom: 1.5rem; }
+  .project-page {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
 
-  .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .stack-card { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-left: 3px solid var(--accent); border-radius: 4px; padding: 1rem; animation: fadeSlideIn 0.5s ease-out both; animation-delay: var(--delay); }
-  @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .stack-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .stack-indicator { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
-  .stack-name { font-family: "IBM Plex Mono", monospace; font-size: 1rem; font-weight: 600; }
-  .stack-role { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--accent); margin-bottom: 0.75rem; }
-  .stack-purpose { font-size: 0.8rem; opacity: 0.75; margin: 0; line-height: 1.5; }
+  .back-link {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
 
-  .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .highlight-card { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 8px; overflow: hidden; animation: fadeSlideIn 0.5s ease-out both; animation-delay: var(--delay); }
-  .highlight-header { display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem; background: color-mix(in srgb, currentColor 3%, transparent); border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent); }
-  .highlight-category { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #10b981; }
-  .highlight-title { font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; font-weight: 600; }
-  .highlight-body { padding: 1rem; }
-  .highlight-row { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; }
-  .highlight-row:last-child { margin-bottom: 0; }
-  .highlight-row .row-label { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; font-weight: 600; color: #10b981; }
-  .highlight-row .row-value { font-size: 0.8rem; opacity: 0.8; line-height: 1.5; }
-  .highlight-row.impact .row-value { color: #10b981; font-weight: 500; opacity: 1; }
+  .back-link:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
+  }
 
-  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .skill-card { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 6px; overflow: hidden; }
-  .skill-header { padding: 0.75rem 1rem; background: color-mix(in srgb, currentColor 3%, transparent); border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent); }
-  .skill-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; }
-  .skill-items { list-style: none; padding: 0.75rem 1rem; margin: 0; }
-  .skill-items li { font-size: 0.75rem; padding: 0.3rem 0; padding-left: 1rem; position: relative; opacity: 0.75; }
-  .skill-items li::before { content: ">"; position: absolute; left: 0; color: #10b981; font-family: "IBM Plex Mono", monospace; }
+  .project-header {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
 
-  .status-block { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
-  .status-indicator { display: flex; align-items: center; gap: 0.75rem; font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; font-weight: 500; margin-bottom: 1rem; }
-  .status-indicator.complete .status-pulse { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
-  .status-pulse { width: 12px; height: 12px; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-  .status-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.5rem; }
-  .status-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; padding: 0.5rem 0.75rem; background: color-mix(in srgb, currentColor 3%, transparent); border-radius: 4px; }
-  .check { color: #10b981; font-weight: bold; }
+  .project-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 0.25rem;
+    line-height: 1.1;
+  }
 
-  @media (max-width: 768px) { .highlights-grid, .stack-grid { grid-template-columns: 1fr; } }
+  .project-subtitle {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+  }
 
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .meta-item { display: flex; align-items: center; gap: 0.4rem; }
+  .meta-label { font-family: "IBM Plex Mono", monospace; color: var(--text-muted); }
+  .meta-value { display: flex; align-items: center; gap: 0.35rem; }
+
+  .tech-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
+  }
+
+  .content-section { margin-bottom: 2.5rem; }
+
+  .content-section h2 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--primary);
+  }
+
+  .content-section h3 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--secondary);
+  }
+
+  .content-section h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+    color: var(--text-muted);
+  }
+
+  .content-section p {
+    line-height: 1.75;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .content-section code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85em;
+    color: var(--primary);
+    background: var(--code-bg);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  /* GitHub Callout */
   .github-callout {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    margin: 1.5rem 0;
+    margin: 0 0 2.5rem;
     background: color-mix(in srgb, currentColor 3%, transparent);
     border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
     border-left: 3px solid #6e5494;
@@ -240,11 +497,7 @@ const skills = [
     flex-wrap: wrap;
   }
 
-  .github-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+  .github-content { display: flex; align-items: center; gap: 1rem; }
 
   .github-icon {
     flex-shrink: 0;
@@ -256,16 +509,9 @@ const skills = [
     color: #6e5494;
   }
 
-  .github-icon svg {
-    width: 100%;
-    height: 100%;
-  }
+  .github-icon svg { width: 100%; height: 100%; }
 
-  .github-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
+  .github-text { display: flex; flex-direction: column; gap: 0.15rem; }
 
   .github-label {
     font-family: "IBM Plex Mono", monospace;
@@ -274,17 +520,9 @@ const skills = [
     color: #6e5494;
   }
 
-  .github-desc {
-    font-size: 0.75rem;
-    opacity: 0.6;
-    margin: 0;
-  }
+  .github-desc { font-size: 0.75rem; opacity: 0.6; margin: 0; }
 
-  .github-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
+  .github-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 
   .github-btn {
     display: inline-flex;
@@ -332,4 +570,216 @@ const skills = [
     border-color: #f59e0b;
   }
 
+  .github-btn.readme {
+    background: color-mix(in srgb, #6e5494 15%, transparent);
+    border: 1px solid color-mix(in srgb, #6e5494 30%, transparent);
+    color: #6e5494;
+  }
+
+  .github-btn.readme:hover {
+    background: color-mix(in srgb, #6e5494 25%, transparent);
+    border-color: #6e5494;
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .stat {
+    text-align: center;
+    padding: 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .stat-val {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+  }
+
+  .stat-lbl {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 0.15rem;
+  }
+
+  /* Architecture */
+  .architecture { display: flex; flex-direction: column; margin-top: 1rem; }
+
+  .arch-layer {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+  }
+
+  .layer-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .source-card {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .source-name { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; font-weight: 600; color: var(--accent); display: block; }
+  .source-type { font-size: 0.65rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+  .source-provides { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; }
+
+  .arch-connector { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 0; }
+  .connector-arrows { display: flex; gap: 2rem; color: var(--primary); font-size: 0.8rem; opacity: 0.6; }
+  .connector-label { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+  .backend-flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  .backend-box { padding: 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: 4px; text-align: center; min-width: 120px; }
+  .box-title { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; font-weight: 600; display: block; }
+  .box-desc { font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 0.15rem; }
+  .flow-arrow { color: var(--primary); font-size: 0.8rem; opacity: 0.5; }
+
+  .consumer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; }
+  .consumer-box { padding: 0.75rem; border: 1px solid var(--border); border-radius: 4px; }
+  .consumer-name { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; font-weight: 600; display: block; color: var(--tertiary); }
+  .consumer-desc { font-size: 0.7rem; color: var(--text-muted); }
+
+  /* Engine Grid */
+  .engine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .engine-card {
+    padding: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .engine-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .engine-icon { font-size: 1.25rem; }
+  .engine-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; }
+  .engine-desc { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  /* Integration Grid */
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .integration-card {
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .int-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .int-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; color: var(--accent); }
+  .int-type { font-size: 0.6rem; color: var(--text-muted); padding: 0.15rem 0.4rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 3px; }
+  .int-desc { font-size: 0.75rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  /* API Grid */
+  .api-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .api-group {
+    padding: 0.75rem 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .api-group h4 { margin: 0 0 0.5rem; }
+
+  .api-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+  .api-chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--primary);
+  }
+
+  /* Tech Decisions Table */
+  .decisions-table { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 1rem; }
+  .decision-header { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; padding: 0.6rem 1rem; background: var(--card-bg); border-bottom: 2px solid var(--border); font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; font-weight: 600; color: var(--primary); }
+  .decision-row { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; transition: background 0.15s ease; }
+  .decision-row:last-child { border-bottom: none; }
+  .decision-row:hover { background: var(--card-bg); }
+  .dr-decision { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.75rem; }
+  .dr-reason { color: var(--text-muted); line-height: 1.5; }
+
+  /* Development Phases */
+  .phases-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+  .phase-item { padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 6px; }
+  .phase-item.completed { border-left: 3px solid var(--primary); }
+  .phase-item.ongoing { border-left: 3px solid var(--tertiary); }
+  .phase-item.pending { border-left: 3px solid var(--text-muted); opacity: 0.7; }
+  .phase-header { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .phase-num { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; color: var(--text-muted); min-width: 55px; }
+  .phase-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; flex: 1; }
+  .phase-status { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .phase-status.completed { color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); }
+  .phase-status.ongoing { color: var(--tertiary); background: color-mix(in srgb, var(--tertiary) 10%, transparent); }
+  .phase-status.pending { color: var(--text-muted); background: var(--card-bg); }
+  .phase-items { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+  .phase-tag { font-size: 0.65rem; padding: 0.15rem 0.45rem; border: 1px solid var(--border); border-radius: 2px; color: var(--text-muted); }
+
+  /* Project Links */
+  .project-links { display: flex; flex-wrap: wrap; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .project-link {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid;
+  }
+  .project-link:not(.secondary) { color: var(--primary); border-color: color-mix(in srgb, var(--primary) 30%, transparent); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+  .project-link:not(.secondary):hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 15%, transparent); }
+  .project-link.secondary { color: var(--text-muted); border-color: var(--border); background: var(--card-bg); }
+  .project-link.secondary:hover { color: var(--text); border-color: var(--text-muted); }
+
+  @media (max-width: 640px) {
+    .project-page { padding: 1.5rem 1rem; }
+    .project-meta { flex-direction: column; gap: 0.5rem; }
+    .source-grid, .consumer-grid, .engine-grid, .integration-grid { grid-template-columns: 1fr; }
+    .backend-flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .decision-header, .decision-row { grid-template-columns: 1fr; gap: 0.25rem; }
+    .phase-header { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+  }
 </style>
