@@ -48,13 +48,13 @@ On Ubuntu/WSL:
 ```bash
 sudo ufw enable
 sudo ufw default deny incoming
-sudo ufw allow from 192.168.0.0/16 to any port 3000  # Local network only
+sudo ufw allow from [redacted-ip]/16 to any port [redacted]  # Local network only
 ```
 
 On Windows, restrict the firewall rule to your local subnet:
 
 ```powershell
-New-NetFirewallRule -DisplayName "OpenClaw Local Only" -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow -RemoteAddress 192.168.0.0/16
+New-NetFirewallRule -DisplayName "OpenClaw Local Only" -Direction Inbound -Localport [redacted] -Protocol TCP -Action Allow -RemoteAddress [redacted-ip]/16
 ```
 
 ### File Permissions

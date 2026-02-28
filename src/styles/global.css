@@ -37,8 +37,36 @@
 :root {
     font-size: clamp(14px, 3vw, 18px);
     line-height: 1.7;
-    --background: #fff2d1;
+}
+
+[data-theme="dark"] {
+    --bg: #0a0a0a;
+    --text: #e5e5e5;
+    --text-muted: #888;
+    --primary: #22c55e;
+    --secondary: #3b82f6;
+    --tertiary: #f59e0b;
+    --code-bg: #141414;
+    --code-border: #222;
+    --border: #222;
+    --card-bg: #111;
+    --blockquote-bg: rgba(245, 158, 11, 0.06);
+    --link: #22c55e;
+}
+
+[data-theme="light"] {
+    --bg: #fff2d1;
     --text: #655a3d;
+    --text-muted: #8a7d65;
+    --primary: #10b981;
+    --secondary: #2563eb;
+    --tertiary: #d97706;
+    --code-bg: rgba(0, 0, 0, 0.04);
+    --code-border: rgba(0, 0, 0, 0.1);
+    --border: rgba(0, 0, 0, 0.1);
+    --card-bg: rgba(0, 0, 0, 0.03);
+    --blockquote-bg: rgba(217, 119, 6, 0.06);
+    --link: #10b981;
 }
 
 body,
@@ -53,11 +81,12 @@ p:last-child {
 }
 
 body {
-    background: var(--background);
+    background: var(--bg);
     color: var(--text);
     font-family: 'IBM Plex Sans', sans-serif;
     overscroll-behavior-y: none;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .site-wrapper {
@@ -76,7 +105,7 @@ body {
     padding: 1rem;
     border-radius: 4px;
     background: var(--text);
-    color: var(--background);
+    color: var(--bg);
 }
 
 #skip-link:focus {
@@ -96,7 +125,7 @@ a:visited {
 
 a:hover {
     background: var(--text);
-    color: var(--background);
+    color: var(--bg);
     border-bottom: 1px solid transparent;
 }
 
@@ -111,8 +140,8 @@ a:hover {
 }
 
 .nav-links a:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: var(--text);
+    background: var(--card-bg);
+    border-color: var(--border);
     transform: translateY(-1px);
     color: var(--text);
 }
@@ -131,9 +160,10 @@ a:hover {
 }
 
 a.current-link {
-    background: var(--text);
-    color: var(--background);
-    box-shadow: 0 0 0 1px var(--text);
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    background: transparent;
+    box-shadow: none;
 }
 
 .title-container {
@@ -217,13 +247,20 @@ h2,
 }
 
 .site-title {
-    font-weight: 400;
+    font-weight: 700;
     font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
     font-size: 1.5rem;
 }
 
-.site-title .user-host {
-    font-weight: 700;
+.site-title a {
+    border-bottom: none;
+    font-size: 1.5rem;
+    color: var(--text);
+}
+
+.site-title a:hover {
+    background: transparent;
+    color: var(--primary);
 }
 
 @keyframes blink {
@@ -245,7 +282,7 @@ h2,
     padding: .8rem 1rem;
     width: 100%;
     max-width: 35rem;
-    border: 1px solid var(--text);
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
     transition: all 0.2s ease;
@@ -254,7 +291,7 @@ h2,
 
 .link-tree li a:hover {
     background: var(--text);
-    color: var(--background);
+    color: var(--bg);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -279,7 +316,7 @@ h2,
 
 .opportunities-list li {
     padding: 0.4rem 0;
-    border-bottom: 1px dotted var(--text);
+    border-bottom: 1px dotted var(--border);
 }
 
 .opportunities-list li:last-child {
@@ -306,13 +343,14 @@ footer {
     align-items: center;
     justify-content: center;
     padding: 0.4rem;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, color 0.2s ease;
+    color: var(--text-muted);
 }
 
 .footer-links a:hover {
     transform: translateY(-3px);
     background: transparent !important;
-    color: currentColor !important;
+    color: var(--primary) !important;
 }
 
 .social-icon {
@@ -382,7 +420,7 @@ a.kofi-button {
     font-size: .8rem;
     padding: clamp(.3rem, .4vw, .512rem) clamp(.512rem, .5vw, .8rem);
     border-radius: 4px;
-    color: var(--background);
+    color: var(--bg);
     transition: all 0.2s ease;
 }
 
@@ -390,59 +428,6 @@ a.kofi-button {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     filter: brightness(1.1);
-}
-
-.shell-button {
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
-    font-size: 1.5rem;
-    color: var(--text);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    transition: opacity 0.2s;
-}
-
-.shell-button:hover {
-    opacity: 0.8;
-}
-
-.shell-button::after {
-    content: "█";
-    animation: blink 1s step-end infinite;
-    color: var(--text);
-    opacity: 0.7;
-    margin-left: 5px;
-}
-
-.theme-btn {
-    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--background);
-    background: var(--text);
-    border: 2px solid var(--text);
-    border-radius: 4px;
-    padding: 0.4rem 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    letter-spacing: 0.03em;
-}
-
-.theme-btn:hover {
-    background: transparent;
-    color: var(--text);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.theme-btn:active {
-    transform: scale(0.96);
 }
 
 .productions {
@@ -454,7 +439,7 @@ a.kofi-button {
 }
 
 .productions tr+tr {
-    border-top: 1px dotted var(--text);
+    border-top: 1px dotted var(--border);
 }
 
 .productions td,
@@ -475,22 +460,13 @@ a.kofi-button {
     display: block;
 }
 
-#filter {
-    position: fixed;
-    top: -400px;
-    left: -400px;
-    bottom: -400px;
-    right: -400px;
-    z-index: 2;
-    pointer-events: none;
-}
-
 blockquote {
     margin-left: 0;
     margin-right: 0;
     padding: 1rem;
-    border: 1px dotted var(--text);
-    border-radius: 4px;
+    border-left: 3px solid var(--tertiary);
+    background: var(--blockquote-bg);
+    border-radius: 0 4px 4px 0;
 }
 
 blockquote p {
@@ -515,6 +491,32 @@ cite a {
 
 .testimonials blockquote+blockquote {
     margin-top: 1.563rem;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.4rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    width: 36px;
+    height: 36px;
+}
+
+.theme-toggle:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.theme-toggle svg {
+    width: 18px;
+    height: 18px;
 }
 
 @media screen and (min-width: 1300px) {

@@ -126,7 +126,7 @@ const appTroubleshooting = [
 
 <ProjectLayout frontmatter={frontmatter}>
   <!-- Overview -->
-  <h2>// Overview</h2>
+  <h2>Overview</h2>
   <p>
     Leading a critical infrastructure migration to transition production systems from Microsoft Hyper-V
     to Proxmox VE. This project encompasses Active Directory Domain Controllers and Linux-based network
@@ -135,7 +135,7 @@ const appTroubleshooting = [
 
   <!-- Migration Scope -->
   <div class="scope-section">
-    <h2>// Migration Scope & Strategy</h2>
+    <h2>Migration Scope & Strategy</h2>
     <div class="scope-grid">
       {migrationScope.map((item) => (
         <div class="scope-card" style={`border-left-color: ${item.color}`}>
@@ -149,7 +149,7 @@ const appTroubleshooting = [
 
   <!-- Critical Warning -->
   <div class="warning-section">
-    <h2>// Critical Warning</h2>
+    <h2>Critical Warning</h2>
     {criticalWarnings.map((warning) => (
       <div class="critical-warning">
         <div class="warning-header">
@@ -176,7 +176,7 @@ const appTroubleshooting = [
 
   <!-- Pre-Migration: Generation Check -->
   <div class="gen-section">
-    <h2>// Pre-Migration: Hyper-V Generation Check</h2>
+    <h2>Pre-Migration: Hyper-V Generation Check</h2>
     <p>
       Before creating the Proxmox VM shell, identify the source generation to match BIOS settings.
       Check via: <code>Hyper-V Manager → VM → Summary Tab → "Generation"</code>
@@ -199,7 +199,7 @@ const appTroubleshooting = [
 
   <!-- Domain Controller Strategy -->
   <div class="leapfrog-section">
-    <h2>// Active Directory: The "Leapfrog" Method</h2>
+    <h2>Active Directory: The "Leapfrog" Method</h2>
     <p class="section-intro">
       Migrate Domain Controllers without IP changes or downtime by building new DCs on Proxmox
       and using AD replication to transfer data safely.
@@ -231,7 +231,7 @@ const appTroubleshooting = [
 
   <!-- Linux VM V2V -->
   <div class="v2v-section">
-    <h2>// Standard Linux VMs: V2V Process</h2>
+    <h2>Standard Linux VMs: V2V Process</h2>
     <p>For Linux VMs like Netdisco, Switchmap, and LibreNMS, use direct disk conversion.</p>
 
     <!-- Phase 1: Shell Creation -->
@@ -288,7 +288,7 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
 
   <!-- Post-Migration Issues -->
   <div class="issues-section">
-    <h2>// Post-Migration Hiccups & Fixes</h2>
+    <h2>Post-Migration Hiccups & Fixes</h2>
     <div class="issues-grid">
       {postMigrationIssues.map((item) => (
         <div class="issue-card">
@@ -316,7 +316,7 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
 
   <!-- App-Specific Troubleshooting -->
   <div class="app-section">
-    <h2>// Application-Specific Troubleshooting</h2>
+    <h2>Application-Specific Troubleshooting</h2>
 
     {appTroubleshooting.map((app) => (
       <div class="app-card">
@@ -358,7 +358,7 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
 
   <!-- File Server Migration -->
   <div class="fileserver-section">
-    <h2>// File Server: Samba AD Migration</h2>
+    <h2>File Server: Samba AD Migration</h2>
     <p>
       The legacy environment had multiple Windows 10 machines acting as file servers in a "split-brain"
       configuration: files scattered across machines with no centralized management, inconsistent
@@ -377,7 +377,7 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
 
   <!-- Current Status -->
   <div class="status-section">
-    <h2>// Current Status</h2>
+    <h2>Current Status</h2>
     <div class="status-block">
       <div class="status-indicator ongoing">
         <div class="status-pulse"></div>
