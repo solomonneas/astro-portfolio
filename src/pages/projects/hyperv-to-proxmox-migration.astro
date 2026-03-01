@@ -3,8 +3,8 @@ import ProjectLayout from "../../layouts/ProjectLayout.astro";
 
 const frontmatter = {
   title: "Hyper-V to Proxmox Migration",
-  status: "In Progress",
-  statusType: "ongoing",
+  status: "Completed",
+  statusType: "completed",
   origin: "Polk State College",
   date: "2026.01",
   techStack: ["Windows Server", "Hyper-V", "Proxmox VE", "Active Directory", "PowerShell", "QEMU", "Linux"],
@@ -14,8 +14,8 @@ const frontmatter = {
 const migrationScope = [
   {
     category: "Domain Controllers",
-    method: "Leapfrog (New Build + Replication)",
-    risk: "Zero V2V",
+    method: "Leapfrog (DC1 → DC2 → rebuild → swap)",
+    risk: "Zero V2V, Zero Downtime",
     color: "#ef4444"
   },
   {
@@ -29,6 +29,18 @@ const migrationScope = [
     method: "New Linux VM + Samba AD + Robocopy",
     risk: "Full Rebuild (Intentional)",
     color: "#10b981"
+  },
+  {
+    category: "UniFi Controller",
+    method: "Backup .unf → Proxmox LXC → Restore",
+    risk: "Minimal (config backup)",
+    color: "#8b5cf6"
+  },
+  {
+    category: "SCCM → FOG Project",
+    method: "Full platform replacement",
+    risk: "New tooling (intentional)",
+    color: "#f59e0b"
   },
 ];
 
@@ -48,32 +60,32 @@ const generationMapping = [
   { gen: "Gen 2", bios: "OVMF (UEFI)", machine: "q35 (recommended)" },
 ];
 
-// Leapfrog steps
+// Leapfrog steps (actual process used)
 const leapfrogSteps = [
   {
-    step: "Provision",
-    action: "Create fresh Windows Server VM on Proxmox",
-    detail: "Name it NEW-DC1 or similar"
+    step: "Prep DC2",
+    action: "Transfer all FSMO roles to DC2 (existing Hyper-V)",
+    detail: "Verify DHCP scopes, DNS records, and AD replication are healthy on DC2"
   },
   {
-    step: "Network",
-    action: "Assign temporary IP (e.g., 10.2.50.15)",
-    detail: "Set DNS to existing active DC (not itself)"
+    step: "Validate",
+    action: "Confirm DC2 holds all roles and services",
+    detail: "Check DHCP failover, DNS zones, AD computer objects, repadmin /showrepl"
   },
   {
-    step: "Promote",
-    action: "Install AD DS role → Promote to Domain Controller",
-    detail: "Verify with: repadmin /showrepl"
+    step: "Rebuild DC1",
+    action: "Delete old DC1, build fresh Windows Server VM on Proxmox",
+    detail: "Promote new DC1, let AD replication sync all objects from DC2"
   },
   {
-    step: "FSMO Transfer",
-    action: "Move all roles from Old DC to New DC",
-    detail: "PowerShell: Move-ADDirectoryServerOperationMasterRole"
+    step: "Swap Roles",
+    action: "Transfer all FSMO roles back to new DC1 on Proxmox",
+    detail: "Verify DHCP scopes, DNS, and replication are clean"
   },
   {
-    step: "Demote & Swap",
-    action: "Demote OLD-DC1, shut it down",
-    detail: "Re-assign its static IP to NEW-DC1"
+    step: "Rebuild DC2",
+    action: "Delete old DC2 on Hyper-V, build fresh on Proxmox",
+    detail: "Promote new DC2, AD replicates from DC1. Both DCs now on Proxmox."
   },
 ];
 
@@ -201,8 +213,10 @@ const appTroubleshooting = [
   <div class="leapfrog-section">
     <h2>Active Directory: The "Leapfrog" Method</h2>
     <p class="section-intro">
-      Migrate Domain Controllers without IP changes or downtime by building new DCs on Proxmox
-      and using AD replication to transfer data safely.
+      With two existing DCs (DC1 and DC2) on Hyper-V, the strategy was straightforward: transfer all FSMO 
+      roles to DC2, rebuild DC1 fresh on Proxmox, transfer roles back, then rebuild DC2 on Proxmox. AD 
+      replication handles the data sync. No V2V conversion, no downtime, no risk of USN rollback. The whole 
+      process was easier than expected because AD replication just works when you let it.
     </p>
 
     <div class="leapfrog-steps">
@@ -375,27 +389,115 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
     </a>
   </div>
 
+  <!-- UniFi Controller Migration -->
+  <div class="unifi-section">
+    <h2>UniFi Controller: Windows VM to Proxmox LXC</h2>
+    <p>
+      The UniFi controller was running on a Windows 11 VM hosted on Hyper-V. There was no SSH access to 
+      the Hyper-V host, so managing the controller meant RDP'ing into the Hyper-V server, then logging 
+      into the Windows VM from there. Not exactly efficient.
+    </p>
+    <p>
+      The migration was clean: export the UniFi backup (.unf file) from the Windows controller, spin up a 
+      new LXC container on Proxmox using the official UniFi container template, upload the backup file, and 
+      restore. All WAP configurations, SSIDs, client data, and network settings came over intact. WiFi was 
+      back up and running on Linux within minutes.
+    </p>
+
+    <div class="migration-steps-compact">
+      <div class="msc-step">
+        <span class="msc-num">1</span>
+        <div class="msc-content">
+          <span class="msc-title">Backup from Windows</span>
+          <span class="msc-desc">UniFi Controller → Settings → Backup → Download .unf file</span>
+        </div>
+      </div>
+      <div class="msc-step">
+        <span class="msc-num">2</span>
+        <div class="msc-content">
+          <span class="msc-title">Create Proxmox LXC</span>
+          <span class="msc-desc">Official UniFi container template, bridged networking, minimal resources</span>
+        </div>
+      </div>
+      <div class="msc-step">
+        <span class="msc-num">3</span>
+        <div class="msc-content">
+          <span class="msc-title">Upload & Restore</span>
+          <span class="msc-desc">Upload .unf backup to new controller, restore. All WAPs re-adopt automatically.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <span class="highlight-icon">💡</span>
+      <span class="highlight-text">
+        Moving from a full Windows 11 VM to an LXC container cut resource usage dramatically. The UniFi 
+        controller doesn't need a whole OS instance. An LXC container is the right tool for the job.
+      </span>
+    </div>
+  </div>
+
+  <!-- SCCM to FOG Project -->
+  <div class="fog-section">
+    <h2>SCCM Replacement: FOG Project</h2>
+    <p>
+      Microsoft SCCM (System Center Configuration Manager) was the existing imaging and deployment solution, 
+      but it's heavy, expensive to license, and tightly coupled to Windows infrastructure. As part of the 
+      migration away from Microsoft dependencies, I replaced it with FOG Project, an open-source network 
+      cloning and management solution.
+    </p>
+    <p>
+      FOG handles PXE boot imaging, hardware inventory, and centralized workstation management without 
+      the licensing overhead. It runs on Linux, integrates with the existing network infrastructure, and 
+      does everything the lab environment actually needs SCCM for at zero cost.
+    </p>
+
+    <div class="comparison-row">
+      <div class="compare-card old">
+        <span class="compare-label">Before</span>
+        <span class="compare-name">Microsoft SCCM</span>
+        <div class="compare-details">
+          <span>Windows Server dependency</span>
+          <span>SQL Server required</span>
+          <span>Per-device licensing</span>
+          <span>Complex infrastructure</span>
+        </div>
+      </div>
+      <div class="compare-arrow">→</div>
+      <div class="compare-card new">
+        <span class="compare-label">After</span>
+        <span class="compare-name">FOG Project</span>
+        <div class="compare-details">
+          <span>Linux-based (Proxmox VM)</span>
+          <span>Built-in database</span>
+          <span>Free and open source</span>
+          <span>PXE boot + web UI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Current Status -->
   <div class="status-section">
-    <h2>Current Status</h2>
+    <h2>Migration Status</h2>
     <div class="status-block">
-      <div class="status-indicator ongoing">
-        <div class="status-pulse"></div>
-        <span>Migration in progress</span>
+      <div class="status-indicator completed">
+        <span>Migration complete</span>
       </div>
       <ul class="status-list">
         <li><span class="check">✓</span> Pre-migration analysis complete</li>
         <li><span class="check">✓</span> Proxmox cluster provisioned</li>
-        <li><span class="check">✓</span> Domain Controller leapfrog strategy documented</li>
-        <li><span class="check">✓</span> Linux VM conversion process validated</li>
+        <li><span class="check">✓</span> Domain Controllers migrated (DC1 + DC2 leapfrog)</li>
+        <li><span class="check">✓</span> DHCP scopes, DNS records, AD objects verified</li>
         <li><span class="check">✓</span> LibreNMS migrated and operational</li>
         <li><span class="check">✓</span> Netdisco migrated and operational</li>
         <li><span class="check">✓</span> Switchmap migrated and operational</li>
         <li><span class="check">✓</span> File server: Samba AD toolkit created and deployed</li>
         <li><span class="check">✓</span> File server: Data migrated via Robocopy</li>
         <li><span class="check">✓</span> File server: DFS namespace updated for cutover</li>
-        <li><span class="pending">○</span> Domain Controller migration (scheduled)</li>
-        <li><span class="pending">○</span> Final cutover and decommissioning</li>
+        <li><span class="check">✓</span> UniFi controller: Windows VM → Proxmox LXC</li>
+        <li><span class="check">✓</span> SCCM replaced with FOG Project</li>
+        <li><span class="check">✓</span> Hyper-V hosts decommissioned</li>
       </ul>
     </div>
   </div>
@@ -1032,8 +1134,136 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
     color: #f59e0b;
   }
 
+  /* Status completed */
+  .status-indicator.completed {
+    color: #10b981;
+  }
+
+  /* UniFi Section */
+  .unifi-section, .fog-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .migration-steps-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 1.25rem 0;
+  }
+
+  .msc-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 6%, transparent);
+    transition: background 0.15s ease;
+  }
+
+  .msc-step:last-child { border-bottom: none; }
+  .msc-step:hover { background: color-mix(in srgb, currentColor 3%, transparent); }
+
+  .msc-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .msc-content { display: flex; flex-direction: column; gap: 0.15rem; }
+  .msc-title { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; font-weight: 600; }
+  .msc-desc { font-size: 0.75rem; color: var(--text-muted); opacity: 0.8; }
+
+  .highlight-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+
+  .highlight-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .highlight-text { font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); }
+
+  /* FOG Comparison */
+  .comparison-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .compare-card {
+    flex: 1;
+    padding: 1rem;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+  }
+
+  .compare-card.old {
+    border-left: 3px solid #ef4444;
+    opacity: 0.7;
+  }
+
+  .compare-card.new {
+    border-left: 3px solid #10b981;
+  }
+
+  .compare-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .compare-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .compare-card.old .compare-name { color: #ef4444; }
+  .compare-card.new .compare-name { color: #10b981; }
+
+  .compare-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .compare-arrow {
+    font-size: 1.25rem;
+    color: var(--primary);
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
+    .comparison-row { flex-direction: column; }
+    .compare-arrow { transform: rotate(90deg); }
     .scope-grid,
     .issues-grid {
       grid-template-columns: 1fr;
