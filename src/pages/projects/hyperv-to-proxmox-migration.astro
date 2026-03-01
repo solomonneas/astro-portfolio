@@ -583,12 +583,14 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
       </div>
       <ul class="status-list">
         <li><span class="check">✓</span> Pre-migration analysis complete</li>
-        <li><span class="check">✓</span> Proxmox cluster provisioned</li>
+        <li><span class="check">✓</span> 4 standalone Proxmox servers provisioned</li>
+        <li><span class="check">✓</span> 6-node Proxmox cluster provisioned (NetLab environment)</li>
         <li><span class="check">✓</span> Domain Controllers migrated (DC1 + DC2 leapfrog)</li>
         <li><span class="check">✓</span> DHCP scopes, DNS records, AD objects verified</li>
         <li><span class="check">✓</span> LibreNMS migrated and operational</li>
         <li><span class="check">✓</span> Netdisco migrated and operational</li>
         <li><span class="check">✓</span> Switchmap migrated and operational</li>
+        <li><span class="check">✓</span> <a href="/projects/soc-stack-architecture">SOC stack</a> migrated (Wazuh, Grafana, TheHive, MISP)</li>
         <li><span class="check">✓</span> File server: Samba AD toolkit created and deployed</li>
         <li><span class="check">✓</span> File server: Data migrated via Robocopy</li>
         <li><span class="check">✓</span> DFS namespace removed, replaced with GPO drive maps (X:\ faculty, Y:\ students)</li>
@@ -596,11 +598,76 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
         <li><span class="check">✓</span> SCCM replaced with FOG Project</li>
         <li><span class="check">✓</span> Hyper-V hosts decommissioned</li>
       </ul>
+
+      <h3>Infrastructure Footprint</h3>
+      <div class="infra-grid">
+        <div class="infra-card">
+          <span class="infra-number">4</span>
+          <span class="infra-label">Standalone Proxmox Servers</span>
+          <span class="infra-desc">Production workloads: DCs, monitoring, file server, imaging, WiFi, SOC stack</span>
+        </div>
+        <div class="infra-card">
+          <span class="infra-number">6</span>
+          <span class="infra-label">Node Proxmox Cluster</span>
+          <span class="infra-desc">NetLab environment for hands-on student lab exercises</span>
+        </div>
+        <div class="infra-card">
+          <span class="infra-number">10</span>
+          <span class="infra-label">Total Proxmox Hosts</span>
+          <span class="infra-desc">All running on open-source infrastructure, $0 in hypervisor licensing</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+        Read the full technical writeup: <a href="/blog/hyperv-to-proxmox-migration-guide">Hyper-V to Proxmox Migration Guide</a>
+      </p>
     </div>
   </div>
 </ProjectLayout>
 
 <style>
+  /* Infrastructure Grid */
+  .infra-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+
+  .infra-card {
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .infra-number {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+  }
+
+  .infra-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .infra-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 600px) {
+    .infra-grid { grid-template-columns: 1fr; }
+  }
+
   /* Section Intro */
   .section-intro {
     opacity: 0.85;
