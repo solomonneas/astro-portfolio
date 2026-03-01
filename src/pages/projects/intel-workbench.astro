@@ -1,250 +1,388 @@
 ---
-import ProjectLayout from "../../layouts/ProjectLayout.astro";
+import Layout from "../../layouts/Layout.astro";
+import StatusLight from "../../components/StatusLight.astro";
 
-const frontmatter = {
-  title: "Intel Workbench: Analysis of Competing Hypotheses Tool",
-  status: "Complete",
-  statusType: "complete",
-  origin: "Portfolio Project",
-  date: "2025.01",
-  techStack: ["React", "TypeScript", "Zustand", "Tailwind CSS", "Vite"],
+// Core tools
+const tools = [
+  { name: "ACH Matrix", desc: "Interactive Analysis of Competing Hypotheses with weighted scoring. Rate evidence against hypotheses as Consistent, Inconsistent, or Neutral, with credibility and relevance multipliers.", icon: "🎯", status: "live" },
+  { name: "Cognitive Bias Checklist", desc: "12 cognitive, analytical, and social biases with progress tracking and mitigation notes. Forces analysts to confront their own reasoning blind spots.", icon: "🧠", status: "live" },
+  { name: "IOC Extractor", desc: "Paste raw threat reports and extract IPs, domains, URLs, hashes, emails, and CVEs via regex. Deduplicate, defang/refang, and export as CSV or JSON.", icon: "🔍", status: "live" },
+  { name: "Diamond Model", desc: "Visual intrusion event modeling with four vertices (adversary, capability, infrastructure, victim), kill chain phase mapping, and confidence scoring.", icon: "💎", status: "live" },
+];
+
+// Scoring model
+const scoringModel = [
+  { field: "Rating", values: "Inconsistent = 2, Neutral = 0, Consistent = -1" },
+  { field: "Credibility", values: "High = 3×, Medium = 2×, Low = 1×" },
+  { field: "Relevance", values: "High = 1.5×, Medium = 1×, Low = 0.5×" },
+  { field: "Formula", values: "Score = Σ(rating × credibility × relevance) per hypothesis" },
+  { field: "Display", values: "Normalized 0-100 bar, raw score label, preferred hypothesis highlight" },
+];
+
+// Tech decisions
+const techDecisions = [
+  { decision: "Zustand over Redux", reason: "Simpler API, built-in persist middleware for localStorage, no boilerplate. Perfect for client-only state." },
+  { decision: "localStorage over backend", reason: "Zero infrastructure. Analyst data stays on their machine. No server to maintain or secure." },
+  { decision: "Regex IOC extraction over NLP", reason: "Deterministic, fast, no dependencies. IOC formats are structured enough that regex catches 95%+ of indicators." },
+  { decision: "5 visual variants", reason: "Built during design phase to find the right analyst aesthetic. Each variant wraps the same routes in a different layout shell." },
+  { decision: "React Router with base path", reason: "Supports deployment at any URL prefix. Variants use nested routes under /v1 through /v5." },
+  { decision: "driver.js for guided tour", reason: "Lightweight, CDN-loaded, auto-starts on first visit. No heavy onboarding framework needed." },
+];
+
+// Development phases
+const phases = [
+  { phase: 1, name: "ACH Core", status: "completed", items: ["Matrix CRUD", "Hypothesis/evidence management", "Cell rating cycling", "Sandworm sample project"] },
+  { phase: 2, name: "Scoring & Bias", status: "completed", items: ["Weighted scoring formula", "Normalized score bars", "12 cognitive biases", "Mitigation notes"] },
+  { phase: 3, name: "Polish & Variants", status: "completed", items: ["5 visual theme variants", "Guided tour", "In-app documentation", "JSON export/import"] },
+  { phase: 4, name: "IOC & Diamond Model", status: "completed", items: ["IOC regex extractor", "Defang/refang toggle", "CSV/JSON export", "Diamond Model events", "Vertex editing", "Kill chain mapping"] },
+  { phase: 5, name: "Theme & Branding", status: "completed", items: ["Dark/light mode", "System preference detection", "Solomon's branding", "Portfolio badge"] },
+  { phase: 6, name: "Advanced Analysis", status: "planned", items: ["Sensitivity analysis panel", "Undo/redo stack", "ACH matrix comparison view", "Evidence linking across matrices"] },
+  { phase: 7, name: "Export & Sharing", status: "planned", items: ["PDF report generation", "Shareable URL encoding", "Markdown report export", "STIX 2.1 IOC export"] },
+  { phase: 8, name: "Integration", status: "planned", items: ["MISP feed import", "TheHive case import", "OpenCTI indicator sync", "CyberBRIEF report ingestion"] },
+];
+
+// Stats
+const stats = {
+  files: "53",
+  srcLoc: "6,951",
+  components: "15",
+  pages: "8",
+  stores: "3",
+  biases: "12",
 };
-
-const stackComponents = [
-  { name: "React + TypeScript", role: "UI Framework", purpose: "Component-driven interface with strict typing for complex matrix state management and hypothesis tracking", color: "#61dafb" },
-  { name: "Zustand", role: "State Management", purpose: "Lightweight store for managing hypothesis matrices, evidence chains, and consistency scores without boilerplate", color: "#443e38" },
-  { name: "Tailwind CSS", role: "Styling", purpose: "Utility-first approach for building responsive matrix tables, evidence panels, and scoring visualizations", color: "#38bdf8" },
-  { name: "Vite", role: "Build Tool", purpose: "Fast HMR during development with optimized production builds for single-page deployment", color: "#646cff" },
-];
-
-const highlights = [
-  {
-    category: "Methodology",
-    title: "ACH Matrix Implementation",
-    scenario: "Intelligence analysts need a structured way to evaluate competing hypotheses against available evidence",
-    solution: "Built an interactive matrix where analysts rate each piece of evidence as consistent, inconsistent, or neutral against each hypothesis. Scores auto-calculate to surface the most defensible conclusion",
-    impact: "Structured analytic technique reduces cognitive bias in threat assessments",
-  },
-  {
-    category: "State Management",
-    title: "Complex Matrix State with Zustand",
-    scenario: "The ACH matrix involves dynamic rows (evidence) and columns (hypotheses) with cell-level ratings that drive aggregate scores",
-    solution: "Used Zustand slices for hypotheses, evidence, and ratings as separate stores with computed selectors for consistency scores, sensitivity analysis, and matrix diagnostics",
-    impact: "Clean state architecture handles dynamic matrix dimensions without re-render cascading",
-  },
-  {
-    category: "UX Design",
-    title: "Evidence Credibility Weighting",
-    scenario: "Not all evidence carries equal weight. A confirmed IOC matters more than an unverified rumor",
-    solution: "Added credibility and relevance sliders per evidence item that feed into weighted scoring. The matrix visually reflects weight through cell opacity and border intensity",
-    impact: "Weighted scoring produces more nuanced results than binary consistent/inconsistent ratings",
-  },
-  {
-    category: "Analysis",
-    title: "Sensitivity Analysis View",
-    scenario: "Analysts need to understand which pieces of evidence most influence the conclusion",
-    solution: "Built a sensitivity panel that temporarily removes each evidence item and recalculates scores, highlighting which pieces of evidence are pivotal to the current leading hypothesis",
-    impact: "Reveals analytical dependencies and helps identify where additional collection would be most valuable",
-  },
-];
-
-const skills = [
-  { name: "React Patterns", items: ["Complex form state", "Dynamic table rendering", "Computed selectors", "Controlled components"] },
-  { name: "State Architecture", items: ["Zustand store slices", "Derived state patterns", "Optimistic updates", "Undo/redo stack"] },
-  { name: "Intelligence Analysis", items: ["ACH methodology", "Cognitive bias mitigation", "Evidence weighting", "Sensitivity analysis"] },
-  { name: "UI/UX", items: ["Interactive matrices", "Color-coded scoring", "Responsive tables", "Export to PDF/JSON"] },
-];
 ---
 
-<ProjectLayout frontmatter={frontmatter}>
-  <h2>Overview</h2>
-  <p>
-    Intel Workbench implements the Analysis of Competing Hypotheses (ACH) methodology as an interactive web
-    application. ACH is a structured analytic technique developed by Richards Heuer at the CIA to help analysts
-    overcome cognitive biases when evaluating multiple explanations for observed events.
-  </p>
-  <p>
-    The tool lets analysts define hypotheses, add evidence items with credibility weights, rate each piece of
-    evidence against each hypothesis, and automatically calculate consistency scores. The result is a data-driven
-    approach to intelligence analysis that surfaces the most defensible conclusion while highlighting analytical
-    gaps.
-  </p>
+<Layout pageTitle="Intel Workbench: Structured Analytic Techniques">
+  <article class="project-page">
+    <header class="project-header">
+      <a href="/projects" class="back-link">← Projects</a>
+      <h1 class="project-title">Intel Workbench</h1>
+      <p class="project-subtitle">Structured Analytic Techniques for CTI</p>
 
-  <!-- GitHub Callout -->
-  <div class="github-callout">
-    <div class="github-content">
-      <div class="github-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-        </svg>
+      <div class="project-meta">
+        <span class="meta-item">
+          <span class="meta-label">Status:</span>
+          <span class="meta-value"><StatusLight status="completed" /> Complete</span>
+        </span>
+        <span class="meta-item">
+          <span class="meta-label">Origin:</span>
+          <span class="meta-value">Portfolio Project</span>
+        </span>
+        <span class="meta-item">
+          <span class="meta-label">Since:</span>
+          <span class="meta-value">2026.01</span>
+        </span>
       </div>
-      <div class="github-text">
-        <span class="github-label">Open Source</span>
-        <p class="github-desc">This project is open source and available on GitHub</p>
+
+      <div class="tech-badges">
+        {["React 18", "TypeScript", "Zustand", "Tailwind CSS", "Vite", "React Router", "localStorage"].map(t => (
+          <span class="badge">{t}</span>
+        ))}
       </div>
-    </div>
-    <div class="github-actions">
-      <a href="https://intel-workbench.solomonneas.dev" target="_blank" class="github-btn demo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM3.5 6a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 3.5 6Zm.75 2.25a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z"/>
-        </svg>
-        <span>Live Demo</span>
-      </a>
-      <a href="https://github.com/solomonneas/intel-workbench" target="_blank" class="github-btn repo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-        </svg>
-        <span>View Repository</span>
-      </a>
-      <a href="https://github.com/solomonneas/intel-workbench/commits" target="_blank" class="github-btn commits">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"/>
-        </svg>
-        <span>8 Commits</span>
-      </a>
-            <a href="https://github.com/solomonneas/intel-workbench#readme" target="_blank" class="github-btn readme">
+    </header>
+
+    <!-- GitHub Callout -->
+    <div class="github-callout">
+      <div class="github-content">
+        <div class="github-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+          </svg>
+        </div>
+        <div class="github-text">
+          <span class="github-label">Open Source</span>
+          <p class="github-desc">Structured analytic techniques for the browser</p>
+        </div>
+      </div>
+      <div class="github-actions">
+        <a href="https://github.com/solomonneas/intel-workbench" target="_blank" class="github-btn repo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+          </svg>
+          <span>View Repository</span>
+        </a>
+        <a href="https://intel-workbench.solomonneas.dev" target="_blank" class="github-btn demo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+          </svg>
+          <span>Live Demo</span>
+        </a>
+        <a href="https://github.com/solomonneas/intel-workbench#readme" target="_blank" class="github-btn readme">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
           </svg>
           <span>README</span>
         </a>
-      <a href="https://github.com/solomonneas/intel-workbench/stargazers" target="_blank" class="github-btn star">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-          <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
-        </svg>
-        <span>Star on GitHub</span>
-      </a>
+        <a href="https://github.com/solomonneas/intel-workbench/stargazers" target="_blank" class="github-btn star">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+            <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+          </svg>
+          <span>Star on GitHub</span>
+        </a>
+      </div>
     </div>
-  </div>
 
-  <!-- Tech Stack -->
-  <h2>Tech Stack</h2>
-  <p class="section-intro">Frontend-only application with Zustand for complex matrix state:</p>
-  <div class="stack-grid">
-    {stackComponents.map((comp, i) => (
-      <div class="stack-card" style={`--accent: ${comp.color}; --delay: ${i * 0.1}s`}>
-        <div class="stack-header">
-          <span class="stack-indicator"></span>
-          <span class="stack-name">{comp.name}</span>
-        </div>
-        <div class="stack-role">{comp.role}</div>
-        <p class="stack-purpose">{comp.purpose}</p>
+    <!-- Stats Bar -->
+    <section class="content-section">
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-val">{stats.files}</span><span class="stat-lbl">Files</span></div>
+        <div class="stat"><span class="stat-val">{stats.srcLoc}</span><span class="stat-lbl">Source LOC</span></div>
+        <div class="stat"><span class="stat-val">{stats.components}</span><span class="stat-lbl">Components</span></div>
+        <div class="stat"><span class="stat-val">{stats.pages}</span><span class="stat-lbl">Pages</span></div>
+        <div class="stat"><span class="stat-val">{stats.stores}</span><span class="stat-lbl">Zustand Stores</span></div>
+        <div class="stat"><span class="stat-val">{stats.biases}</span><span class="stat-lbl">Bias Definitions</span></div>
       </div>
-    ))}
-  </div>
+    </section>
 
-  <!-- Technical Highlights -->
-  <h2>Technical Highlights</h2>
-  <div class="highlights-grid">
-    {highlights.map((item, i) => (
-      <div class="highlight-card" style={`--delay: ${i * 0.1}s`}>
-        <div class="highlight-header">
-          <span class="highlight-category">{item.category}</span>
-          <span class="highlight-title">{item.title}</span>
+    <!-- Overview -->
+    <section class="content-section">
+      <h2>Overview</h2>
+      <p>
+        Intel Workbench brings structured analytic techniques from the intelligence community into the browser.
+        It implements the Analysis of Competing Hypotheses (ACH) methodology developed by Richards Heuer at the CIA, 
+        alongside cognitive bias checklists, IOC extraction, and the Diamond Model of Intrusion Analysis.
+      </p>
+      <p>
+        Everything runs client-side with localStorage persistence. No backend, no accounts, no data leaving the 
+        analyst's machine. Load the page, start analyzing. The Sandworm APT sample project ships pre-loaded so 
+        analysts can see the workflow before building their own matrices.
+      </p>
+    </section>
+
+    <!-- Analysis Tools -->
+    <section class="content-section">
+      <h2>Analysis Tools</h2>
+      <div class="tool-grid">
+        {tools.map((t) => (
+          <div class="tool-card">
+            <div class="tool-header">
+              <span class="tool-icon">{t.icon}</span>
+              <span class="tool-name">{t.name}</span>
+              <span class="tool-status">{t.status}</span>
+            </div>
+            <p class="tool-desc">{t.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ACH Scoring Model -->
+    <section class="content-section">
+      <h2>ACH Scoring Model</h2>
+      <p>
+        Each cell in the ACH matrix represents an analyst's judgment about how a piece of evidence relates to 
+        a hypothesis. The scoring formula weights these ratings by evidence credibility and relevance to produce 
+        a composite score per hypothesis. Higher scores indicate more inconsistency, so the hypothesis with 
+        the lowest score is the preferred explanation.
+      </p>
+      <div class="scoring-table">
+        <div class="scoring-header">
+          <span class="sh-field">Component</span>
+          <span class="sh-values">Values / Formula</span>
         </div>
-        <div class="highlight-body">
-          <div class="highlight-row">
-            <span class="row-label">Problem:</span>
-            <span class="row-value">{item.scenario}</span>
+        {scoringModel.map((s) => (
+          <div class="scoring-row">
+            <span class="sr-field">{s.field}</span>
+            <span class="sr-values">{s.values}</span>
           </div>
-          <div class="highlight-row">
-            <span class="row-label">Solution:</span>
-            <span class="row-value">{item.solution}</span>
+        ))}
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="content-section">
+      <h2>Architecture</h2>
+      <div class="architecture">
+        <div class="arch-layer">
+          <span class="layer-label">CLIENT-SIDE APPLICATION</span>
+          <div class="arch-flow">
+            <div class="arch-box">
+              <span class="box-title">React 18</span>
+              <span class="box-desc">8 pages, 15 components</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box">
+              <span class="box-title">Zustand Stores</span>
+              <span class="box-desc">Project, IOC, Diamond</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box">
+              <span class="box-title">localStorage</span>
+              <span class="box-desc">Persist middleware</span>
+            </div>
           </div>
-          <div class="highlight-row impact">
-            <span class="row-label">Result:</span>
-            <span class="row-value">{item.impact}</span>
+        </div>
+
+        <div class="arch-connector">
+          <span class="connector-label">No backend. No API calls. Everything in the browser.</span>
+        </div>
+
+        <div class="arch-layer">
+          <span class="layer-label">DATA FLOW</span>
+          <div class="consumer-grid">
+            <div class="consumer-box">
+              <span class="consumer-name">Import</span>
+              <span class="consumer-desc">JSON project files, raw text for IOC extraction</span>
+            </div>
+            <div class="consumer-box">
+              <span class="consumer-name">Analysis</span>
+              <span class="consumer-desc">ACH matrix scoring, bias review, Diamond modeling</span>
+            </div>
+            <div class="consumer-box">
+              <span class="consumer-name">Export</span>
+              <span class="consumer-desc">JSON projects, Markdown reports, CSV/JSON IOCs</span>
+            </div>
           </div>
         </div>
       </div>
-    ))}
-  </div>
+    </section>
 
-  <!-- Skills -->
-  <h2>Skills Demonstrated</h2>
-  <div class="skills-grid">
-    {skills.map((skill) => (
-      <div class="skill-card">
-        <div class="skill-header">
-          <span class="skill-name">{skill.name}</span>
+    <!-- Tech Decisions -->
+    <section class="content-section">
+      <h2>Technical Decisions</h2>
+      <div class="decisions-table">
+        <div class="decision-header">
+          <span class="dh-decision">Decision</span>
+          <span class="dh-reason">Reasoning</span>
         </div>
-        <ul class="skill-items">
-          {skill.items.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
+        {techDecisions.map((td) => (
+          <div class="decision-row">
+            <span class="dr-decision">{td.decision}</span>
+            <span class="dr-reason">{td.reason}</span>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
+    </section>
 
-  <!-- Status -->
-  <h2>Project Status</h2>
-  <div class="status-block">
-    <div class="status-indicator complete">
-      <div class="status-pulse"></div>
-      <span>Complete</span>
-    </div>
-    <ul class="status-list">
-      <li><span class="check">&#10003;</span> Interactive ACH matrix with dynamic rows/columns</li>
-      <li><span class="check">&#10003;</span> Evidence credibility and relevance weighting</li>
-      <li><span class="check">&#10003;</span> Automated consistency scoring</li>
-      <li><span class="check">&#10003;</span> Sensitivity analysis panel</li>
-      <li><span class="check">&#10003;</span> Export to PDF and JSON formats</li>
-      <li><span class="check">&#10003;</span> Undo/redo support for matrix edits</li>
-    </ul>
-  </div>
-</ProjectLayout>
+    <!-- Development Phases -->
+    <section class="content-section">
+      <h2>Development Timeline</h2>
+      <div class="phases-list">
+        {phases.map((p) => (
+          <div class={`phase-item ${p.status}`}>
+            <div class="phase-header">
+              <span class="phase-num">Phase {p.phase}</span>
+              <span class="phase-name">{p.name}</span>
+              <span class={`phase-status ${p.status}`}>
+                {p.status === "completed" ? "✓" : p.status === "ongoing" ? "◉" : "○"} {p.status}
+              </span>
+            </div>
+            <div class="phase-items">
+              {p.items.map((item) => (
+                <span class="phase-tag">{item}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Links -->
+    <section class="content-section">
+      <div class="project-links">
+        <a href="https://intel-workbench.solomonneas.dev" target="_blank" class="project-link">Live Demo →</a>
+        <a href="https://github.com/solomonneas/intel-workbench" target="_blank" class="project-link">GitHub Repository →</a>
+        <a href="/projects" class="project-link secondary">← All Projects</a>
+      </div>
+    </section>
+  </article>
+</Layout>
 
 <style>
-  .section-intro { opacity: 0.85; margin-bottom: 1.5rem; }
+  .project-page {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
 
-  .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .stack-card { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-left: 3px solid var(--accent); border-radius: 4px; padding: 1rem; animation: fadeSlideIn 0.5s ease-out both; animation-delay: var(--delay); }
-  @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .stack-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .stack-indicator { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
-  .stack-name { font-family: "IBM Plex Mono", monospace; font-size: 1rem; font-weight: 600; }
-  .stack-role { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--accent); margin-bottom: 0.75rem; }
-  .stack-purpose { font-size: 0.8rem; opacity: 0.75; margin: 0; line-height: 1.5; }
+  .back-link {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
 
-  .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .highlight-card { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 8px; overflow: hidden; animation: fadeSlideIn 0.5s ease-out both; animation-delay: var(--delay); }
-  .highlight-header { display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem; background: color-mix(in srgb, currentColor 3%, transparent); border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent); }
-  .highlight-category { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #10b981; }
-  .highlight-title { font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; font-weight: 600; }
-  .highlight-body { padding: 1rem; }
-  .highlight-row { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; }
-  .highlight-row:last-child { margin-bottom: 0; }
-  .highlight-row .row-label { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; font-weight: 600; color: #10b981; }
-  .highlight-row .row-value { font-size: 0.8rem; opacity: 0.8; line-height: 1.5; }
-  .highlight-row.impact .row-value { color: #10b981; font-weight: 500; opacity: 1; }
+  .back-link:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--card-bg);
+  }
 
-  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .skill-card { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 6px; overflow: hidden; }
-  .skill-header { padding: 0.75rem 1rem; background: color-mix(in srgb, currentColor 3%, transparent); border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent); }
-  .skill-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; }
-  .skill-items { list-style: none; padding: 0.75rem 1rem; margin: 0; }
-  .skill-items li { font-size: 0.75rem; padding: 0.3rem 0; padding-left: 1rem; position: relative; opacity: 0.75; }
-  .skill-items li::before { content: ">"; position: absolute; left: 0; color: #10b981; font-family: "IBM Plex Mono", monospace; }
+  .project-header {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
 
-  .status-block { background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
-  .status-indicator { display: flex; align-items: center; gap: 0.75rem; font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; font-weight: 500; margin-bottom: 1rem; }
-  .status-indicator.complete .status-pulse { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
-  .status-pulse { width: 12px; height: 12px; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-  .status-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.5rem; }
-  .status-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; padding: 0.5rem 0.75rem; background: color-mix(in srgb, currentColor 3%, transparent); border-radius: 4px; }
-  .check { color: #10b981; font-weight: bold; }
+  .project-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 0.25rem;
+    line-height: 1.1;
+  }
 
-  @media (max-width: 768px) { .highlights-grid, .stack-grid { grid-template-columns: 1fr; } }
+  .project-subtitle {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+  }
 
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .meta-item { display: flex; align-items: center; gap: 0.4rem; }
+  .meta-label { font-family: "IBM Plex Mono", monospace; color: var(--text-muted); }
+  .meta-value { display: flex; align-items: center; gap: 0.35rem; }
+
+  .tech-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
+  }
+
+  .content-section { margin-bottom: 2.5rem; }
+
+  .content-section h2 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--primary);
+  }
+
+  .content-section p {
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+
+  /* GitHub Callout */
   .github-callout {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    margin: 1.5rem 0;
+    margin: 0 0 2.5rem;
     background: color-mix(in srgb, currentColor 3%, transparent);
     border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
     border-left: 3px solid #6e5494;
@@ -252,51 +390,13 @@ const skills = [
     flex-wrap: wrap;
   }
 
-  .github-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .github-icon {
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    padding: 6px;
-    background: color-mix(in srgb, #6e5494 15%, transparent);
-    border-radius: 6px;
-    color: #6e5494;
-  }
-
-  .github-icon svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .github-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .github-label {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6e5494;
-  }
-
-  .github-desc {
-    font-size: 0.75rem;
-    opacity: 0.6;
-    margin: 0;
-  }
-
-  .github-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
+  .github-content { display: flex; align-items: center; gap: 1rem; }
+  .github-icon { flex-shrink: 0; width: 32px; height: 32px; padding: 6px; background: color-mix(in srgb, #6e5494 15%, transparent); border-radius: 6px; color: #6e5494; }
+  .github-icon svg { width: 100%; height: 100%; }
+  .github-text { display: flex; flex-direction: column; gap: 0.15rem; }
+  .github-label { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; color: #6e5494; }
+  .github-desc { font-size: 0.75rem; opacity: 0.6; margin: 0; }
+  .github-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 
   .github-btn {
     display: inline-flex;
@@ -311,48 +411,129 @@ const skills = [
     transition: all 0.2s ease;
   }
 
-  .github-btn.repo {
-    background: color-mix(in srgb, currentColor 5%, transparent);
-    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
-    color: currentColor;
+  .github-btn.repo { background: color-mix(in srgb, currentColor 5%, transparent); border: 1px solid color-mix(in srgb, currentColor 15%, transparent); color: currentColor; }
+  .github-btn.repo:hover { background: color-mix(in srgb, currentColor 10%, transparent); border-color: color-mix(in srgb, currentColor 25%, transparent); }
+  .github-btn.demo { background: color-mix(in srgb, #10b981 15%, transparent); border: 1px solid color-mix(in srgb, #10b981 30%, transparent); color: #10b981; }
+  .github-btn.demo:hover { background: color-mix(in srgb, #10b981 25%, transparent); border-color: #10b981; }
+  .github-btn.readme { background: color-mix(in srgb, #6e5494 15%, transparent); border: 1px solid color-mix(in srgb, #6e5494 30%, transparent); color: #6e5494; }
+  .github-btn.readme:hover { background: color-mix(in srgb, #6e5494 25%, transparent); border-color: #6e5494; }
+  .github-btn.star { background: color-mix(in srgb, #f59e0b 15%, transparent); border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent); color: #f59e0b; }
+  .github-btn.star:hover { background: color-mix(in srgb, #f59e0b 25%, transparent); border-color: #f59e0b; }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
   }
 
-  .github-btn.repo:hover {
-    background: color-mix(in srgb, currentColor 10%, transparent);
-    border-color: color-mix(in srgb, currentColor 25%, transparent);
+  .stat {
+    text-align: center;
+    padding: 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
   }
 
-  .github-btn.demo {
-    background: color-mix(in srgb, #10b981 15%, transparent);
-    border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
-    color: #10b981;
+  .stat-val { font-family: "IBM Plex Mono", monospace; font-size: 1rem; font-weight: 700; color: var(--primary); display: block; }
+  .stat-lbl { font-size: 0.6rem; color: var(--text-muted); display: block; margin-top: 0.15rem; }
+
+  /* Tool Grid */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
   }
 
-  .github-btn.demo:hover {
-    background: color-mix(in srgb, #10b981 25%, transparent);
-    border-color: #10b981;
+  .tool-card {
+    padding: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
   }
 
-  .github-btn.star {
-    background: color-mix(in srgb, #f59e0b 15%, transparent);
-    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
-    color: #f59e0b;
-  }
+  .tool-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .tool-icon { font-size: 1.25rem; }
+  .tool-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; flex: 1; }
+  .tool-status { font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); }
+  .tool-desc { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
 
-  .github-btn.star:hover {
-    background: color-mix(in srgb, #f59e0b 25%, transparent);
-    border-color: #f59e0b;
-  }
+  /* Scoring Table */
+  .scoring-table { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 1rem; }
+  .scoring-header { display: grid; grid-template-columns: 120px 1fr; gap: 1rem; padding: 0.6rem 1rem; background: var(--card-bg); border-bottom: 2px solid var(--border); font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; font-weight: 600; color: var(--primary); }
+  .scoring-row { display: grid; grid-template-columns: 120px 1fr; gap: 1rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; transition: background 0.15s ease; }
+  .scoring-row:last-child { border-bottom: none; }
+  .scoring-row:hover { background: var(--card-bg); }
+  .sr-field { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.75rem; }
+  .sr-values { color: var(--text-muted); line-height: 1.5; }
 
-  .github-btn.readme {
-    background: color-mix(in srgb, #6e5494 15%, transparent);
-    border: 1px solid color-mix(in srgb, #6e5494 30%, transparent);
-    color: #6e5494;
-  }
+  /* Architecture */
+  .architecture { display: flex; flex-direction: column; margin-top: 1rem; }
+  .arch-layer { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; }
+  .layer-label { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; color: var(--primary); display: block; margin-bottom: 0.75rem; }
+  .arch-flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  .arch-box { padding: 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: 4px; text-align: center; min-width: 120px; }
+  .box-title { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; font-weight: 600; display: block; }
+  .box-desc { font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 0.15rem; }
+  .flow-arrow { color: var(--primary); font-size: 0.8rem; opacity: 0.5; }
+  .arch-connector { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 0; }
+  .connector-label { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
+  .consumer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; }
+  .consumer-box { padding: 0.75rem; border: 1px solid var(--border); border-radius: 4px; }
+  .consumer-name { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; font-weight: 600; display: block; color: var(--tertiary); }
+  .consumer-desc { font-size: 0.7rem; color: var(--text-muted); }
 
-  .github-btn.readme:hover {
-    background: color-mix(in srgb, #6e5494 25%, transparent);
-    border-color: #6e5494;
-  }
+  /* Tech Decisions Table */
+  .decisions-table { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 1rem; }
+  .decision-header { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; padding: 0.6rem 1rem; background: var(--card-bg); border-bottom: 2px solid var(--border); font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; font-weight: 600; color: var(--primary); }
+  .decision-row { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; transition: background 0.15s ease; }
+  .decision-row:last-child { border-bottom: none; }
+  .decision-row:hover { background: var(--card-bg); }
+  .dr-decision { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.75rem; }
+  .dr-reason { color: var(--text-muted); line-height: 1.5; }
 
+  /* Development Phases */
+  .phases-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+  .phase-item { padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 6px; }
+  .phase-item.completed { border-left: 3px solid var(--primary); }
+  .phase-item.ongoing { border-left: 3px solid var(--tertiary); }
+  .phase-item.planned { border-left: 3px solid var(--text-muted); opacity: 0.7; }
+  .phase-header { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .phase-num { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; color: var(--text-muted); min-width: 55px; }
+  .phase-name { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; font-weight: 600; flex: 1; }
+  .phase-status { font-family: "IBM Plex Mono", monospace; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .phase-status.completed { color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); }
+  .phase-status.ongoing { color: var(--tertiary); background: color-mix(in srgb, var(--tertiary) 10%, transparent); }
+  .phase-status.planned { color: var(--text-muted); background: var(--card-bg); }
+  .phase-items { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+  .phase-tag { font-size: 0.65rem; padding: 0.15rem 0.45rem; border: 1px solid var(--border); border-radius: 2px; color: var(--text-muted); }
+
+  /* Project Links */
+  .project-links { display: flex; flex-wrap: wrap; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .project-link {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid;
+  }
+  .project-link:not(.secondary) { color: var(--primary); border-color: color-mix(in srgb, var(--primary) 30%, transparent); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+  .project-link:not(.secondary):hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 15%, transparent); }
+  .project-link.secondary { color: var(--text-muted); border-color: var(--border); background: var(--card-bg); }
+  .project-link.secondary:hover { color: var(--text); border-color: var(--text-muted); }
+
+  @media (max-width: 640px) {
+    .project-page { padding: 1.5rem 1rem; }
+    .project-meta { flex-direction: column; gap: 0.5rem; }
+    .tool-grid, .consumer-grid { grid-template-columns: 1fr; }
+    .arch-flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .decision-header, .decision-row, .scoring-header, .scoring-row { grid-template-columns: 1fr; gap: 0.25rem; }
+    .phase-header { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .github-callout { flex-direction: column; align-items: flex-start; }
+  }
 </style>
