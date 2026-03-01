@@ -100,11 +100,11 @@ Microsoft SCCM is powerful but absurdly heavy for an educational lab environment
 
 I build golden images as Proxmox VMs (not on physical hardware) so I can snapshot before Sysprep. This is critical because if Sysprep fails, you cannot simply run it again. The only recovery is reverting to a snapshot.
 
-**Phase 1: Audit Mode.** Install Windows 11, press `Ctrl+Shift+F3` at the OOBE region screen. This drops you into the built-in Administrator account before any user setup. Strip all the bloatware (Candy Crush, Spotify, etc.) with PowerShell. Staged Appx packages are the number one cause of silent Sysprep failures.
+**Step 1: Install and debloat.** Set up a clean Windows 11 installation on a reference machine. Run [Chris Titus Tech's Windows Utility](https://github.com/ChrisTitusTech/winutil) to strip all the bloatware (Candy Crush, Spotify, Xbox, etc.) and disable telemetry. This handles both installed and provisioned packages, which is important because leftover staged Appx packages are the number one cause of silent Sysprep failures.
 
-**Phase 2: Unattend.xml.** Create an answer file that handles BypassNRO (Windows 11's forced internet requirement), skips privacy screens, and creates a local admin account. Post-deployment script deletes the file so credentials don't persist on disk.
+**Step 2: Sysprep and shutdown.** Once the machine is configured how you want it, run `sysprep.exe /generalize /oobe /shutdown /unattend:C:\Windows\Panther\unattend.xml`. The unattend file handles BypassNRO (Windows 11's forced internet requirement) and automates the OOBE setup after deployment. The machine shuts down after Sysprep completes. Do not power it back on.
 
-**Phase 3: Sysprep and Capture.** Snapshot the VM, run `sysprep.exe /generalize /oobe /shutdown /unattend:C:\Windows\Panther\unattend.xml`, then capture with FOG. Never power the VM on between Sysprep and capture.
+**Step 3: FOG capture.** Schedule a capture task in the FOG web UI for that machine, then PXE boot it. FOG captures the sysprepped image as-is, sitting at OOBE. When the image gets deployed to a workstation later, the unattend.xml automates the OOBE setup, the FOG service agent kicks in for background management, and AD auto-join handles domain membership. No manual touch required.
 
 ### Per-Classroom Deployment
 
