@@ -199,6 +199,24 @@ CSV import your hosts, group by classroom, one-click deploy.
 github.com/FOGProject/
 
 **Post D:**
+The best thing about Proxmox isn't the price (free).
+
+It's that the host is just Debian with root access.
+
+SSH in. Script anything. Automate everything.
+
+qm for VMs. pct for containers. pvesm for storage.
+
+And the community helper scripts are insane:
+bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/docker.sh)"
+
+One command = fully configured Docker LXC.
+
+Pi-hole, Wireguard, Nginx Proxy Manager, Home Assistant... all one-liners.
+
+community-scripts.github.io/ProxmoxVE/
+
+**Post E:**
 "Should I use DFS for my file server?"
 
 If you have one file server: no.
