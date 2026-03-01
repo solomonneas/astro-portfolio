@@ -443,13 +443,9 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
     <p>
       Microsoft SCCM (System Center Configuration Manager) was the existing imaging and deployment solution, 
       but it's heavy, expensive to license, and tightly coupled to Windows infrastructure. As part of the 
-      migration away from Microsoft dependencies, I replaced it with FOG Project, an open-source network 
+      migration away from Microsoft dependencies, I replaced it with 
+      <a href="https://github.com/FOGProject/" target="_blank">FOG Project</a>, an open-source network 
       cloning and management solution.
-    </p>
-    <p>
-      FOG handles PXE boot imaging, hardware inventory, and centralized workstation management without 
-      the licensing overhead. It runs on Linux, integrates with the existing network infrastructure, and 
-      does everything the lab environment actually needs SCCM for at zero cost.
     </p>
 
     <div class="comparison-row">
@@ -473,6 +469,42 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
           <span>Free and open source</span>
           <span>PXE boot + web UI</span>
         </div>
+      </div>
+    </div>
+
+    <h3>How It Works</h3>
+    <p>
+      Each classroom has different hardware, so I built and captured a golden image per classroom. 
+      The FOG agent runs silently on every workstation, communicating back to the FOG server through 
+      a dedicated <code>fog-service</code> Active Directory service account. When a machine needs 
+      reimaging, it PXE boots using <code>snponly.efi</code>, which DHCP points to the FOG server. 
+      The machine pulls its assigned image and deploys without any manual intervention.
+    </p>
+
+    <div class="fog-workflow">
+      <div class="fog-step">
+        <span class="fog-label">Golden Image</span>
+        <span class="fog-desc">Clean Windows install configured per classroom hardware, captured to FOG as a base image</span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">Per-Classroom Images</span>
+        <span class="fog-desc">Separate images for each room (different drivers, hardware configs, software packages)</span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">AD Integration</span>
+        <span class="fog-desc"><code>fog-service</code> AD account authenticates the FOG agent on each workstation for background communication</span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">PXE Boot Chain</span>
+        <span class="fog-desc">DHCP Option 66/67 points to FOG server, workstations boot <code>snponly.efi</code> for UEFI network boot</span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">Deploy</span>
+        <span class="fog-desc">Machine pulls its assigned classroom image, reimages unattended, joins AD automatically</span>
       </div>
     </div>
   </div>
@@ -1258,6 +1290,50 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
     color: var(--primary);
     flex-shrink: 0;
     opacity: 0.5;
+  }
+
+  /* FOG Workflow */
+  .fog-workflow {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 1.25rem 0;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .fog-step {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 6%, transparent);
+    transition: background 0.15s ease;
+  }
+
+  .fog-step:last-child { border-bottom: none; }
+  .fog-step:hover { background: color-mix(in srgb, currentColor 3%, transparent); }
+
+  .fog-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .fog-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .fog-connector {
+    text-align: center;
+    color: var(--primary);
+    font-size: 0.7rem;
+    opacity: 0.4;
+    padding: 0.1rem 0;
+    background: color-mix(in srgb, currentColor 2%, transparent);
   }
 
   /* Responsive */
