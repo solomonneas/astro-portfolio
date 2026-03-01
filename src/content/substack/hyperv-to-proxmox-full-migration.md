@@ -13,6 +13,23 @@ Then Broadcom acquired VMware and started charging $350/core/year for VCF licens
 
 This post documents the full migration. Not the theory. The actual process, with the commands I ran, the problems I hit, and the decisions I made along the way.
 
+## Why Proxmox Feels Different
+
+Coming from Hyper-V, the first thing that hits you is: you have full root access to the host. It's Debian underneath. SSH in, run whatever you want, script anything. Hyper-V gives you PowerShell remoting or RDP into a GUI. Proxmox gives you a real Linux shell with the entire ecosystem of tools that comes with it.
+
+Every action in the web UI has a CLI equivalent. `qm` for VM management, `pct` for containers, `pvesm` for storage, `pvecm` for clustering. You can automate your entire infrastructure with bash scripts and cron jobs. Try doing that with Hyper-V Manager.
+
+The community makes it even better. The [Proxmox VE Helper Scripts](https://community-scripts.github.io/ProxmoxVE/) project maintains one-liner bash scripts that deploy fully configured LXC containers for common services. Docker host, Pi-hole, Nginx Proxy Manager, Home Assistant, Wireguard, dozens more. One command, 60 seconds, running service.
+
+```bash
+# Spin up a fully configured Docker LXC
+bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/docker.sh)"
+```
+
+The script downloads the template, creates the container, configures networking, installs the service, starts it. What takes 30 minutes of clicking through installers on Hyper-V takes a single command on Proxmox. I used these for several auxiliary services during the migration and they saved hours of setup time.
+
+This is what I mean when I say Proxmox is more lightweight with more controls. It's not just the price tag. It's the operational velocity. You move faster because the platform doesn't fight you.
+
 ## Scoping the Migration
 
 Before touching anything, I mapped every workload on Hyper-V:

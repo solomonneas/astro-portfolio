@@ -15,6 +15,23 @@ Hyper-V felt heavy by comparison. Limited Linux VM support, clunky management (R
 
 The question was never "should we migrate?" It was "how do we migrate production Active Directory, network monitoring, file servers, and imaging infrastructure without breaking anything?"
 
+## The Power of Root on a Proxmox Host
+
+One thing that surprised me coming from Hyper-V: you have full root access to the Proxmox host. It's just Debian under the hood. You can SSH in, run any Linux command, script anything, automate everything. Hyper-V locks you into PowerShell remoting or RDP. Proxmox gives you a real shell on a real Linux system.
+
+Need to resize a disk? One command. Snapshot a VM? One command. Migrate a VM between hosts? One command. Everything in the web UI is also available from the CLI through `qm` (VM management), `pct` (container management), `pvesm` (storage), and `pvecm` (cluster). You can script your entire infrastructure.
+
+But the real game changer is the [Proxmox VE Helper Scripts](https://community-scripts.github.io/ProxmoxVE/) community project. These are one-liner bash scripts that spin up fully configured LXC containers or VMs for common services. Need a Pi-hole? One command. Docker host? One command. Home Assistant, Nginx Proxy Manager, Plex, Grafana, Wireguard? One command each.
+
+```bash
+# Example: spin up a Docker LXC in seconds
+bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/docker.sh)"
+```
+
+The script handles everything: downloads the template, creates the container, configures networking, installs the service, and starts it. What would take 30 minutes of manual setup takes 60 seconds. I used these for several of our auxiliary services and they just work.
+
+Compare that to Hyper-V where deploying a new service means: create a VM, install Windows or manually download an ISO, walk through the installer, configure networking, install the actual application. The gap in operational speed is enormous.
+
 ## The Domain Controller Leapfrog
 
 This was the part that scared me most. Domain controllers are the heartbeat of a Windows network. Every authentication, every group policy, every DNS lookup flows through them. Get this wrong and the whole campus goes dark.
