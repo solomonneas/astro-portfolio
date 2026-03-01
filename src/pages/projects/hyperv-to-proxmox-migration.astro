@@ -538,6 +538,33 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
       </div>
     </div>
 
+    <h3>Host Management</h3>
+    <p>
+      Every workstation across all classrooms is registered in FOG via CSV import (hostname + MAC address). 
+      Each host is assigned to its classroom group with the correct image. When it's time to reimage a 
+      room, select the group, schedule a deploy task, and FOG uses 
+      <a href="https://partclone.org/" target="_blank">Partclone</a> to push the image over the network. 
+      Partclone only writes used blocks, so a 60GB Windows install on a 256GB drive doesn't transfer 256GB 
+      of data.
+    </p>
+
+    <div class="fog-workflow">
+      <div class="fog-step">
+        <span class="fog-label">CSV Import</span>
+        <span class="fog-desc">Bulk register all workstations: hostname, MAC address, classroom group, assigned image</span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">Group Assignment</span>
+        <span class="fog-desc">Each classroom is a FOG group with its own image. Deploy to 30 machines with one click.</span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">Partclone Deploy</span>
+        <span class="fog-desc">Block-level imaging that only transfers used sectors. Faster than full-disk cloning and supports NTFS, ext4, and more.</span>
+      </div>
+    </div>
+
     <div class="highlight-box">
       <span class="highlight-icon">⚠️</span>
       <span class="highlight-text">
