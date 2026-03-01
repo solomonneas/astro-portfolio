@@ -120,13 +120,13 @@ The FOG agent runs on every workstation with a dedicated `fog-service` Active Di
 
 ## The SOC Stack
 
-I also migrated the full security operations stack: Wazuh for endpoint detection and SIEM, Grafana for dashboards, TheHive for case management, and MISP for threat intelligence sharing. Same V2V process as the other Linux VMs. These were already running on Linux, so it was disk conversion, interface rename, guest agent install, and verify services. Nothing special, but worth mentioning because people forget about their security tooling when planning hypervisor migrations.
+I also migrated the full security operations stack: Wazuh for endpoint detection and SIEM, Cortex for automated analysis, TheHive for case management, and MISP for threat intelligence sharing. Same V2V process as the other Linux VMs. These were already running on Linux, so it was disk conversion, interface rename, guest agent install, and verify services. Nothing special, but worth mentioning because people forget about their security tooling when planning hypervisor migrations.
 
 ## The Final Tally
 
 When everything was done, the infrastructure footprint looked like this:
 
-- **4 standalone Proxmox servers** running production workloads: domain controllers, network monitoring (LibreNMS, Netdisco, Switchmap), Samba AD file server, FOG imaging, UniFi controller, and the SOC stack (Wazuh, Grafana, TheHive, MISP)
+- **4 standalone Proxmox servers** running production workloads: domain controllers, network monitoring (LibreNMS, Netdisco, Switchmap), Samba AD file server, FOG imaging, UniFi controller, and the SOC stack (Wazuh, Cortex, TheHive, MISP)
 - **6-node Proxmox cluster** for the NetLab environment, where students run hands-on lab exercises
 - **10 total Proxmox hosts**, all on open-source infrastructure
 
