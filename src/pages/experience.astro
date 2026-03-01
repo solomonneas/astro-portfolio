@@ -128,12 +128,10 @@ const certifications = [
 
 <Layout pageTitle="Experience">
   <section class="experience">
-    <div class="page-header">
-      <h1 class="page-title">Experience</h1>
-      <div class="resume-cta">
-        <a href="/hire" class="resume-btn">↓ Download Resume</a>
-      </div>
-    </div>
+    <header class="page-header">
+      <h1>Experience</h1>
+      <p class="subtitle">Professional timeline and technical growth</p>
+    </header>
 
     <div class="section">
       <h2 class="section-header">Education</h2>
@@ -230,21 +228,22 @@ const certifications = [
   }
 
   .page-header {
-    margin-bottom: 2.5rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px dashed var(--border);
+    margin-bottom: 3rem;
   }
 
-  .page-title {
+  .page-header h1 {
+    font-family: "IBM Plex Mono", monospace;
     font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 700;
-    margin: 0 0 1rem 0;
-    line-height: 1.1;
+    margin: 0 0 0.5rem 0;
     color: var(--primary);
+    line-height: 1.1;
   }
 
-  .resume-cta {
-    margin-top: 1rem;
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
   }
 
   .resume-btn {

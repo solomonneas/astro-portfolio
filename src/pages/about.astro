@@ -5,9 +5,12 @@ import StatusLight from "../components/StatusLight.astro";
 
 <Layout pageTitle="About Me">
   <section class="about">
+    <header class="page-header">
+      <h1>About</h1>
+      <p class="subtitle">Infrastructure Engineer · Security Architect · Agentic Engineer</p>
+    </header>
+
     <div class="profile">
-      <h1 class="name">Solomon Neas</h1>
-      <p class="role">Infrastructure Engineer · Security Architect · Agentic Engineer</p>
 
       <div class="profile-details">
         <div class="detail">
@@ -200,19 +203,23 @@ import StatusLight from "../components/StatusLight.astro";
     border-bottom: 1px dashed var(--border);
   }
 
-  .name {
+  .page-header {
+    margin-bottom: 3rem;
+  }
+
+  .page-header h1 {
+    font-family: "IBM Plex Mono", monospace;
     font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 700;
     margin: 0 0 0.5rem 0;
-    line-height: 1.1;
     color: var(--primary);
+    line-height: 1.1;
   }
 
-  .role {
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: clamp(0.85rem, 2vw, 1rem);
+  .subtitle {
+    font-size: 0.9rem;
     color: var(--text-muted);
-    margin: 0 0 1.5rem 0;
+    margin: 0;
   }
 
   .profile-details {
@@ -426,9 +433,7 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   @media (max-width: 640px) {
-    .name {
-      font-size: 2rem;
-    }
+
 
     .detail {
       flex-direction: column;
