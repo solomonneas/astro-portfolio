@@ -5,13 +5,10 @@ import StatusLight from "../components/StatusLight.astro";
 
 <Layout pageTitle="Hire">
   <section class="hire">
-    <div class="page-header">
-      <h1 class="page-title">Hire Me</h1>
-      <div class="availability">
-        <StatusLight status="ongoing" />
-        <span class="avail-text">Available for Work</span>
-      </div>
-    </div>
+    <header class="page-header">
+      <h1>Hire Me</h1>
+      <p class="subtitle">Available for infrastructure, security, and engineering roles</p>
+    </header>
 
     <div class="section">
       <p class="intro">
@@ -222,21 +219,22 @@ import StatusLight from "../components/StatusLight.astro";
   }
 
   .page-header {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px dashed var(--border);
+    margin-bottom: 3rem;
   }
 
-  .page-title {
+  .page-header h1 {
+    font-family: "IBM Plex Mono", monospace;
     font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 700;
-    margin: 0 0 0.75rem 0;
-    line-height: 1.1;
+    margin: 0 0 0.5rem 0;
     color: var(--primary);
+    line-height: 1.1;
   }
 
-  .availability {
-    display: inline-flex;
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
     align-items: center;
     gap: 0.4rem;
     font-size: 0.8rem;
