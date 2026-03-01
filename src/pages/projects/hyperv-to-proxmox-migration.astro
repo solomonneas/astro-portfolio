@@ -472,21 +472,51 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
       </div>
     </div>
 
-    <h3>How It Works</h3>
+    <h3>Golden Image Pipeline</h3>
     <p>
-      Each classroom has different hardware, so I built and captured a golden image per classroom. 
-      The FOG agent runs silently on every workstation, communicating back to the FOG server through 
-      a dedicated <code>fog-service</code> Active Directory service account. When a machine needs 
-      reimaging, it PXE boots using <code>snponly.efi</code>, which DHCP points to the FOG server. 
-      The machine pulls its assigned image and deploys without any manual intervention.
+      Each classroom has different hardware, so I maintain separate images per room. The golden image 
+      is built as a <strong>Proxmox VM</strong> (not on physical hardware) so I can snapshot before 
+      Sysprep and roll back if anything breaks. The process has three phases:
     </p>
 
     <div class="fog-workflow">
       <div class="fog-step">
-        <span class="fog-label">Golden Image</span>
-        <span class="fog-desc">Clean Windows install configured per classroom hardware, captured to FOG as a base image</span>
+        <span class="fog-label">Phase 1: Audit Mode Prep</span>
+        <span class="fog-desc">
+          Install Windows 11, hit <code>Ctrl+Shift+F3</code> at the OOBE region screen to enter Audit Mode. 
+          Strip all bloatware (Candy Crush, Spotify, etc.) with PowerShell before Sysprep even touches the image. 
+          Staged Appx packages will cause Sysprep to fail silently if left behind.
+        </span>
       </div>
       <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">Phase 2: Unattend.xml</span>
+        <span class="fog-desc">
+          Drop an answer file at <code>C:\Windows\Panther\unattend.xml</code> that handles BypassNRO 
+          (skips the "Connect to Internet" requirement), auto-accepts privacy screens, and creates a 
+          local admin account. Post-setup script deletes the file to avoid leaving credentials on disk.
+        </span>
+      </div>
+      <div class="fog-connector">↓</div>
+      <div class="fog-step">
+        <span class="fog-label">Phase 3: Sysprep + Capture</span>
+        <span class="fog-desc">
+          Snapshot the VM ("Pre-Sysprep"), then run 
+          <code>sysprep.exe /generalize /oobe /shutdown /unattend:C:\Windows\Panther\unattend.xml</code>. 
+          Once the VM shuts down, create a FOG Capture Task, boot the VM, and FOG pulls the image to the server. 
+          Never power the VM on between Sysprep and capture.
+        </span>
+      </div>
+    </div>
+
+    <h3>Deployment Architecture</h3>
+    <p>
+      The FOG agent runs silently on every workstation, communicating back to the FOG server through 
+      a dedicated <code>fog-service</code> Active Directory service account. When a machine needs 
+      reimaging, it PXE boots using <code>snponly.efi</code>, which DHCP points to the FOG server.
+    </p>
+
+    <div class="fog-workflow">
       <div class="fog-step">
         <span class="fog-label">Per-Classroom Images</span>
         <span class="fog-desc">Separate images for each room (different drivers, hardware configs, software packages)</span>
@@ -506,6 +536,15 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
         <span class="fog-label">Deploy</span>
         <span class="fog-desc">Machine pulls its assigned classroom image, reimages unattended, joins AD automatically</span>
       </div>
+    </div>
+
+    <div class="highlight-box">
+      <span class="highlight-icon">⚠️</span>
+      <span class="highlight-text">
+        Always snapshot before Sysprep. If the command fails (and it will, usually because of leftover 
+        staged Appx packages), you cannot simply run it again. The only recovery path is reverting to 
+        your pre-Sysprep snapshot.
+      </span>
     </div>
   </div>
 
