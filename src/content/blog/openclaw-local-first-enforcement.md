@@ -112,7 +112,7 @@ Haiku at $1/$5M tokens understood exit codes, produced clean reports, and follow
 
 Then the 500 errors started.
 
-Both Opus and Haiku hit Anthropic's API through the same OAuth credential (`anthropic:claude-cli`). When Opus spawns a Haiku coder, both agents make simultaneous API calls on the same token. Four internal server errors in a single session, all correlating with concurrent Opus + Haiku requests.
+Both Opus and Haiku hit Anthropic through the same API credential. When Opus spawns a Haiku coder, both agents make simultaneous API calls on the same provider. Four internal server errors in a single session, all correlating with concurrent Opus + Haiku requests.
 
 Worse, OpenClaw's retry logic didn't catch them. The retry handler (`isTransientHttpError`) checks for HTTP status code prefixes like "500 Internal Server Error." But Anthropic returns JSON error payloads: `{"type":"error","error":{"type":"api_error","message":"Internal server error"}}`. The JSON format doesn't match the prefix pattern, so retry never fires.
 
@@ -120,7 +120,7 @@ The cascade was ugly: Opus lost track of coder results, re-spawned the same task
 
 ### Phase 3: GPT 5.3 Codex (Different Provider, No Conflicts)
 
-The fix was simple: use a coder model from a different API provider. Codex uses the `openai-codex` OAuth provider, completely independent from Anthropic's token. Opus and Codex can make concurrent API calls without interfering.
+The fix was simple: use a coder model from a different API provider. Codex runs through OpenAI, completely independent from Anthropic. Opus and Codex can make concurrent API calls without interfering.
 
 ```json
 {
@@ -154,7 +154,7 @@ No more shared rate limits. No more 500 errors from concurrent requests. Codex h
 - System prompt rules still aren't guaranteed. A true infrastructure-level routing hook would be stronger.
 
 **For sub-agent model selection:**
-- Never share an API provider between orchestrator and sub-agent. Concurrent requests on shared OAuth tokens cause 500 errors.
+- Never share an API provider between orchestrator and sub-agent. Concurrent requests on a shared API credential cause 500 errors.
 - Local models save $0 if they can't follow instructions. Bad output costs more in wasted orchestrator turns than API fees.
 - Auto-announce bypasses the orchestrator. Sub-agent models must produce user-facing quality output independently.
 - Test exit code handling explicitly. `grep` returning 1 (no matches) is the litmus test for whether a model understands Unix conventions.

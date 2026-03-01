@@ -23,7 +23,7 @@ The letters got long. Important details got buried under noise. I was spending r
 
 ## Three Attempts That Didn't Work
 
-**Attempt 1: OpenAI Embeddings.** Default config pointed at OpenAI's API. I was on the $20/mo Plus plan (OAuth only, no per-token billing). Every search attempt returned a 429 rate limit error. Dead on arrival.
+**Attempt 1: OpenAI Embeddings.** Default config pointed at OpenAI's API. I was on the $20/mo Plus plan (no per-token billing). Every search attempt returned a 429 rate limit error. Dead on arrival.
 
 **Attempt 2: QMD (Quantized Model Daemon).** OpenClaw ships with local embedding support via QMD. I got it running, downloaded the models. The problem: QMD loads a 2.2GB model into memory for every single subprocess call. Each query spawned a fresh process, loaded the model, ran one embedding, then exited. Timed out consistently.
 
