@@ -7,9 +7,11 @@ tags: ["proxmox", "hyper-v", "migration", "infrastructure", "active-directory", 
 
 ## Why We Left Hyper-V
 
-This wasn't ideological. Broadcom acquired VMware and started charging $350/core/year for VCF licensing. Our institution ran vSphere for years, then Broadcom killed the VMware IT Academy program entirely. The writing was on the wall for commercial hypervisors in education.
+Broadcom acquired VMware and started charging $350/core/year for VCF licensing. They killed the VMware IT Academy program entirely. The institution moved from vSphere to Hyper-V as a cost-saving measure, but I'd already done a VMware to Proxmox migration on my own infrastructure at that point. That migration opened my eyes to how good Proxmox actually is.
 
-Hyper-V was our interim solution, but it came with its own problems: limited Linux VM support, clunky management (RDP into the host just to manage VMs), and tight coupling to Windows Server licensing. When I started evaluating Proxmox VE, the math was simple. Enterprise-grade KVM/QEMU virtualization, web-based management, clustering support, and the price tag was zero.
+It's more lightweight. The web UI gives you more granular control than Hyper-V Manager ever did. Snapshots, live migration, ZFS, LXC containers, and full KVM virtualization all in one platform. Completely free. No per-socket licensing, no Windows Server dependency, no CALs. One less thing Microsoft gets to hold over your budget.
+
+Hyper-V felt heavy by comparison. Limited Linux VM support, clunky management (RDP into the host just to touch anything), and tight coupling to Windows Server licensing. Once I'd seen what Proxmox could do, going back to Hyper-V felt like a downgrade.
 
 The question was never "should we migrate?" It was "how do we migrate production Active Directory, network monitoring, file servers, and imaging infrastructure without breaking anything?"
 
@@ -111,8 +113,6 @@ Each classroom has different hardware, so I maintain separate images per room. E
 The FOG agent runs on every workstation with a dedicated `fog-service` Active Directory service account. DHCP points PXE boot to the FOG server using `snponly.efi` for UEFI network boot. A machine needing reimaging just needs to PXE boot and everything happens automatically.
 
 ## What I'd Do Differently
-
-**Start with the DCs.** I left them for later because they felt risky. In hindsight, the leapfrog method is so reliable that I should have done it first. Having DCs on Proxmox early would have simplified everything else.
 
 **Document interface names before migration.** Every Linux VM had a different post-migration network issue because the interface name changed. A quick `ip link show` before the migration would have saved debugging time.
 
