@@ -42,7 +42,7 @@ Coder subagent model evolution in OpenClaw:
 Qwen → Haiku → Codex.
 
 Qwen failed grep semantics.
-Haiku worked but collided with Opus on shared Anthropic OAuth under concurrency (500s).
+Haiku worked but collided with Opus on a shared Anthropic API credential under concurrency (500s).
 Codex fixed it by provider separation.
 
 Subagent model choice is an architecture decision, not just a pricing one.
@@ -70,7 +70,7 @@ If orchestrator + coder run in parallel, provider isolation matters.
 OpenClaw coder model migration notes:
 Qwen 14B → Haiku 4.5 → GPT 5.3 Codex.
 
-The key reliability breakpoint was shared-provider concurrency. When orchestrator and coder both hit Anthropic on one OAuth credential, we saw repeated 500s and failed continuation flows.
+The key reliability breakpoint was shared-provider concurrency. When orchestrator and coder both hit Anthropic on the same API credential, we saw repeated 500s and failed continuation flows.
 
 Moving coder to Codex separated provider traffic and stabilized the system.
 

@@ -11,7 +11,7 @@ The fix: an OpenClaw lifecycle hook that injects enforcement rules into every ag
 Then came the coder sub-agent problem. I went through three models:
 
 1. Qwen 14B (local, free): couldn't interpret grep exit code 1 as "no matches." Reported errors that weren't errors.
-2. Haiku 4.5 (Anthropic, cheap): competent, but shared the same OAuth token as Opus. Concurrent API calls caused 500 errors that OpenClaw's retry logic couldn't catch.
+2. Haiku 4.5 (Anthropic, cheap): competent, but shared the same API credential as Opus. Concurrent API calls caused 500 errors that OpenClaw's retry logic couldn't catch.
 3. GPT 5.3 Codex (OpenAI): different provider, no token conflicts, no concurrent request issues. Problem solved.
 
 The lesson that keeps repeating: "free" and "cheap" aren't free when the model produces bad output. The cost of confusion and wasted orchestrator turns exceeds any API savings.
@@ -30,7 +30,7 @@ We built a system prompt injection hook for OpenClaw that enforces local-first b
 
 The most useful finding from iterating on the rules: concrete instructions ("curl this endpoint before any codebase question") work on the first attempt. Delegation rules ("use the cheaper model for file operations") require keyword blocklists, pre-empted rationalizations, and cost framing tied to the user before the model complies.
 
-We also documented the full coder sub-agent model selection process. Key takeaway: never share an API provider between your orchestrator and sub-agent. Concurrent requests on the same OAuth token cause 500 errors that retry logic may not catch. Use a different provider for each agent tier.
+We also documented the full coder sub-agent model selection process. Key takeaway: never share an API provider between your orchestrator and sub-agent. Concurrent requests on the same API credential cause 500 errors that retry logic may not catch. Use a different provider for each agent tier.
 
 Details: https://solomonneas.dev/blog/openclaw-local-first-enforcement
 
@@ -44,7 +44,7 @@ Built an OpenClaw hook that forces my AI agent to check local APIs before burnin
 
 5 enforcement rules, injected at session bootstrap. Concrete rules worked immediately. Judgment calls needed keyword blocklists + pre-empted excuses.
 
-Also: never share an OAuth token between orchestrator and sub-agent. Concurrent requests = 500 errors.
+Also: never share an API credential between orchestrator and sub-agent. Concurrent requests = 500 errors.
 
 solomonneas.dev/blog/openclaw-local-first-enforcement
 
@@ -68,7 +68,7 @@ Built a local-first enforcement hook for my personal AI agent (OpenClaw). Forces
 
 Five rules, four iterations. Concrete rules land on first try. Delegation rules need keyword blocklists and pre-empted excuses.
 
-Coder sub-agent went through three models: Qwen 14B (couldn't parse grep exit codes), Haiku 4.5 (shared OAuth token caused concurrent 500 errors), GPT 5.3 Codex (different provider, no conflicts).
+Coder sub-agent went through three models: Qwen 14B (couldn't parse grep exit codes), Haiku 4.5 (shared API credential caused concurrent 500 errors), GPT 5.3 Codex (different provider, no conflicts).
 
 Never share an API provider between orchestrator and sub-agent.
 

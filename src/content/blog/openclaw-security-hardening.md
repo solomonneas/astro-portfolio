@@ -19,7 +19,7 @@ Before hardening anything, understand what you're defending against:
 
 1. **Prompt injection** - Someone sends your agent a crafted email or document designed to hijack its behavior. This is already happening. People are embedding injection payloads in their LinkedIn bios to catch any agent that scrapes their profile.
 
-2. **Credential exposure** - Your agent has API keys, OAuth tokens, and access credentials. If your machine is compromised, so is everything your agent can touch.
+2. **Credential exposure** - Your agent has API keys and access credentials. If your machine is compromised, so is everything your agent can touch.
 
 3. **Unauthorized access** - Someone on your network (or the internet) accessing your OpenClaw instance directly.
 

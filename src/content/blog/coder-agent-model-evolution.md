@@ -60,7 +60,7 @@ Haiku is inexpensive and materially better at shell semantics and structured rep
 
 ### What Went Wrong
 
-Both Opus and Haiku were hitting Anthropic via the same `anthropic:claude-cli` OAuth credential.
+Both Opus and Haiku were hitting Anthropic via the same API credential.
 
 Concurrent Opus + coder traffic correlated with repeated Anthropic 500 errors in-session.
 
@@ -97,7 +97,7 @@ Separately, coder auto-announce delivery does not itself trigger a fresh orchest
 
 ### Why This Works
 
-Different provider, different OAuth path.
+Different provider, different API path.
 
 Codex uses OpenAI credentials, so concurrent Opus (Anthropic) + coder (OpenAI) traffic does not contend on the same provider token.
 
