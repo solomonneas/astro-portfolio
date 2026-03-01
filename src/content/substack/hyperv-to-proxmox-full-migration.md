@@ -167,16 +167,28 @@ When a classroom needs reimaging, I select the group in FOG and schedule a deplo
 
 The FOG agent runs on every workstation in the background, communicating with the server through a dedicated `fog-service` Active Directory service account. This allows FOG to inventory hardware, push tasks, and manage hosts without requiring manual interaction.
 
-## Results
+## The SOC Stack
 
-Every production workload is now running on Proxmox VE. Two domain controllers, three network monitoring tools, a Samba AD file server, FOG imaging, and a UniFi controller. All on open-source infrastructure.
+The security operations stack also came over: Wazuh for endpoint detection and SIEM, Grafana for dashboards, TheHive for case management, and MISP for threat intelligence sharing. Same V2V process as the other Linux VMs. Disk conversion, interface rename, guest agent install, verify services. People forget about their security tooling when planning hypervisor migrations. Don't be that person.
+
+## The Final Tally
+
+When everything was done:
+
+- **4 standalone Proxmox servers** running production workloads: domain controllers, network monitoring (LibreNMS, Netdisco, Switchmap), Samba AD file server, FOG imaging, UniFi controller, and the full SOC stack
+- **6-node Proxmox cluster** for the NetLab environment (student lab exercises)
+- **10 total Proxmox hosts**
 
 | Metric | Before | After |
 |--------|--------|-------|
 | Hypervisor licensing | Per-socket | $0 |
+| Total Proxmox hosts | 0 | 10 (4 standalone + 6-node cluster) |
 | Imaging platform | SCCM (licensed) | FOG Project (free) |
 | WiFi management | Nested RDP | Direct SSH/web |
 | File sharing | DFS namespace | GPO drive maps |
-| DC management | Single Hyper-V host | Proxmox cluster |
+| Security stack | Hyper-V VMs | Proxmox VMs |
+| DC management | Single Hyper-V host | Standalone Proxmox servers |
 
 The migration required careful planning, especially for the domain controllers. But none of it was technically beyond what a competent sysadmin can handle. The hardest part is trusting that AD replication works. It does.
+
+Full project breakdown with architecture and status: [solomonneas.dev/projects/hyperv-to-proxmox-migration](https://solomonneas.dev/projects/hyperv-to-proxmox-migration)

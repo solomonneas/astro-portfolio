@@ -4,7 +4,9 @@
 
 I migrated an entire college network from Microsoft Hyper-V to Proxmox VE.
 
-Active Directory domain controllers. Network monitoring. File servers. WiFi controllers. Workstation imaging.
+Domain controllers. Network monitoring. File servers. WiFi controllers. Workstation imaging. Full SOC stack.
+
+4 standalone servers + a 6-node cluster. 10 Proxmox hosts total.
 
 Zero downtime. Zero data loss. $0 in licensing.
 
@@ -18,7 +20,9 @@ Here's what I learned:
 
 4. The UniFi controller was trapped in a Windows 11 VM that required two layers of RDP to reach. Now it runs in an LXC container I can SSH into directly.
 
-5. Always snapshot before Sysprep. If it fails (it will, at least once), you cannot simply run it again.
+5. Don't forget your security stack. Wazuh, Grafana, TheHive, MISP all came over too.
+
+Final tally: 4 standalone Proxmox servers + a 6-node Proxmox cluster for NetLab. 10 hosts total. $0 in hypervisor licensing.
 
 The hardest part wasn't the technology. It was trusting that AD replication would actually work as advertised.
 
@@ -97,11 +101,13 @@ AD replication has been rock-solid since Windows Server 2003. Trust it.
 **Tweet 1:**
 Migrated an entire college network from Hyper-V to Proxmox.
 
-Domain controllers, file servers, monitoring, imaging, WiFi.
+DCs, file servers, monitoring, imaging, WiFi, full SOC stack.
+
+4 standalone servers + 6-node cluster. 10 Proxmox hosts.
 
 Zero downtime. $0 licensing.
 
-Here's the thread 🧵
+Thread 🧵
 
 **Tweet 2:**
 Domain Controllers: the "leapfrog" method.
@@ -134,6 +140,11 @@ To manage WiFi: RDP → Hyper-V host → open VM console → open browser → Un
 Now: LXC container. SSH directly. Backup/restore took 10 minutes.
 
 **Tweet 6:**
+SOC stack came over too: Wazuh, Grafana, TheHive, MISP.
+
+Same V2V process as the other Linux VMs. Don't forget your security tooling when planning a hypervisor migration.
+
+**Tweet 7:**
 Replaced SCCM with FOG Project for workstation imaging.
 
 Chris Titus debloat → Sysprep → FOG capture → deploy.
@@ -142,7 +153,7 @@ Per-classroom images, CSV-imported hosts, PXE boot via snponly.efi, Partclone fo
 
 $0.
 
-**Tweet 7:**
+**Tweet 8:**
 Sysprep tip: if it fails, you cannot run it again on the same install.
 
 Failure is almost always leftover staged Appx packages (Candy Crush, Spotify, Xbox).
@@ -151,7 +162,7 @@ Use Chris Titus Tech's debloat tool BEFORE running Sysprep.
 
 github.com/ChrisTitusTech/winutil
 
-**Tweet 8:**
+**Tweet 9:**
 Full writeup with commands, configs, and troubleshooting on my blog:
 
 solomonneas.dev/blog/hyperv-to-proxmox-migration-guide
