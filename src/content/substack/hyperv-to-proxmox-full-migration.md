@@ -143,37 +143,21 @@ SCCM (System Center Configuration Manager) is Microsoft's enterprise deployment 
 
 ### Building the Golden Image
 
-I build all golden images as Proxmox VMs, not on physical hardware. The reason is Sysprep. Microsoft's system preparation tool generalizes a Windows installation so it can be deployed to different hardware. If it fails (and it will, at least once), you cannot run it again on the same installation. Your only option is reverting to a snapshot. Building in a VM gives you that safety net.
+The golden image process is straightforward: prep a reference machine, Sysprep it, capture with FOG.
 
-**Audit Mode.** Install Windows 11 normally. At the OOBE screen where it asks for your region, press `Ctrl+Shift+F3`. This reboots into the built-in Administrator account, skipping all the "sign in with Microsoft" nonsense. From here, strip all the preinstalled bloatware:
+**Debloat.** Install Windows 11 on a reference machine, then run [Chris Titus Tech's Windows Utility](https://github.com/ChrisTitusTech/winutil) to strip all the preinstalled garbage. Candy Crush, Spotify, Xbox, telemetry services. The tool handles both installed and provisioned Appx packages, which matters because leftover staged provisioned packages are the number one cause of silent Sysprep failures. If Sysprep gives you a cryptic error, check for leftover Appx packages first.
 
-```powershell
-$Bloatware = @(
-    "Microsoft.BingNews", "Microsoft.GetHelp",
-    "Microsoft.MicrosoftSolitaireCollection",
-    "Microsoft.Spotify", "Microsoft.XboxApp",
-    "Microsoft.ZuneMusic", "Microsoft.ZuneVideo"
-)
-foreach ($App in $Bloatware) {
-    Get-AppxPackage -Name $App -AllUsers | Remove-AppxPackage -AllUsers
-    Get-AppxProvisionedPackage -Online |
-        Where-Object DisplayName -eq $App |
-        Remove-AppxProvisionedPackage -Online
-}
-powercfg.exe /h off  # Disable hibernation, saves image size
-```
+**Unattend.xml.** Windows 11 forces you to connect to the internet during OOBE. The `BypassNRO` registry key skips this requirement. I drop an answer file at `C:\Windows\Panther\unattend.xml` that handles the bypass and automates OOBE setup after the image gets deployed to a workstation.
 
-The `Remove-AppxProvisionedPackage` line is the important one. Without it, the apps reinstall for new users. Staged provisioned packages are also the number one cause of Sysprep failures. If Sysprep gives you a cryptic error, check for leftover Appx packages first.
-
-**Unattend.xml.** Windows 11 forces you to connect to the internet during OOBE. The `BypassNRO` registry key skips this requirement. I use an answer file at `C:\Windows\Panther\unattend.xml` that handles the bypass, skips all privacy questions, and creates a local admin account. A post-deployment script deletes the file so the plaintext credentials don't persist.
-
-**Sysprep and Capture.** Snapshot the VM ("Pre-Sysprep"), then:
+**Sysprep and Capture.** Once the machine is configured:
 
 ```
 C:\Windows\System32\Sysprep\sysprep.exe /generalize /oobe /shutdown /unattend:C:\Windows\Panther\unattend.xml
 ```
 
-After shutdown, do NOT power the VM back on. Go to the FOG web GUI, create a Capture task for this host, then boot the VM. FOG pulls the image to the server.
+The machine shuts down. Do NOT power it back on. Go to the FOG web GUI, schedule a Capture task for this host, then PXE boot the machine. FOG captures the sysprepped image as-is, frozen at OOBE.
+
+When the image deploys to a workstation later, the unattend.xml automates OOBE setup, the FOG service agent kicks in for background management, and AD auto-join handles domain membership. No manual touch required at the workstation.
 
 ### Per-Classroom Deployment
 

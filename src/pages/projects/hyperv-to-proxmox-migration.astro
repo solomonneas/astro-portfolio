@@ -474,37 +474,36 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
 
     <h3>Golden Image Pipeline</h3>
     <p>
-      Each classroom has different hardware, so I maintain separate images per room. The golden image 
-      is built as a <strong>Proxmox VM</strong> (not on physical hardware) so I can snapshot before 
-      Sysprep and roll back if anything breaks. The process has three phases:
+      Each classroom has different hardware, so I maintain separate images per room. Prep a reference 
+      machine, Sysprep it, capture with FOG.
     </p>
 
     <div class="fog-workflow">
       <div class="fog-step">
-        <span class="fog-label">Phase 1: Audit Mode Prep</span>
+        <span class="fog-label">Step 1: Install + Debloat</span>
         <span class="fog-desc">
-          Install Windows 11, hit <code>Ctrl+Shift+F3</code> at the OOBE region screen to enter Audit Mode. 
-          Strip all bloatware (Candy Crush, Spotify, etc.) with PowerShell before Sysprep even touches the image. 
-          Staged Appx packages will cause Sysprep to fail silently if left behind.
+          Clean Windows 11 install, then run 
+          <a href="https://github.com/ChrisTitusTech/winutil" target="_blank">Chris Titus Tech's Windows Utility</a> 
+          to strip bloatware (Candy Crush, Spotify, Xbox, telemetry). Handles both installed and staged 
+          provisioned Appx packages, which is critical because leftover staged packages cause silent Sysprep failures.
         </span>
       </div>
       <div class="fog-connector">↓</div>
       <div class="fog-step">
-        <span class="fog-label">Phase 2: Unattend.xml</span>
+        <span class="fog-label">Step 2: Sysprep + Shutdown</span>
         <span class="fog-desc">
-          Drop an answer file at <code>C:\Windows\Panther\unattend.xml</code> that handles BypassNRO 
-          (skips the "Connect to Internet" requirement), auto-accepts privacy screens, and creates a 
-          local admin account. Post-setup script deletes the file to avoid leaving credentials on disk.
+          Run <code>sysprep.exe /generalize /oobe /shutdown /unattend:C:\Windows\Panther\unattend.xml</code>. 
+          The unattend handles BypassNRO (Windows 11's forced internet requirement) and automates OOBE after 
+          deployment. Machine shuts down. Do not power it back on.
         </span>
       </div>
       <div class="fog-connector">↓</div>
       <div class="fog-step">
-        <span class="fog-label">Phase 3: Sysprep + Capture</span>
+        <span class="fog-label">Step 3: FOG Capture</span>
         <span class="fog-desc">
-          Snapshot the VM ("Pre-Sysprep"), then run 
-          <code>sysprep.exe /generalize /oobe /shutdown /unattend:C:\Windows\Panther\unattend.xml</code>. 
-          Once the VM shuts down, create a FOG Capture Task, boot the VM, and FOG pulls the image to the server. 
-          Never power the VM on between Sysprep and capture.
+          Schedule a capture task in FOG, PXE boot the machine. FOG captures the sysprepped image frozen at OOBE. 
+          On deployment, unattend.xml automates setup, FOG service agent kicks in, and AD auto-join handles domain 
+          membership. No manual touch at the workstation.
         </span>
       </div>
     </div>
@@ -568,9 +567,9 @@ qm importdisk 102 /var/lib/vz/dump/Netdisco.vhdx local-lvm</code></pre>
     <div class="highlight-box">
       <span class="highlight-icon">⚠️</span>
       <span class="highlight-text">
-        Always snapshot before Sysprep. If the command fails (and it will, usually because of leftover 
-        staged Appx packages), you cannot simply run it again. The only recovery path is reverting to 
-        your pre-Sysprep snapshot.
+        If Sysprep fails (usually leftover staged Appx packages), you cannot simply run it again on the 
+        same installation. Always debloat thoroughly before running Sysprep, or you'll be rebuilding the 
+        reference machine from scratch.
       </span>
     </div>
   </div>

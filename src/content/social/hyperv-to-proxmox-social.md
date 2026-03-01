@@ -38,7 +38,7 @@ Same result. Zero licensing cost.
 
 Here's the setup for a college with multiple classrooms, each with different hardware:
 
-Golden images built as Proxmox VMs (snapshots before Sysprep = safety net)
+Chris Titus debloat tool to strip Windows before Sysprep
 
 Per-classroom images because each room has different Dell models
 
@@ -52,10 +52,11 @@ FOG agent on every machine talks to a dedicated fog-service AD account
 
 Reimaging a classroom: select the group, schedule the task, walk away.
 
-The Sysprep pipeline has three phases:
-1. Audit Mode (Ctrl+Shift+F3) to strip bloatware before imaging
-2. Unattend.xml with BypassNRO for Windows 11's forced internet requirement  
-3. Capture to FOG, never power on between Sysprep and capture
+The pipeline:
+1. Chris Titus debloat tool to strip bloatware before Sysprep
+2. Sysprep with unattend.xml (BypassNRO for Win11's forced internet requirement)
+3. PXE boot, FOG captures the image frozen at OOBE
+4. Deploy: unattend automates setup, FOG agent + AD auto-join do the rest
 
 SCCM needs Windows Server + SQL Server + licensing + infrastructure complexity.
 
@@ -135,20 +136,20 @@ Now: LXC container. SSH directly. Backup/restore took 10 minutes.
 **Tweet 6:**
 Replaced SCCM with FOG Project for workstation imaging.
 
-Golden images built as Proxmox VMs (snapshots before Sysprep).
+Chris Titus debloat → Sysprep → FOG capture → deploy.
 
 Per-classroom images, CSV-imported hosts, PXE boot via snponly.efi, Partclone for block-level imaging.
 
 $0.
 
 **Tweet 7:**
-Sysprep tip: always snapshot before running it.
+Sysprep tip: if it fails, you cannot run it again on the same install.
 
-If it fails (usually because of leftover Appx packages like Candy Crush or Spotify), you cannot run it again.
+Failure is almost always leftover staged Appx packages (Candy Crush, Spotify, Xbox).
 
-Only recovery: revert to snapshot.
+Use Chris Titus Tech's debloat tool BEFORE running Sysprep.
 
-Strip all staged provisioned packages FIRST.
+github.com/ChrisTitusTech/winutil
 
 **Tweet 8:**
 Full writeup with commands, configs, and troubleshooting on my blog:
@@ -173,9 +174,9 @@ Sysprep fails silently if staged Appx packages are present.
 
 Candy Crush. Spotify. Xbox.
 
-Remove them in Audit Mode BEFORE running Sysprep.
+Run Chris Titus Tech's debloat tool BEFORE Sysprep. It handles both installed and provisioned packages.
 
-Remove-AppxProvisionedPackage is the one that matters, not just Remove-AppxPackage.
+github.com/ChrisTitusTech/winutil
 
 **Post C:**
 FOG Project + Partclone is underrated.
