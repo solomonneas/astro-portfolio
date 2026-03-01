@@ -20,7 +20,7 @@ Here's what I learned:
 
 4. The UniFi controller was trapped in a Windows 11 VM that required two layers of RDP to reach. Now it runs in an LXC container I can SSH into directly.
 
-5. Don't forget your security stack. Wazuh, Grafana, TheHive, MISP all came over too.
+5. Don't forget your security stack. Wazuh, Cortex, TheHive, MISP all came over too.
 
 Final tally: 4 standalone Proxmox servers + a 6-node Proxmox cluster for NetLab. 10 hosts total. $0 in hypervisor licensing.
 
@@ -140,7 +140,7 @@ To manage WiFi: RDP → Hyper-V host → open VM console → open browser → Un
 Now: LXC container. SSH directly. Backup/restore took 10 minutes.
 
 **Tweet 6:**
-SOC stack came over too: Wazuh, Grafana, TheHive, MISP.
+SOC stack came over too: Wazuh, Cortex, TheHive, MISP.
 
 Same V2V process as the other Linux VMs. Don't forget your security tooling when planning a hypervisor migration.
 

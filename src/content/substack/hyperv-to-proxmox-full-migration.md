@@ -169,7 +169,7 @@ The FOG agent runs on every workstation in the background, communicating with th
 
 ## The SOC Stack
 
-The security operations stack also came over: Wazuh for endpoint detection and SIEM, Grafana for dashboards, TheHive for case management, and MISP for threat intelligence sharing. Same V2V process as the other Linux VMs. Disk conversion, interface rename, guest agent install, verify services. People forget about their security tooling when planning hypervisor migrations. Don't be that person.
+The security operations stack also came over: Wazuh for endpoint detection and SIEM, Cortex for automated analysis, TheHive for case management, and MISP for threat intelligence sharing. Same V2V process as the other Linux VMs. Disk conversion, interface rename, guest agent install, verify services. People forget about their security tooling when planning hypervisor migrations. Don't be that person.
 
 ## The Final Tally
 
